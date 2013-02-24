@@ -1,7 +1,6 @@
 #!/usr/bin/env python 
-import pdb
 import os, sys, shlex
-from time import sleep
+import time
 import subprocess
 from threading  import Thread
 try:
@@ -11,24 +10,15 @@ except ImportError:
 from xml.dom import pulldom
 
 class NmapProcess:
-    class ProcessState: 
-       READY=1 
-       RUNNING=2
-       CANCELLED=3
-       FAILED=4
-       DONE=5
-
     def __init__(self, targets="127.0.0.1", options= "-sT", event_callback=None):
         self._nmap_proc = None
         self._nmap_rc = 0
-        self._nmap_results = {}
+        self._nmap_results = ''
  
         self._nmap_binary_name = "nmap"
-        self._nmap_fixed_options = "-oX - -v --stats-every 5s"
+        self._nmap_fixed_options = "-oX - -vvv --stats-every 2s"
         self._nmap_binary = self._whereis(self._nmap_binary_name)
         self._sudo_run = ""
-        self.__process = self.ProcessState()
-
         self._nmap_targets = targets.split() if isinstance(targets, str) else targets
         self._nmap_dynamic_options = options
 
@@ -36,20 +26,29 @@ class NmapProcess:
         self._nmap_event_callback = event_callback if event_callback and callable(event_callback) else None
         self.__io_queue = Queue()
         (self._stdin, self._stdout, self._stderr) = (None, None, None)
-        self.state = self.__process.READY
+        (self.DONE, self.READY, self.RUNNING, self.CANCELLED, self.FAILED) = range(5)
+
+        # API usable in callback function
+        self.state = self.READY
+        self.starttime = 0
+        self.endtime = 0 
         self.progress = 0
         self.etc = 0
-        self.__blocking = True
+        self.elapsed = ''
+        self.summary = ''
 
     def _run_init(self):
         self._nmap_proc = None
-        self._nmap_rc = 0
-        self._nmap_results = {}
+        self._nmap_rc = -1
+        self._nmap_results = ''
         self._nmap_command_line = self.get_command_line()
-        self.state = self.__process.READY
+        self.state = self.READY
         self.progress = 0
         self.etc = 0
-        self.__blocking = True
+        self.starttime = 0
+        self.endtime = 0
+        self.elapsed = ''
+        self.summary = ''
 
     def _whereis(self, program):
         for path in os.environ.get('PATH', '').split(':'):
@@ -72,79 +71,61 @@ class NmapProcess:
 
         return rc
 
-    def start(self, blocking=True):
+    def run(self):
         def stdout_reader(thread_stdout, io_queue):
             for streamline in iter(thread_stdout.readline, b''):
-                if streamline is not None: io_queue.put(streamline)
+                try:
+                    if streamline is not None: io_queue.put(streamline)
+                except Full: 
+                    raise Exception("Queue ran out of buffer: increase q.get(timeout) value")
 
-        rc = 0
         self._run_init()
-        self._nmap_proc = subprocess.Popen(args=shlex.split(self._nmap_command_line), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        t = Thread(target=stdout_reader, args=(self._nmap_proc.stdout, self.__io_queue))
-        t.daemon = True
-        t.start()
+        try:
+            self._nmap_proc = subprocess.Popen(args=shlex.split(self._nmap_command_line), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            t = Thread(target=stdout_reader, args=(self._nmap_proc.stdout, self.__io_queue))
+            t.daemon = True
+            t.start()
 
-        self.state = self.__process.RUNNING
-        self.__wait = blocking
+            self.state = self.RUNNING
+        except OSError as e: # nmap not found
+            self.state = self.FAILED
+            raise
 
-        return rc
+        return self.get()
 
-    def wait(self):
-        thread_output = ""
+    def get(self):
+        thread_stream = ''
         while self._nmap_proc.poll() is None or not self.__io_queue.empty():
-            try: thread_stream = self.__io_queue.get_nowait()
+            try: thread_stream = self.__io_queue.get(timeout=1)
             except Empty: pass
+            except KeyboardInterrupt: break
             else:
-                if self._nmap_event_callback: self._nmap_event_callback(thread_stream)
+                if self._nmap_event_callback: self._nmap_event_callback(self, thread_stream)
                 self.process_event(thread_stream)
-                thread_output += thread_stream
-            sleep(500/1000000.0)
+                self._nmap_results += thread_stream
 
         self._nmap_rc = self._nmap_proc.poll()
-        self._nmap_results = thread_output
-        
-        self.state = self.__process.DONE
+        if not self._nmap_rc:
+            rc = self.state = self.CANCELLED
+        elif self._nmap_rc == 0:
+            rc = self.state = self.DONE
+            self.progress = 100
+        else:
+            rc = self.state = self.FAILED
 
         return self._nmap_rc
 
-    def get_nowait(self):
-        streamdata = ''
-        if not self.__io_queue.empty():
-           try:
-               streamdata = self.__io_queue.get_nowait()
-           except Empty: pass
-
-        if self._nmap_proc.poll() is not None:
-            self._nmap_rc = self._nmap_proc.poll()
-            if self._nmap_rc == 0:
-                rc = self.state == self.__process.DONE
-            else:
-                rc = self.state == self.__process.FAILED
-
-        self.process_event(streamdata)
-
-        return streamdata
-
     def is_running(self):
-        rc = False
-        if self.__wait:
-            rc = self.state == self.__process.RUNNING
-        elif self._nmap_proc.poll() is None and self.state == self.__process.RUNNING:
-            rc = True
-        return rc
+        return self.state == self.RUNNING
 
-    def is_done(self):
-        rc = False
-        if self.__wait:
-            rc = self.state == self.__process.DONE
-        elif self._nmap_proc.poll() is not None:
-            if self.state == self.__process.RUNNING: 
-                self.state == self.__process.DONE
-            rc = True
-        return rc
+    def has_terminated(self):
+        return self.state == self.DONE or self.state == self.FAILED or self.state == self.CANCELLED
 
-    def is_failed(self):
-        return self.state == self.__process.FAILED
+    def has_failed(self):
+        return self.state == self.FAILED
+
+    def is_successful(self):
+        return self.state == self.DONE
 
     def update_progress(self, percent_done, etc):
         self.progress = percent_done
@@ -154,31 +135,30 @@ class NmapProcess:
         try:
            edomdoc = pulldom.parseString(eventdata)
            for e, xmlnode in edomdoc:
-               if e is not None and e == pulldom.START_ELEMENT and xmlnode.nodeName == 'taskprogress' and xmlnode.attributes.keys():
-                   self.update_progress(xmlnode.attributes['percent'].value, xmlnode.attributes['etc'].value)
+               if e is not None and e == pulldom.START_ELEMENT:
+                   if xmlnode.nodeName == 'taskprogress' and xmlnode.attributes.keys():
+                       self.update_progress(xmlnode.attributes['percent'].value, xmlnode.attributes['etc'].value)
+                   elif xmlnode.nodeName == 'nmaprun' and xmlnode.attributes.keys():
+                       self.starttime = xmlnode.attributes['start'].value
+                       self.nmap_version = xmlnode.attributes['version'].value
+                   elif xmlnode.nodeName == 'finished' and xmlnode.attributes.keys():
+                       self.endtime = xmlnode.attributes['time'].value
+                       self.elapsed = xmlnode.attributes['elapsed'].value
+                       self.summary = xmlnode.attributes['summary'].value
         except: pass
 
 def main(argv):
-    def mycallback(data): pass
-        #print "XML SIZE: [%d]" % (len(data))
+    def mycallback(nmapscan=None, data=""):
+        if nmapscan.is_running():
+            print "Progress: %s %% - ETC: %s" % (nmapscan.progress, nmapscan.etc)
 
-    nm = NmapProcess("scanme.nmap.org", event_callback=mycallback)
-    #print nm.get_command_line()
-    nm.start()
-    rc = nm.wait()
+    nm = NmapProcess("scanme.nmap.org localhost", event_callback=mycallback)
+    rc = nm.run()
 
-    if rc == 0:
-         print "results: %d" % len(nm._nmap_results)
-    else:
-         print "rc: %d" % rc
-#
-#    print "-----------------"
-#    t = nm.start(blocking=False)
-#    while nm.is_running():
-#        s = nm.get_nowait()
-#        if len(s):
-#            print "%s%% %s" % (nm.progress, nm.etc)
-#        sleep(2)
-#
+    print "Scan started {0} {1}".format(nm.starttime, nm.nmap_version)
+    print "results: %d" % len(nm._nmap_results)
+    print "Scand ended {0}: {1}".format(nm.endtime, nm.summary)
+    print "state: %s" % nm.state
+
 if __name__ == '__main__':
     main(sys.argv[1:])
