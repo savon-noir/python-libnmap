@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="file:///usr/share/nmap/nmap.xsl" type="text/xsl"?>
+<!-- Nmap 5.51 scan initiated Sun Feb 24 21:42:02 2013 as: nmap -sV -vv -p 22,25,80,443 -oX 1_hosts_banner_ports_notsyn.xml localhost -->
+<nmaprun scanner="nmap" args="nmap -sV -vv -p 22,25,80,443 -oX 1_hosts_banner_ports_notsyn.xml localhost" start="1361738522" startstr="Sun Feb 24 21:42:02 2013" version="5.51" xmloutputversion="1.03">
+<scaninfo type="connect" protocol="tcp" numservices="4" services="22,25,80,443"/>
+<verbose level="2"/>
+<debugging level="0"/>
+<taskbegin task="Ping Scan" time="1361738522"/>
+<taskend task="Ping Scan" time="1361738522" extrainfo="1 total hosts"/>
+<taskbegin task="Connect Scan" time="1361738522"/>
+<taskend task="Connect Scan" time="1361738522" extrainfo="4 total ports"/>
+<taskbegin task="Service scan" time="1361738522"/>
+<taskend task="Service scan" time="1361738522" extrainfo="2 services on 1 host"/>
+<host starttime="1361738522" endtime="1361738522"><status state="up" reason="conn-refused"/>
+<address addr="127.0.0.1" addrtype="ipv4"/>
+<hostnames>
+<hostname name="localhost" type="user"/>
+<hostname name="localhost" type="PTR"/>
+</hostnames>
+<ports><port protocol="tcp" portid="22"><state state="open" reason="syn-ack" reason_ttl="0"/><service name="ssh" product="OpenSSH" version="5.3" extrainfo="protocol 2.0" method="probed" conf="10"/></port>
+<port protocol="tcp" portid="25"><state state="open" reason="syn-ack" reason_ttl="0"/><service name="smtp" product="Postfix smtpd" hostname=" jambon.localdomain" method="probed" conf="10"/></port>
+<port protocol="tcp" portid="80"><state state="closed" reason="conn-refused" reason_ttl="0"/><service name="http" method="table" conf="3"/></port>
+<port protocol="tcp" portid="443"><state state="closed" reason="conn-refused" reason_ttl="0"/><service name="https" method="table" conf="3"/></port>
+</ports>
+<times srtt="328" rttvar="1624" to="100000"/>
+</host>
+<runstats><finished time="1361738522" timestr="Sun Feb 24 21:42:02 2013" elapsed="0.13" summary="Nmap done at Sun Feb 24 21:42:02 2013; 1 IP address (1 host up) scanned in 0.13 seconds" exit="success"/><hosts up="1" down="0" total="1"/>
+</runstats>
+</nmaprun>

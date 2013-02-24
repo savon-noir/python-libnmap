@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="file:///usr/share/nmap/nmap.xsl" type="text/xsl"?>
+<!-- Nmap 5.51 scan initiated Sun Feb 24 21:42:25 2013 as: nmap -sX -vv -p 22,25,80,443 -oX 1_hosts_banner_ports_xmas.xml localhost -->
+<nmaprun scanner="nmap" args="nmap -sX -vv -p 22,25,80,443 -oX 1_hosts_banner_ports_xmas.xml localhost" start="1361738545" startstr="Sun Feb 24 21:42:25 2013" version="5.51" xmloutputversion="1.03">
+<scaninfo type="xmas" protocol="tcp" numservices="4" services="22,25,80,443"/>
+<verbose level="2"/>
+<debugging level="0"/>
+<taskbegin task="XMAS Scan" time="1361738545"/>
+<taskend task="XMAS Scan" time="1361738546" extrainfo="4 total ports"/>
+<host starttime="1361738545" endtime="1361738546"><status state="up" reason="localhost-response"/>
+<address addr="127.0.0.1" addrtype="ipv4"/>
+<hostnames>
+<hostname name="localhost" type="user"/>
+<hostname name="localhost" type="PTR"/>
+</hostnames>
+<ports><port protocol="tcp" portid="22"><state state="open|filtered" reason="no-response" reason_ttl="0"/><service name="ssh" method="table" conf="3"/></port>
+<port protocol="tcp" portid="25"><state state="open|filtered" reason="no-response" reason_ttl="0"/><service name="smtp" method="table" conf="3"/></port>
+<port protocol="tcp" portid="80"><state state="closed" reason="reset" reason_ttl="64"/><service name="http" method="table" conf="3"/></port>
+<port protocol="tcp" portid="443"><state state="closed" reason="reset" reason_ttl="64"/><service name="https" method="table" conf="3"/></port>
+</ports>
+<times srtt="14" rttvar="3752" to="100000"/>
+</host>
+<runstats><finished time="1361738546" timestr="Sun Feb 24 21:42:26 2013" elapsed="1.25" summary="Nmap done at Sun Feb 24 21:42:26 2013; 1 IP address (1 host up) scanned in 1.25 seconds" exit="success"/><hosts up="1" down="0" total="1"/>
+</runstats>
+</nmaprun>
