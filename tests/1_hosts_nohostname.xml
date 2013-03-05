@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="file:///usr/share/nmap/nmap.xsl" type="text/xsl"?>
+<!-- Nmap 5.51 scan initiated Tue Mar  5 05:50:45 2013 as: nmap -oX /tmp/a.xml -p 22,80 1.1.1.1 -->
+<nmaprun scanner="nmap" args="nmap -oX /tmp/a.xml -p 22,80 1.1.1.1" start="1362459045" startstr="Tue Mar  5 05:50:45 2013" version="5.51" xmloutputversion="1.03">
+<scaninfo type="syn" protocol="tcp" numservices="2" services="22,80"/>
+<verbose level="0"/>
+<debugging level="0"/>
+<host starttime="1362459045" endtime="1362459046"><status state="up" reason="reset"/>
+<address addr="1.1.1.1" addrtype="ipv4"/>
+<hostnames>
+</hostnames>
+<ports><port protocol="tcp" portid="22"><state state="filtered" reason="no-response" reason_ttl="0"/><service name="ssh" method="table" conf="3"/></port>
+<port protocol="tcp" portid="80"><state state="filtered" reason="no-response" reason_ttl="0"/><service name="http" method="table" conf="3"/></port>
+</ports>
+<times srtt="17848" rttvar="17848" to="100000"/>
+</host>
+<runstats><finished time="1362459046" timestr="Tue Mar  5 05:50:46 2013" elapsed="1.31" summary="Nmap done at Tue Mar  5 05:50:46 2013; 1 IP address (1 host up) scanned in 1.31 seconds" exit="success"/><hosts up="1" down="0" total="1"/>
+</runstats>
+</nmaprun>

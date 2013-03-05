@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <?xml-stylesheet href="file:///usr/share/nmap/nmap.xsl" type="text/xsl"?>
-<!-- Nmap 5.51 scan initiated Sun Feb 24 21:41:28 2013 as: nmap -sV -vv -p 22,25,80,443 -oX 1_hosts_banner_ports.xml localhost -->
-<nmaprun scanner="nmap" args="nmap -sV -vv -p 22,25,80,443 -oX 1_hosts_banner_ports.xml localhost" start="1361738488" startstr="Sun Feb 24 21:41:28 2013" version="5.51" xmloutputversion="1.03">
+<!-- Nmap 5.51 scan initiated Sun Feb 24 21:41:28 2013 as: nmap -sV -vv -p 22,25,80,443 -oX 1_hosts_banner_ports.xml localhost2 -->
+<nmaprun scanner="nmap" args="nmap -sV -vv -p 22,25,80,443 -oX 1_hosts_banner_ports.xml localhost2" start="1361738488" startstr="Sun Feb 24 21:41:28 2013" version="5.51" xmloutputversion="1.03">
 <scaninfo type="syn" protocol="tcp" numservices="4" services="22,25,80,443"/>
 <verbose level="2"/>
 <debugging level="0"/>
@@ -9,11 +9,11 @@
 <taskend task="SYN Stealth Scan" time="1361738488" extrainfo="4 total ports"/>
 <taskbegin task="Service scan" time="1361738488"/>
 <taskend task="Service scan" time="1361738488" extrainfo="2 services on 1 host"/>
-<host starttime="1361738488" endtime="1361738488"><status state="up" reason="localhost-response"/>
+<host starttime="1361738488" endtime="1361738488"><status state="up" reason="localhost2-response"/>
 <address addr="127.0.0.1" addrtype="ipv4"/>
 <hostnames>
-<hostname name="localhost" type="user"/>
-<hostname name="localhost" type="PTR"/>
+<hostname name="localhost2" type="user"/>
+<hostname name="localhost2" type="PTR"/>
 </hostnames>
 <ports><port protocol="tcp" portid="22"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="ssh" product="OpenSSH" version="5.3" extrainfo="protocol 2.0" method="probed" conf="10"/></port>
 <port protocol="tcp" portid="25"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="smtp" product="Postfix smtpd" hostname=" jambon.localdomain" method="probed" conf="10"/></port>

@@ -91,9 +91,9 @@ class NmapProcess:
             self.state = self.FAILED
             raise
 
-        return self.get()
+        return self.wait()
 
-    def get(self):
+    def wait(self):
         thread_stream = ''
         while self._nmap_proc.poll() is None or not self.__io_queue.empty():
             try: thread_stream = self.__io_queue.get(timeout=1)
@@ -152,12 +152,12 @@ def main(argv):
         if nmapscan.is_running():
             print "Progress: %s %% - ETC: %s" % (nmapscan.progress, nmapscan.etc)
 
-    nm = NmapProcess("scanme.nmap.org localhost", event_callback=mycallback)
+    nm = NmapProcess("localhost", event_callback=mycallback)
     rc = nm.run()
 
     print "Scan started {0} {1}".format(nm.starttime, nm.nmap_version)
-    print "results: %d" % len(nm._nmap_results)
-    print "Scand ended {0}: {1}".format(nm.endtime, nm.summary)
+    print "results size: %d" % len(nm._nmap_results)
+    print "Scan ended {0}: {1}".format(nm.endtime, nm.summary)
     print "state: %s" % nm.state
 
 if __name__ == '__main__':
