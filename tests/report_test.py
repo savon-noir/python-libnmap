@@ -4,9 +4,9 @@ import unittest
 import os, sys
 
 sys.path.append("".join([os.path.dirname(__file__), "/../"]))
-from nmapreport import NmapReport
+from nmapparser import NmapParser
 
-class TestNmapReport(unittest.TestCase):
+class TestNmapParser(unittest.TestCase):
     def setUp(self):
         self.flist_full = [{'file': 'tests/2_hosts.xml', 'hosts': 2}, {'file': 'tests/1_hosts.xml', 'hosts': 1},
                    {'file': 'tests/1_hosts_banner_ports_notsyn.xml', 'hosts': 1},
@@ -18,8 +18,10 @@ class TestNmapReport(unittest.TestCase):
                    {'file': 'tests/2_tcp_hosts.xml', 'hosts': 2},
                    {'file': 'tests/1_hosts_nohostname.xml', 'hosts': 1},
         ]
-        self.flist_one = [{'file': 'tests/2_hosts.xml', 'hosts': 2}]
-        self.flist_two = [{'file': 'tests/1_hosts_nohostname.xml', 'hosts': 1}]
+        self.flist_one = [{'file': 'tests/1_hosts_nohostname.xml', 'hosts': 1}]
+        self.flist_two = [{'file': 'tests/2_hosts.xml', 'hosts': 2, 
+                           'elapsed': '134.36', 'endtime': "1361738040", 
+                           'summary': "Nmap done at Sun Feb 24 21:34:00 2013; 2 IP addresses (2 hosts up) scanned in 134.36 seconds"}]
 
         self.hlist = [ {'hostname': 'localhost', 'ports': 5, 'open': 5}, 
                           {'hostname': 'localhost2', 'ports': 4, 'open': 2},
@@ -32,7 +34,7 @@ class TestNmapReport(unittest.TestCase):
     def test_get_hosts(self):
         for testfile in self.flist:
             fd = open(testfile['file'], 'r')
-            nr = NmapReport(fd.read())
+            nr = NmapParser(fd.read())
             fd.close()
 
             nr.parse()
@@ -42,7 +44,7 @@ class TestNmapReport(unittest.TestCase):
     def test_get_ports(self):
         for testfile in self.flist:
             fd = open(testfile['file'], 'r')
-            nr = NmapReport(fd.read())
+            nr = NmapParser(fd.read())
             fd.close()
 
             nr.parse()
@@ -56,10 +58,20 @@ class TestNmapReport(unittest.TestCase):
                     sport = h.get_port(np)
                     self.assertEqual(sport['port'], np)
 
+    def test_runstats(self):
+        for testfile in self.flist_two:
+            fd = open(testfile['file'], 'r')
+            nr = NmapParser(fd.read())
+            fd.close()
+
+            nr.parse()
+            for attr in ('endtime', 'summary', 'elapsed'):
+                self.assertEqual(getattr(nr, attr), testfile[attr])
+
 if __name__ == '__main__':
-    test_suite = ['test_get_hosts' , 'test_get_ports']
+    test_suite = ['test_get_hosts' , 'test_get_ports', 'test_runstats']
 #    io_file = StringIO()
-    suite = unittest.TestSuite(map(TestNmapReport, test_suite))
+    suite = unittest.TestSuite(map(TestNmapParser, test_suite))
     test_result = unittest.TextTestRunner(verbosity=2).run(suite) ## for more verbosity uncomment this line and comment next line
 #    test_result = unittest.TextTestRunner(stream=io_file).run(suite)
 #    if len(test_result.failures) or len(test_result.errors):

@@ -24,8 +24,6 @@ class NmapProcess:
 
         self._nmap_command_line = self.get_command_line()
         self._nmap_event_callback = event_callback if event_callback and callable(event_callback) else None
-        self.__io_queue = Queue()
-        (self._stdin, self._stdout, self._stderr) = (None, None, None)
         (self.DONE, self.READY, self.RUNNING, self.CANCELLED, self.FAILED) = range(5)
 
         # API usable in callback function
@@ -36,6 +34,8 @@ class NmapProcess:
         self.etc = 0
         self.elapsed = ''
         self.summary = ''
+        self.stdout = ''
+        self.stderr = ''
 
     def _run_init(self):
         self._nmap_proc = None
@@ -49,6 +49,11 @@ class NmapProcess:
         self.endtime = 0
         self.elapsed = ''
         self.summary = ''
+        self.nmap_version = ''
+        self.__io_queue = Queue()
+        self.__ioerr_queue = Queue()
+        self.stdout = ''
+        self.stderr = ''
 
     def _whereis(self, program):
         for path in os.environ.get('PATH', '').split(':'):
@@ -72,7 +77,7 @@ class NmapProcess:
         return rc
 
     def run(self):
-        def stdout_reader(thread_stdout, io_queue):
+        def stream_reader(thread_stdout, io_queue):
             for streamline in iter(thread_stdout.readline, b''):
                 try:
                     if streamline is not None: io_queue.put(streamline)
@@ -82,9 +87,8 @@ class NmapProcess:
         self._run_init()
         try:
             self._nmap_proc = subprocess.Popen(args=shlex.split(self._nmap_command_line), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            t = Thread(target=stdout_reader, args=(self._nmap_proc.stdout, self.__io_queue))
-            t.daemon = True
-            t.start()
+            tout = Thread(target=stream_reader, name='stdout-reader', args=(self._nmap_proc.stdout, self.__io_queue)).start()
+            terr = Thread(target=stream_reader, name='stderr-reader', args=(self._nmap_proc.stderr, self.__ioerr_queue)).start()
 
             self.state = self.RUNNING
         except OSError as e: # nmap not found
@@ -100,18 +104,20 @@ class NmapProcess:
             except Empty: pass
             except KeyboardInterrupt: break
             else:
-                if self._nmap_event_callback: self._nmap_event_callback(self, thread_stream)
-                self.process_event(thread_stream)
+                e = self.process_event(thread_stream)
+                if self._nmap_event_callback and e: self._nmap_event_callback(self, thread_stream)
                 self._nmap_results += thread_stream
 
         self._nmap_rc = self._nmap_proc.poll()
-        if not self._nmap_rc:
+        if self._nmap_rc is None:
             rc = self.state = self.CANCELLED
         elif self._nmap_rc == 0:
             rc = self.state = self.DONE
             self.progress = 100
         else:
             rc = self.state = self.FAILED
+            self.stderr = self.__ioerr_queue.get(timeout=2) 
+        self.stdout = self._nmap_results
 
         return self._nmap_rc
 
@@ -132,33 +138,43 @@ class NmapProcess:
         self.etc = etc
 
     def process_event(self, eventdata):
+        rval = False
         try:
            edomdoc = pulldom.parseString(eventdata)
            for e, xmlnode in edomdoc:
                if e is not None and e == pulldom.START_ELEMENT:
                    if xmlnode.nodeName == 'taskprogress' and xmlnode.attributes.keys():
                        self.update_progress(xmlnode.attributes['percent'].value, xmlnode.attributes['etc'].value)
+                       rval = True
                    elif xmlnode.nodeName == 'nmaprun' and xmlnode.attributes.keys():
                        self.starttime = xmlnode.attributes['start'].value
                        self.nmap_version = xmlnode.attributes['version'].value
+                       rval = True
                    elif xmlnode.nodeName == 'finished' and xmlnode.attributes.keys():
                        self.endtime = xmlnode.attributes['time'].value
                        self.elapsed = xmlnode.attributes['elapsed'].value
                        self.summary = xmlnode.attributes['summary'].value
+                       rval = True
         except: pass
+        return rval
 
 def main(argv):
     def mycallback(nmapscan=None, data=""):
         if nmapscan.is_running():
             print "Progress: %s %% - ETC: %s" % (nmapscan.progress, nmapscan.etc)
 
-    nm = NmapProcess("localhost", event_callback=mycallback)
+    nm = NmapProcess("localhost", options="-sT", event_callback=mycallback)
+    print nm.get_command_line()
     rc = nm.run()
 
-    print "Scan started {0} {1}".format(nm.starttime, nm.nmap_version)
-    print "results size: %d" % len(nm._nmap_results)
-    print "Scan ended {0}: {1}".format(nm.endtime, nm.summary)
-    print "state: %s" % nm.state
+    if rc == 0:
+        print "Scan started {0} {1}".format(nm.starttime, nm.nmap_version)
+        print "results size: {0}".format(len(nm._nmap_results))
+        print "Scan ended {0}: {1}".format(nm.endtime, nm.summary)
+        print "state: %s" % nm.state
+    else:
+        print "Error: {stderr}".format(stderr=nm.stderr)
+        print "Result: {0}".format(nm.stdout)
 
 if __name__ == '__main__':
     main(sys.argv[1:])

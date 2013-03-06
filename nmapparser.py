@@ -2,46 +2,28 @@
 import xml.etree.ElementTree as ET
 from StringIO import StringIO
 
-#<host starttime="1361737906" endtime="1361738040"><status state="up" reason="echo-reply"/>
-#<address addr="74.207.244.221" addrtype="ipv4"/>
-#<hostnames>
-#<hostname name="scanme.nmap.org" type="user"/>
-#<hostname name="scanme.nmap.org" type="PTR"/>
-#</hostnames>
-#<ports><extraports state="closed" count="996">
-#<extrareasons reason="resets" count="996"/>
-#</extraports>
-#<port protocol="tcp" portid="22"><state state="open" reason="syn-ack" reason_ttl="53"/><service name="ssh" method="table" conf="3"/></port>
-#<port protocol="tcp" portid="25"><state state="filtered" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="smtp" method="table" conf="3"/></port>
-#<port protocol="tcp" portid="80"><state state="open" reason="syn-ack" reason_ttl="51"/><service name="http" method="table" conf="3"/></port>
-#<port protocol="tcp" portid="9929"><state state="open" reason="syn-ack" reason_ttl="53"/><service name="nping-echo" method="table" conf="3"/></port>
-#</ports>
-#<times srtt="177425" rttvar="1981" to="185349"/>
-#</host>"
-
-class NmapReport:
+class NmapParser:
     def __init__(self, nmap_report=None, type='XML'):
         self._nmap_xml_report = nmap_report
         self._nmap_dict_report = {'hosts': []}
+        # CLASS "API":
+        self.endtime = ''
+        self.elapsed = ''
+        self.summary = ''
+        self.hosts_up = ''
+        self.hosts_down = ''
+        self.hosts_total = ''
 
-#<host starttime="1361738377" endtime="1361738377"><status state="up" reason="localhost-response"/>
-#<address addr="127.0.0.1" addrtype="ipv4"/>
-#<hostnames>
-#<hostname name="localhost" type="user"/>
-#<hostname name="localhost" type="PTR"/>
-#</hostnames>
     def __struct_host(self, xelement):
-    # parses out all host  xml element to create a NmapHost
         nhost = NmapHost()
         for h in xelement:
             if h.tag == 'ports': nhost.ports = self.__struct_ports(h)
             elif h.tag == 'hostnames': nhost.hostnames = self.__struct_hostnames(h)
             elif h.tag in ('status', 'address'): setattr(nhost, h.tag, h.attrib)
-            else: print "struct host unknown attr: %s value: %s" % (h.tag, h.get(h.tag))
+            #else: print "struct host unknown attr: %s value: %s" % (h.tag, h.get(h.tag))
         self._nmap_dict_report['hosts'].append(nhost)
 
     def __struct_ports(self, xelement):
-    # creates a service dictionary to be added in a NmapHost's ports attribute
         plist = []
         for p in xelement:
             pdict = {}
@@ -51,7 +33,7 @@ class NmapReport:
                 pdict.update(p.find('state').attrib)
                 pdict.update(p.find('service').attrib)
                 plist.append(pdict)
-            else: print "struct ports unknown attr: %s value: %s" % (p.tag, p.get(p.tag))
+            #else: print "struct ports unknown attr: %s value: %s" % (p.tag, p.get(p.tag))
         return plist
 
     def __struct_hostnames(self, xelement):
@@ -59,7 +41,18 @@ class NmapReport:
         for p in xelement:
             if p.tag == 'hostname': hlist.append(p.get('name'))
         return hlist
-                
+
+    def __struct_stats(self, xelement):
+        for s in xelement:
+            if s.tag == 'finished':
+                self.endtime = s.get('time')
+                self.elapsed = s.get('elapsed')
+                self.summary = s.get('summary')
+            elif s.tag == 'hosts':
+                self.hosts_up = s.get('up')
+                self.hosts_down = s.get('down')
+                self.hosts_total = s.get('total')
+            else: raise Exception('Unpexpected data structure for <runstats>')
 
     def parse(self):
         if not self._nmap_xml_report:
@@ -70,12 +63,12 @@ class NmapReport:
         self._nmap_dict_report[root.tag] = root.attrib
         for el in root:
             if el.tag == 'host': self.__struct_host(el)
+            elif el.tag == 'runstats': self.__struct_stats(el)
             #else: self._nmap_dict_report[el.tag] = el.attrib
-            #else: print "struct pparse unknown attr: %s value: %s" % (el.tag, el.get(el.tag))
+            else: print "struct pparse unknown attr: %s value: %s" % (el.tag, el.get(el.tag))
 
     def get_hosts(self):
         return self._nmap_dict_report['hosts'] if self._nmap_dict_report.has_key('hosts') else None
-
 
 class NmapHost:
     def __init__(self):
