@@ -18,7 +18,9 @@ class NmapParser:
         nhost = NmapHost()
         for h in xelement:
             if h.tag == 'ports': nhost.ports = self.__struct_ports(h)
-            elif h.tag == 'hostnames': nhost.hostnames = self.__struct_hostnames(h)
+            elif h.tag == 'hostnames':
+                for hname in h:
+                    if hname.tag == 'hostname': nhost.add_hostname(hname.get('name'))
             elif h.tag in ('status', 'address'): setattr(nhost, h.tag, h.attrib)
             #else: print "struct host unknown attr: %s value: %s" % (h.tag, h.get(h.tag))
         self._nmap_dict_report['hosts'].append(nhost)
@@ -35,12 +37,6 @@ class NmapParser:
                 plist.append(pdict)
             #else: print "struct ports unknown attr: %s value: %s" % (p.tag, p.get(p.tag))
         return plist
-
-    def __struct_hostnames(self, xelement):
-        hlist = []
-        for p in xelement:
-            if p.tag == 'hostname': hlist.append(p.get('name'))
-        return hlist
 
     def __struct_stats(self, xelement):
         for s in xelement:
@@ -73,10 +69,15 @@ class NmapParser:
 class NmapHost:
     def __init__(self):
         self.hostnames = []
-        self.address = {}
+        self.starttime = ''
+        self.endtime = ''
         self.status = {}
+        self.address = {}
         # {'22': {'method': 'table', 'state': 'open', 'name': 'ssh', 'conf': '3', 'reason': 'syn-ack', 'reason_ttl': '64'}}
         self.ports = []
+
+    def add_hostname(self, hostname):
+        self.hostnames.append(hostname)
 
     def get_hostname(self):
         return self.hostnames[0] if len(self.hostnames) else self.get_ip()

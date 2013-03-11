@@ -3,23 +3,23 @@
 import unittest
 import os, sys
 
-sys.path.append("".join([os.path.dirname(__file__), "/../"]))
-from nmapparser import NmapParser
+#sys.path.append("".join([os.path.dirname(__file__), "/../"]))
+from libnmap import NmapParser
 
 class TestNmapParser(unittest.TestCase):
     def setUp(self):
-        self.flist_full = [{'file': 'tests/2_hosts.xml', 'hosts': 2}, {'file': 'tests/1_hosts.xml', 'hosts': 1},
-                   {'file': 'tests/1_hosts_banner_ports_notsyn.xml', 'hosts': 1},
-                  # {'file': 'tests/1_hosts_banner_ports_xmas.xml', 'hosts': 1},
-                   {'file': 'tests/1_hosts_banner_ports.xml', 'hosts': 1},
-                   {'file': 'tests/1_hosts_banner.xml', 'hosts': 1},
-                   {'file': 'tests/2_hosts_version.xml', 'hosts': 2},
-                  # {'file': 'tests/2_null_hosts.xml', 'hosts': 2},
-                   {'file': 'tests/2_tcp_hosts.xml', 'hosts': 2},
-                   {'file': 'tests/1_hosts_nohostname.xml', 'hosts': 1},
+        self.flist_full = [{'file': 'test/2_hosts.xml', 'hosts': 2}, {'file': 'test/1_hosts.xml', 'hosts': 1},
+                   {'file': 'test/1_hosts_banner_ports_notsyn.xml', 'hosts': 1},
+                  # {'file': 'test/1_hosts_banner_ports_xmas.xml', 'hosts': 1},
+                   {'file': 'test/1_hosts_banner_ports.xml', 'hosts': 1},
+                   {'file': 'test/1_hosts_banner.xml', 'hosts': 1},
+                   {'file': 'test/2_hosts_version.xml', 'hosts': 2},
+                  # {'file': 'test/2_null_hosts.xml', 'hosts': 2},
+                   {'file': 'test/2_tcp_hosts.xml', 'hosts': 2},
+                   {'file': 'test/1_hosts_nohostname.xml', 'hosts': 1},
         ]
-        self.flist_one = [{'file': 'tests/1_hosts_nohostname.xml', 'hosts': 1}]
-        self.flist_two = [{'file': 'tests/2_hosts.xml', 'hosts': 2, 
+        self.flist_one = [{'file': 'test/1_hosts_nohostname.xml', 'hosts': 1}]
+        self.flist_two = [{'file': 'test/2_hosts.xml', 'hosts': 2, 
                            'elapsed': '134.36', 'endtime': "1361738040", 
                            'summary': "Nmap done at Sun Feb 24 21:34:00 2013; 2 IP addresses (2 hosts up) scanned in 134.36 seconds"}]
 
