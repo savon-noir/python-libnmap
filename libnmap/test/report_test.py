@@ -28,6 +28,11 @@ class TestNmapParser(unittest.TestCase):
                           {'hostname': 'scanme.nmap.org', 'ports': 4, 'open': 3},
                           {'hostname': '1.1.1.1', 'ports': 2, 'open': 0},
         ]
+        self.flist_banner = [ {'file': 'test/1_hosts_banner.xml' }, 
+                                   {'file': 'test/1_hosts_banner_ports_notsyn.xml'},
+                                   {'file': 'test/1_hosts_banner_ports_xmas.xml'},
+                                   {'file': 'test/1_hosts_banner_ports.xml' }
+        ]
 
         self.flist = self.flist_full
 
@@ -56,7 +61,7 @@ class TestNmapParser(unittest.TestCase):
 
                 for np in h.get_open_ports():
                     sport = h.get_port(np)
-                    self.assertEqual(sport['port'], np)
+                    self.assertEqual(sport.port, np)
 
     def test_runstats(self):
         for testfile in self.flist_two:
@@ -68,8 +73,20 @@ class TestNmapParser(unittest.TestCase):
             for attr in ('endtime', 'summary', 'elapsed'):
                 self.assertEqual(getattr(nr, attr), testfile[attr])
 
+    def test_banner(self):
+        for testfile in self.flist_banner:
+            fd = open(testfile['file'], 'r')
+            nr = NmapParser(fd.read())
+            fd.close()
+
+            nr.parse()
+            for h in nr.get_hosts():
+                for service in h.services:
+                    b = service.get_banner()
+                    print "[unittest] %s" % (b)
+
 if __name__ == '__main__':
-    test_suite = ['test_get_hosts' , 'test_get_ports', 'test_runstats']
+    test_suite = ['test_get_hosts' , 'test_get_ports', 'test_runstats', 'test_banner']
 #    io_file = StringIO()
     suite = unittest.TestSuite(map(TestNmapParser, test_suite))
     test_result = unittest.TextTestRunner(verbosity=2).run(suite) ## for more verbosity uncomment this line and comment next line
