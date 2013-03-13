@@ -6,14 +6,10 @@ from libnmap import NmapHost, NmapService
 class NmapParser:
     def __init__(self, nmap_report=None, type='XML'):
         self._nmap_xml_report = nmap_report
-        self._nmap_dict_report = {'hosts': []}
-        # CLASS "API":
-        self.endtime = ''
-        self.elapsed = ''
-        self.summary = ''
-        self.hosts_up = ''
-        self.hosts_down = ''
-        self.hosts_total = ''
+        self._nmaprun = {}
+        self._scaninfo = {}
+        self._hosts = []
+        self._runstats = {}
 
     def parse(self):
         if not self._nmap_xml_report:
@@ -21,12 +17,22 @@ class NmapParser:
         tree = ET.parse(StringIO(self._nmap_xml_report))
 
         root = tree.getroot()
-        self._nmap_dict_report[root.tag] = root.attrib
+        if root.tag == 'nmaprun':
+            self._nmaprun = root.attrib
+        else:
+            raise Exception('Unpexpected data structure for XML root node')
         for el in root:
-            if el.tag == 'host': self.parse_host(el)
-            elif el.tag == 'runstats': self.parse_runstats(el)
-            #else: self._nmap_dict_report[el.tag] = el.attrib
-            else: print "struct pparse unknown attr: %s value: %s" % (el.tag, el.get(el.tag))
+            if el.tag == 'scaninfo':
+                self._scaninfo = self.parse_scaninfo(el)
+            elif el.tag == 'host':
+                self._hosts.append(self.parse_host(el))
+            elif el.tag == 'runstats':
+                self._runstats = self.parse_runstats(el)
+            #else: print "struct pparse unknown attr: %s value: %s" % (el.tag, el.get(el.tag))
+        return self.get_parsed_data()
+
+    def parse_scaninfo(self, xelement):
+        return xelement.attrib
 
     def parse_host(self, xelement):
         nhost = NmapHost()
@@ -39,7 +45,6 @@ class NmapParser:
                     nhost.add_service(port)
             elif xh.tag in ('status', 'address'): setattr(nhost, xh.tag, xh.attrib)
             #else: print "struct host unknown attr: %s value: %s" % (h.tag, h.get(h.tag))
-        self._nmap_dict_report['hosts'].append(nhost)
         return nhost
 
     def parse_hostnames(self, xelement):
@@ -58,19 +63,43 @@ class NmapParser:
                                       state=xservice.find('state').attrib,
                                       service=xservice.find('service').attrib)
                 ports.append(nport)
+            #else: print "struct port unknown attr: %s value: %s" % (h.tag, h.get(h.tag))
         return ports
          
     def parse_runstats(self, xelement):
+        rdict = {'finished': {}, 'hosts': {}}
         for s in xelement:
             if s.tag == 'finished':
-                self.endtime = s.get('time')
-                self.elapsed = s.get('elapsed')
-                self.summary = s.get('summary')
+                rdict[s.tag]['time'] = s.get('time')
+                rdict[s.tag]['elapsed'] = s.get('elapsed')
+                rdict[s.tag]['summary'] = s.get('summary')
             elif s.tag == 'hosts':
-                self.hosts_up = s.get('up')
-                self.hosts_down = s.get('down')
-                self.hosts_total = s.get('total')
+                rdict[s.tag]['up'] = s.get('up')
+                rdict[s.tag]['down'] = s.get('down')
+                rdict[s.tag]['total'] = s.get('total')
             else: raise Exception('Unpexpected data structure for <runstats>')
 
+        return rdict
+
     def get_hosts(self):
-        return self._nmap_dict_report['hosts'] if self._nmap_dict_report.has_key('hosts') else None
+        return self._hosts
+
+    @property
+    def endtime(self):
+        return self._runstats['finished']['time']
+
+    @property
+    def summary(self):
+        return self._runstats['finished']['summary']
+
+    @property
+    def elapsed(self):
+        return self._runstats['finished']['elapsed']
+
+    def get_parsed_data(self):
+        parsed_data = { 'nmaprun': self._nmaprun,
+                        'scaninfo': self._scaninfo,
+                        'hosts': self._hosts, 
+                        'runstats': self._runstats,
+        }
+        return parsed_data

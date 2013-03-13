@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-class NmapHost:
+class NmapHost(object):
     def __init__(self):
         self.starttime = ''
         self.endtime = ''
@@ -51,7 +51,7 @@ class NmapHost:
 
     def get_port(self, portno, protocol='tcp'):
         plist = [ p for p in self._services if p.port == portno and p.protocol == protocol ]
-        return plist.pop() if len(plist) else {}
+        return plist.pop() if len(plist) else None
   
     def get_open_ports(self):
         return [ p.port for p in self._services if p.state == 'open' ]

@@ -1,1 +1,7 @@
-v0.1, 11/03/2013 -- First developement release packaged for Project Ninaval
+v0.1.2, 13/03/2013 -- Bug Fixes and improvement after refactory
+                    - added scaninfo parsing
+                    - corrected unused variables and wrong unittests
+                    - parse() method reviewed to call "independent" XML bloc
+                      parsers
+v0.1.1, 12/03/2013 -- Complete refactory of code to isolate NMAP objects.
+v0.1.0, 11/03/2013 -- First developement release packaged for Project Ninaval

@@ -28,11 +28,14 @@ class TestNmapParser(unittest.TestCase):
                           {'hostname': 'scanme.nmap.org', 'ports': 4, 'open': 3},
                           {'hostname': '1.1.1.1', 'ports': 2, 'open': 0},
         ]
-        self.flist_banner = [ {'file': 'test/1_hosts_banner.xml' }, 
-                                   {'file': 'test/1_hosts_banner_ports_notsyn.xml'},
-                                   {'file': 'test/1_hosts_banner_ports_xmas.xml'},
-                                   {'file': 'test/1_hosts_banner_ports.xml' }
-        ]
+        self.flist_banner = [ {'file': 'test/1_hosts_banner.xml', 
+                               'banner': { '631': 'product: CUPS version: 1.4',
+                                           '3306': 'product: MySQL version: 5.1.61',
+                                           '22': 'product: OpenSSH extrainfo: protocol 2.0 version: 5.3',
+                                           '25': 'product: Postfix smtpd hostname:  jambon.localdomain',
+                                           '111': '',
+                               }
+        } ]
 
         self.flist = self.flist_full
 
@@ -83,7 +86,7 @@ class TestNmapParser(unittest.TestCase):
             for h in nr.get_hosts():
                 for service in h.services:
                     b = service.get_banner()
-                    print "[unittest] %s" % (b)
+                    self.assertEqual(b, testfile['banner'][service.port]) 
 
 if __name__ == '__main__':
     test_suite = ['test_get_hosts' , 'test_get_ports', 'test_runstats', 'test_banner']
