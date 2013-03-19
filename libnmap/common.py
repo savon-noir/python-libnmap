@@ -16,7 +16,7 @@ class NmapHost(object):
         return  self._hostnames != other._hostnames
 
     def __repr__(self):
-        return _hostname[0]
+        return ''.join(self._hostnames)
 
     @property
     def hostnames(self):
@@ -65,7 +65,7 @@ class NmapHost(object):
     def get_open_ports(self):
         return [ p.port for p in self._services if p.state == 'open' ]
 
-class NmapService:
+class NmapService(object):
     def __init__(self, portid, protocol='tcp', state={}, service={}):
         self._portid = portid
         self._protocol = protocol
@@ -73,14 +73,13 @@ class NmapService:
         self._service = service
 
     def __eq__(self,other):
-        return  self._portid == other._portid  && self._state == other._state
+        return  self._portid == other._portid  and len(DictDiffer(self._state,other._state).changed()) == 0
 
     def __ne__(self,other):
-        return  self._portid != other._portid  && self._state != other._state
+        return  self._portid != other._portid  or len(DictDiffer(self._state,other._state).changed()) > 0
 
     def __repr__(self):
-        return _hostname[0]
-
+        return "%s(%s - %s - %s -%s)" % (self.__class__, self._portid, self._protocol, self._service, self._state)
 
     @property
     def port(self):
