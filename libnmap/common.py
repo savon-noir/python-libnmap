@@ -16,7 +16,7 @@ class NmapHost(object):
         return  self._hostnames != other._hostnames
 
     def __repr__(self):
-        return ''.join(self._hostnames)
+        return self.get_hostname()
 
     @property
     def hostnames(self):
@@ -99,6 +99,22 @@ class NmapService(object):
 
     def open(self):
         return True if self._state['state'] and self._state['state'] == 'open' else False
+    
+    def getStateChanged(self,other):
+        'return a set of keys for which the value has changed'
+        return DictDiffer(self._state,other._state).changed() if self.port == other.port and self.protocol == other.protocol else ()
+
+    def getStateUnChanged(self,other):
+        'return a set of key for which the value hasn t changed value'
+        return DictDiffer(self._state,other._state).unchanged() if self.port == other.port and self.protocol == other.protocol else ()
+    
+    def getServiceDetailsChanged(self,other):
+        'return a set of keys for which the value has changed'
+        return DictDiffer(self._service,other._service).changed() if self.port == other.port and self.protocol == other.protocol else ()
+ 
+    def getServiceDetailsUnChanged(self,other):
+        'return a set of key for which the value hasn t changed value'
+        return DictDiffer(self._service,other._service).unchanged() if self.port == other.port and self.protocol == other.protocol else ()
 
     def get_banner(self):
         notrelevant = ['name', 'method', 'conf' ]
