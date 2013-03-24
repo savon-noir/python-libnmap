@@ -123,9 +123,44 @@ class TestNmapParser(unittest.TestCase):
             host1.services[0]._portid ='23'
             self.assertNotEqual(host1.services[0] , host2.services[0])
 
+    def test_HostNotEqual(self):
+        for testfile in self.flist:
+            fd = open(testfile['file'], 'r')
+            np1 = NmapParser(fd.read())
+            fd.close()
+            fd = open(testfile['file'], 'r')
+            np2 = NmapParser(fd.read())
+            fd.close()
+
+            np1.parse()
+            np2.parse()
+            host1 = np1.get_hosts().pop()
+            host2 = np2.get_hosts().pop()
+            
+            host1._address['addr'] = 'xxxxxx'
+            self.assertNotEqual(host1 , host2)
+
+    def test_HostEqual(self):
+        for testfile in self.flist:
+            fd = open(testfile['file'], 'r')
+            np1 = NmapParser(fd.read())
+            fd.close()
+            fd = open(testfile['file'], 'r')
+            np2 = NmapParser(fd.read())
+            fd.close()
+
+            np1.parse()
+            np2.parse()
+            host1 = np1.get_hosts().pop()
+            host2 = np2.get_hosts().pop()
+            
+            host1.services[0]._portid ='23'
+            self.assertEqual(host1 , host2)
+
+
 
 if __name__ == '__main__':
-    test_suite = ['test_get_hosts' , 'test_get_ports', 'test_runstats', 'test_banner', 'test_serviceEqual', 'test_serviceNotEqual']
+    test_suite = ['test_get_hosts' , 'test_get_ports', 'test_runstats', 'test_banner', 'test_serviceEqual', 'test_serviceNotEqual', 'test_HostNotEqual', 'test_HostEqual']
 #    io_file = StringIO()
     suite = unittest.TestSuite(map(TestNmapParser, test_suite))
     test_result = unittest.TextTestRunner(verbosity=2).run(suite) ## for more verbosity uncomment this line and comment next line

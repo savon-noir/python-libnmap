@@ -9,15 +9,32 @@ class NmapHost(object):
         self._address = {}
         self._services = []
 
-    def __eq__(self,other):
-        return  self._hostnames == other._hostnames  
+    def __eq__(self, other):
+        return  self._hostnames == other._hostnames  and self.address == other.address
 
     def __ne__(self,other):
-        return  self._hostnames != other._hostnames
+        return  self._hostnames != other._hostnames or self.address != other.address
 
     def __repr__(self):
-        return self.get_hostname()
+        return "%s(%s - %s - %s -%s)" % (self.__class__, self.hostnames,self.address,self.services,self.status)
 
+    def statusChanged(self, other):
+	setdiff = DictDiffer(self.status,other.status)
+	return setdiff.changed()
+
+    def serviceChanged(self, other):
+        setOfServ1 = set(self.services)
+        setOfServ2 = set(other.services)
+        return ((setOfServ1 | setOfServ2) - (setOfServ1 & setOfServ2))
+
+#    def HostDiff(self, other):
+#        'This fct should be able to return all the differences between two hosts'
+#        if self != other:
+#             raise Exception("Host object MUST have the same hostname/adress")
+#        else:
+#             print self.statusChanged(other)
+#             print self.serviceChanged(other)
+#
     @property
     def hostnames(self):
         return self._hostnames
