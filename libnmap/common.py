@@ -97,7 +97,8 @@ class NmapService(object):
 
     def __repr__(self):
         return "%s(%s - %s - %s -%s)" % (self.__class__, self._portid, self._protocol, self._service, self._state)
-
+    def __hash__(self):
+        return hash(self._portid) ^ hash(self._protocol) ^ hash(frozenset(self._state)) ^ hash(frozenset(self._service))
     @property
     def port(self):
         return self._portid

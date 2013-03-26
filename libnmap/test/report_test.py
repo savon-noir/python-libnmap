@@ -101,10 +101,13 @@ class TestNmapParser(unittest.TestCase):
             np2.parse()
             host1 = np1.get_hosts().pop()
             host2 = np2.get_hosts().pop()
-            
-            self.assertEqual(host1.services[0] , host2.services[0])
-            host1.services[0]._portid ='23'
-            self.assertNotEqual(host1.services[0] , host2.services[0])
+            'All the service of the host must be compare + the hash should be also the same'
+            for i in range(len(host1.services)):
+                self.assertEqual(hash(host1.services[i]),hash(host2.services[i]))
+                self.assertEqual(host1.services[i] , host2.services[i])
+
+            print host1.serviceChanged(host2)
+
 
     def test_serviceNotEqual(self):
         for testfile in self.flist:
@@ -122,6 +125,8 @@ class TestNmapParser(unittest.TestCase):
             
             host1.services[0]._portid ='23'
             self.assertNotEqual(host1.services[0] , host2.services[0])
+            print host1.serviceChanged(host2)
+            print "-----------"
 
     def test_HostNotEqual(self):
         for testfile in self.flist:
