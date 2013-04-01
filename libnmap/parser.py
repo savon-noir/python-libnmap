@@ -4,9 +4,6 @@ from StringIO import StringIO
 from libnmap import NmapHost, NmapService
 
 class NmapParser(object):
-    def __init__(self):
-        pass
-
     @classmethod
     def parse(cls, nmap_xml_report=None, type='XML'):
         nmap_scan = { 'nmaprun': {}, 'scaninfo': {}, 'hosts': [], 'runstats': {} }
@@ -35,29 +32,12 @@ class NmapParser(object):
 
     @classmethod
     def parse_scaninfo(cls, scaninfo_data):
-        if isinstance(scaninfo_data, str):
-            try:
-                xelement = ET.fromstring(scaninfo_data)
-            except:
-                raise Exception("Error while trying to instanciate XML Element from string")
-        elif isintance(scaninfo_data, ET.Element):
-            xelement = scaninfo_data
-        else:
-            raise Exception("Error while trying to parse supplied data: unsupported format")
-
+        xelement = cls.__format_element(scaninfo_data)
         return xelement.attrib
 
     @classmethod
     def parse_host(cls, scanhost_data):
-        if isinstance(scanhost_data, str):
-            try:
-                xelement = ET.fromstring(scanhost_data)
-            except:
-                raise Exception("Error while trying to instanciate NmapHost XML Element from string")
-        elif isintance(scanhost_data, ET.Element):
-            xelement = scanhost_data
-        else:
-            raise Exception("Error while trying to parse supplied data: unsupported format")
+        xelement = cls.__format_element(scanhost_data)
 
         nhost = NmapHost()
         for xh in xelement:
@@ -72,26 +52,41 @@ class NmapParser(object):
             #else: print "struct host unknown attr: %s value: %s" % (h.tag, h.get(h.tag))
         return nhost
 
-    def parse_hostnames(self, xelement):
+    @classmethod
+    def parse_hostnames(cls, scanhostnames_data):
+        xelement = cls.__format_element(scanhostnames_data)
+
         hostnames = []
         for hname in xelement:
             if hname.tag == 'hostname':
                 hostnames.append(hname.get('name'))
         return hostnames
 
-    def parse_ports(self, xelement):
+    @classmethod
+    def parse_ports(cls, scanports_data):
+        xelement = cls.__format_element(scanports_data)
+
         ports = []
         for xservice in xelement:
             if xservice.tag == 'port':
-                nport = NmapService(portid=xservice.get('portid'),
-                                      protocol=xservice.get('protocol'),
-                                      state=xservice.find('state').attrib,
-                                      service=xservice.find('service').attrib)
+                nport = cls.parse_port(xservice)
                 ports.append(nport)
             #else: print "struct port unknown attr: %s value: %s" % (h.tag, h.get(h.tag))
         return ports
-         
-    def parse_runstats(self, xelement):
+
+    @classmethod
+    def parse_port(cls, scanport_data):
+        xelement = cls.__format_element(scanport_data)
+        nport = NmapService(portid=xelement.get('portid'),
+                                      protocol=xelement.get('protocol'),
+                                      state=xelement.find('state').attrib,
+                                      service=xelement.find('service').attrib)
+        return nport
+
+    @classmethod 
+    def parse_runstats(cls, scanrunstats_data):
+        xelement = cls.__format_element(scanrunstats_data)
+
         rdict = {'finished': {}, 'hosts': {}}
         for s in xelement:
             if s.tag == 'finished':
@@ -102,29 +97,20 @@ class NmapParser(object):
                 rdict[s.tag]['up'] = s.get('up')
                 rdict[s.tag]['down'] = s.get('down')
                 rdict[s.tag]['total'] = s.get('total')
-            else: raise Exception('Unpexpected data structure for <runstats>')
+            else:
+                raise Exception('Unpexpected data structure for <runstats>')
 
         return rdict
 
-    def get_hosts(self):
-        return self._hosts
-
-    @property
-    def endtime(self):
-        return self._runstats['finished']['time']
-
-    @property
-    def summary(self):
-        return self._runstats['finished']['summary']
-
-    @property
-    def elapsed(self):
-        return self._runstats['finished']['elapsed']
-
-    def get_parsed_data(self):
-        parsed_data = { 'nmaprun': self._nmaprun,
-                        'scaninfo': self._scaninfo,
-                        'hosts': self._hosts, 
-                        'runstats': self._runstats,
-        }
-        return parsed_data
+    @classmethod
+    def __format_element(cls, elt_data):
+        if isinstance(elt_data, str):
+            try:
+                xelement = ET.fromstring(elt_data)
+            except:
+                raise Exception("Error while trying to instanciate XML Element from string")
+        elif ET.iselement(elt_data):
+            xelement = elt_data
+        else:
+            raise Exception("Error while trying to parse supplied data: unsupported format")
+        return xelement

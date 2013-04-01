@@ -81,7 +81,7 @@ class NmapHost(object):
             self._services.append(nmapservice)
             v = True
         else:
-            raise Exception("Object type should be NmapService
+            raise Exception("Object type should be NmapService \
                             for add_service")
         return v
 
