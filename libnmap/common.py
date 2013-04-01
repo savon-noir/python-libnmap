@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+
 class NmapHost(object):
     def __init__(self):
         self.starttime = ''
@@ -10,25 +11,37 @@ class NmapHost(object):
         self._services = []
 
     def __eq__(self, other):
-        return  self._hostnames == other._hostnames  and self.address == other.address
+        return (self._hostnames == other._hostnames and
+                self.address == other.address)
 
-    def __ne__(self,other):
-        return  self._hostnames != other._hostnames or self.address != other.address
+    def __ne__(self, other):
+        return (self._hostnames != other._hostnames or
+                self.address != other.address)
 
     def __repr__(self):
-        return "%s(%s - %s - %s -%s)" % (self.__class__, self.hostnames,self.address,self.services,self.status)
+        return "%s(%s - %s - %s -%s)" % (self.__class__,
+                                         self.hostnames,
+                                         self.address,
+                                         self.services,
+                                         self.status)
 
     def statusChanged(self, other):
-	setdiff = DictDiffer(self.status,other.status)
-	return setdiff.changed()
+        setdiff = DictDiffer(self.status, other.status)
+        return setdiff.changed()
 
     def serviceChanged(self, other):
         setOfServ1 = set(self.services)
         setOfServ2 = set(other.services)
+
+        stringInter = "DEBUG INTER : "
+        stringInter += ''.join(map(str, setOfServ1 & setOfServ2))
+        print stringInter+"\n"
+
         return ((setOfServ1 | setOfServ2) - (setOfServ1 & setOfServ2))
 
 #    def HostDiff(self, other):
-#        'This fct should be able to return all the differences between two hosts'
+#        'This fct should be able to return all the
+#          differences between two hosts'
 #        if self != other:
 #             raise Exception("Host object MUST have the same hostname/adress")
 #        else:
@@ -46,6 +59,7 @@ class NmapHost(object):
     @property
     def address(self):
         return self._address['addr']
+
     @address.setter
     def address(self, addrdict):
         self._address = addrdict
@@ -53,6 +67,7 @@ class NmapHost(object):
     @property
     def status(self):
         return self._status
+
     @status.setter
     def status(self, statusdict):
         self._status = statusdict
@@ -66,21 +81,24 @@ class NmapHost(object):
             self._services.append(nmapservice)
             v = True
         else:
-            raise Exception("Object type should be NmapService for add_service")
+            raise Exception("Object type should be NmapService
+                            for add_service")
         return v
 
     def get_hostname(self):
         return self._hostnames[0] if len(self._hostnames) else self.address
 
     def get_ports(self):
-        return [ p.port for p in self._services ]
+        return [p.port for p in self._services]
 
     def get_port(self, portno, protocol='tcp'):
-        plist = [ p for p in self._services if p.port == portno and p.protocol == protocol ]
+        plist = [p for p in self._services if
+                 p.port == portno and p.protocol == protocol]
         return plist.pop() if len(plist) else None
-  
+
     def get_open_ports(self):
-        return [ p.port for p in self._services if p.state == 'open' ]
+        return [p.port for p in self._services if p.state == 'open']
+
 
 class NmapService(object):
     def __init__(self, portid, protocol='tcp', state={}, service={}):
@@ -89,16 +107,19 @@ class NmapService(object):
         self._state = state
         self._service = service
 
-    def __eq__(self,other):
-        return  self._portid == other._portid  and len(DictDiffer(self._state,other._state).changed()) == 0
+    def __eq__(self, other):
+        return  (self._portid == other._portid  and
+                len(DictDiffer(self._state,other._state).changed()) == 0)
 
-    def __ne__(self,other):
+    def __ne__(self, other):
         return  self._portid != other._portid  or len(DictDiffer(self._state,other._state).changed()) > 0
 
     def __repr__(self):
         return "%s(%s - %s - %s -%s)" % (self.__class__, self._portid, self._protocol, self._service, self._state)
+
     def __hash__(self):
         return hash(self._portid) ^ hash(self._protocol) ^ hash(frozenset(self._state)) ^ hash(frozenset(self._service))
+
     @property
     def port(self):
         return self._portid

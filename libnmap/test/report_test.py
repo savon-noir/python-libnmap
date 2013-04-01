@@ -122,9 +122,10 @@ class TestNmapParser(unittest.TestCase):
             np2.parse()
             host1 = np1.get_hosts().pop()
             host2 = np2.get_hosts().pop()
-            
-            host1.services[0]._portid ='23'
-            self.assertNotEqual(host1.services[0] , host2.services[0])
+            for i in range(len(host1.services)): 
+                host1.services[i]._state['state'] = 'closed'
+                self.assertNotEqual(host1.services[i] , host2.services[i])
+            print "-----------" 
             print host1.serviceChanged(host2)
             print "-----------"
 
