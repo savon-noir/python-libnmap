@@ -17,7 +17,7 @@ class NmapParser(object):
 
         root = tree.getroot()
         if root.tag == 'nmaprun':
-                nmap_scan['nmaprun'] = root.attrib
+                nmap_scan['nmaprun'] = cls.__format_attributes(root)
         else:
             raise Exception('Unpexpected data structure for XML root node')
         for el in root:
@@ -33,7 +33,7 @@ class NmapParser(object):
     @classmethod
     def parse_scaninfo(cls, scaninfo_data):
         xelement = cls.__format_element(scaninfo_data)
-        return xelement.attrib
+        return cls.__format_attributes(xelement)
 
     @classmethod
     def parse_host(cls, scanhost_data):
@@ -48,7 +48,7 @@ class NmapParser(object):
                 for port in cls.parse_ports(xh):
                     nhost.add_service(port)
             elif xh.tag in ('status', 'address'):
-                setattr(nhost, xh.tag, xh.attrib)
+                setattr(nhost, xh.tag, cls.__format_attributes(xh))
             #else: print "struct host unknown attr: %s value: %s" % (h.tag, h.get(h.tag))
         return nhost
 
@@ -77,10 +77,18 @@ class NmapParser(object):
     @classmethod
     def parse_port(cls, scanport_data):
         xelement = cls.__format_element(scanport_data)
+
         nport = NmapService(portid=xelement.get('portid'),
-                                      protocol=xelement.get('protocol'),
-                                      state=xelement.find('state').attrib,
-                                      service=xelement.find('service').attrib)
+                            protocol=xelement.get('protocol'))
+
+        nport.add_state(cls.__format_attributes(xelement.find('state')))
+        if not nport.state:
+            raise NmapParserException("Service state is not known or could not be parsed")
+
+        nport.add_service(cls.__format_attributes(xelement.find('service')))
+        if not nport.service:
+            raise NmapParserException("Service name is not known or could not be parsed")
+
         return nport
 
     @classmethod 
@@ -98,19 +106,37 @@ class NmapParser(object):
                 rdict[s.tag]['down'] = s.get('down')
                 rdict[s.tag]['total'] = s.get('total')
             else:
-                raise Exception('Unpexpected data structure for <runstats>')
+                raise NmapParserException('Unpexpected data structure for <runstats>')
 
         return rdict
 
-    @classmethod
-    def __format_element(cls, elt_data):
+    @staticmethod
+    def __format_element(elt_data):
         if isinstance(elt_data, str):
             try:
                 xelement = ET.fromstring(elt_data)
             except:
-                raise Exception("Error while trying to instanciate XML Element from string")
+                raise NmapParserException("Error while trying to instanciate XML Element from string {0}".format(elt_data))
         elif ET.iselement(elt_data):
             xelement = elt_data
         else:
-            raise Exception("Error while trying to parse supplied data: unsupported format")
+            raise NmapParserException("Error while trying to parse supplied data: unsupported format")
         return xelement
+
+    @staticmethod
+    def __format_attributes(elt_data):
+        r = {}
+        if not ET.iselement(elt_data):
+            raise NmapParserException("Error while trying to parse supplied data attributes: format is not XML")
+        try:
+            for k in elt_data.keys():
+                r[k] = elt_data.get(k)
+                if r[k] is None:
+                    raise NmapParserException("Error while trying to build-up element attributes")
+        except:
+            raise
+        return r
+
+class NmapParserException(Exception):
+    def __init__(self, msg):
+        self.msg = msg

@@ -4,7 +4,7 @@ import unittest
 import os, sys
 
 #sys.path.append("".join([os.path.dirname(__file__), "/../"]))
-from libnmap import NmapParser
+from libnmap import NmapParser, NmapReport
 
 class TestNmapParser(unittest.TestCase):
     def setUp(self):
@@ -39,24 +39,30 @@ class TestNmapParser(unittest.TestCase):
 
         self.flist = self.flist_full
 
-    def test_get_hosts(self):
+    def test_report_constructor(self):
         for testfile in self.flist:
             fd = open(testfile['file'], 'r')
-            nr = NmapParser(fd.read())
+            s = fd.read()
             fd.close()
+            raw_data = NmapParser.parse(s)
 
-            nr.parse()
-            self.assertEqual(len(nr.get_hosts()), testfile['hosts'])
+            nr = NmapReport(raw_data=raw_data)
+            self.assertEqual(len(nr.scanned_hosts), testfile['hosts'])
 
+            nr2 = NmapReport('test_report')
+            nr2.set_raw_data(raw_data)
+            self.assertEqual(len(nr2.scanned_hosts), testfile['hosts'])
+            self.assertEqual(nr2.name, 'test_report')
+            self.assertEqual(sorted(nr2.get_raw_data()), sorted(raw_data))
 
     def test_get_ports(self):
         for testfile in self.flist:
             fd = open(testfile['file'], 'r')
-            nr = NmapParser(fd.read())
+            s = fd.read()
             fd.close()
 
-            nr.parse()
-            for h in nr.get_hosts():
+            nr = NmapReport(NmapParser.parse(s))
+            for h in nr.scanned_hosts:
                 for th in self.hlist:
                     if th['hostname'] == h.get_hostname():
                         self.assertEqual(th['ports'], len(h.get_ports()))
@@ -69,38 +75,35 @@ class TestNmapParser(unittest.TestCase):
     def test_runstats(self):
         for testfile in self.flist_two:
             fd = open(testfile['file'], 'r')
-            nr = NmapParser(fd.read())
+            s = fd.read()
             fd.close()
-
-            nr.parse()
+            rdata = NmapParser.parse(s)
+            nr = NmapReport(raw_data=rdata)
             for attr in ('endtime', 'summary', 'elapsed'):
                 self.assertEqual(getattr(nr, attr), testfile[attr])
 
     def test_banner(self):
         for testfile in self.flist_banner:
             fd = open(testfile['file'], 'r')
-            nr = NmapParser(fd.read())
+            nr = NmapReport('testreport', NmapParser.parse(fd.read()))
             fd.close()
 
-            nr.parse()
-            for h in nr.get_hosts():
+            for h in nr.scanned_hosts:
                 for service in h.services:
                     b = service.get_banner()
-                    self.assertEqual(b, testfile['banner'][service.port]) 
+                    self.assertEqual(b, testfile['banner'][str(service.port)]) 
     
-    def test_serviceEqual(self):
+    def test_service_equal(self):
         for testfile in self.flist:
             fd = open(testfile['file'], 'r')
-            np1 = NmapParser(fd.read())
+            np1 = NmapReport('np1', raw_data=NmapParser.parse(fd.read()))
             fd.close()
             fd = open(testfile['file'], 'r')
-            np2 = NmapParser(fd.read())
+            np2 = NmapReport('np2', raw_data=NmapParser.parse(fd.read()))
             fd.close()
 
-            np1.parse()
-            np2.parse()
-            host1 = np1.get_hosts().pop()
-            host2 = np2.get_hosts().pop()
+            host1 = np1.scanned_hosts.pop()
+            host2 = np2.scanned_hosts.pop()
             'All the service of the host must be compare + the hash should be also the same'
             for i in range(len(host1.services)):
                 self.assertEqual(hash(host1.services[i]),hash(host2.services[i]))
@@ -109,56 +112,50 @@ class TestNmapParser(unittest.TestCase):
             print host1.serviceChanged(host2)
 
 
-    def test_serviceNotEqual(self):
+    def test_service_not_equal(self):
         for testfile in self.flist:
             fd = open(testfile['file'], 'r')
-            np1 = NmapParser(fd.read())
+            np1 = NmapReport('np1', NmapParser.parse(fd.read()))
             fd.close()
             fd = open(testfile['file'], 'r')
-            np2 = NmapParser(fd.read())
+            np2 = NmapReport('np2', NmapParser.parse(fd.read()))
             fd.close()
 
-            np1.parse()
-            np2.parse()
-            host1 = np1.get_hosts().pop()
-            host2 = np2.get_hosts().pop()
+            host1 = np1.scanned_hosts.pop()
+            host2 = np2.scanned_hosts.pop()
             for i in range(len(host1.services)): 
-                host1.services[i]._state['state'] = 'closed'
+                host1.services[i]._state['state'] = 'changed'
                 self.assertNotEqual(host1.services[i] , host2.services[i])
             print "-----------" 
             print host1.serviceChanged(host2)
             print "-----------"
 
-    def test_HostNotEqual(self):
+    def test_host_not_equal(self):
         for testfile in self.flist:
             fd = open(testfile['file'], 'r')
-            np1 = NmapParser(fd.read())
+            np1 = NmapReport(raw_data=NmapParser.parse(fd.read()))
             fd.close()
             fd = open(testfile['file'], 'r')
-            np2 = NmapParser(fd.read())
+            np2 = NmapReport(raw_data=NmapParser.parse(fd.read()))
             fd.close()
 
-            np1.parse()
-            np2.parse()
-            host1 = np1.get_hosts().pop()
-            host2 = np2.get_hosts().pop()
+            host1 = np1.scanned_hosts.pop()
+            host2 = np2.scanned_hosts.pop()
             
             host1._address['addr'] = 'xxxxxx'
             self.assertNotEqual(host1 , host2)
 
-    def test_HostEqual(self):
+    def test_host_equal(self):
         for testfile in self.flist:
             fd = open(testfile['file'], 'r')
-            np1 = NmapParser(fd.read())
+            np1 = NmapReport(raw_data=NmapParser.parse(fd.read()))
             fd.close()
             fd = open(testfile['file'], 'r')
-            np2 = NmapParser(fd.read())
+            np2 = NmapReport(raw_data=NmapParser.parse(fd.read()))
             fd.close()
 
-            np1.parse()
-            np2.parse()
-            host1 = np1.get_hosts().pop()
-            host2 = np2.get_hosts().pop()
+            host1 = np1.scanned_hosts.pop()
+            host2 = np2.scanned_hosts.pop()
             
             host1.services[0]._portid ='23'
             self.assertEqual(host1 , host2)
@@ -166,7 +163,8 @@ class TestNmapParser(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    test_suite = ['test_get_hosts' , 'test_get_ports', 'test_runstats', 'test_banner', 'test_serviceEqual', 'test_serviceNotEqual', 'test_HostNotEqual', 'test_HostEqual']
+#    test_suite = ['test_get_hosts' , 'test_get_ports', 'test_runstats', 'test_banner', 'test_serviceEqual', 'test_serviceNotEqual', 'test_HostNotEqual', 'test_HostEqual']
+    test_suite = ['test_report_constructor', 'test_get_ports', 'test_runstats', 'test_banner' , 'test_service_equal', 'test_service_not_equal', 'test_host_not_equal' , 'test_host_equal' ] 
 #    io_file = StringIO()
     suite = unittest.TestSuite(map(TestNmapParser, test_suite))
     test_result = unittest.TextTestRunner(verbosity=2).run(suite) ## for more verbosity uncomment this line and comment next line
