@@ -3,47 +3,72 @@ import xml.etree.ElementTree as ET
 from StringIO import StringIO
 from libnmap import NmapHost, NmapService
 
-class NmapParser:
-    def __init__(self, nmap_report=None, type='XML'):
-        self._nmap_xml_report = nmap_report
-        self._nmaprun = {}
-        self._scaninfo = {}
-        self._hosts = []
-        self._runstats = {}
+class NmapParser(object):
+    def __init__(self):
+        pass
 
-    def parse(self):
-        if not self._nmap_xml_report:
+    @classmethod
+    def parse(cls, nmap_xml_report=None, type='XML'):
+        nmap_scan = { 'nmaprun': {}, 'scaninfo': {}, 'hosts': [], 'runstats': {} }
+        if not nmap_xml_report:
             raise Exception("No report to parse")
-        tree = ET.parse(StringIO(self._nmap_xml_report))
+
+        try:
+            tree = ET.parse(StringIO(nmap_xml_report))
+        except:
+            raise
 
         root = tree.getroot()
         if root.tag == 'nmaprun':
-            self._nmaprun = root.attrib
+                nmap_scan['nmaprun'] = root.attrib
         else:
             raise Exception('Unpexpected data structure for XML root node')
         for el in root:
             if el.tag == 'scaninfo':
-                self._scaninfo = self.parse_scaninfo(el)
+                nmap_scan['scaninfo'] = cls.parse_scaninfo(el)
             elif el.tag == 'host':
-                self._hosts.append(self.parse_host(el))
+                nmap_scan['hosts'].append(cls.parse_host(el))
             elif el.tag == 'runstats':
-                self._runstats = self.parse_runstats(el)
+                nmap_scan['runstats'] = cls.parse_runstats(el)
             #else: print "struct pparse unknown attr: %s value: %s" % (el.tag, el.get(el.tag))
-        return self.get_parsed_data()
+        return nmap_scan
 
-    def parse_scaninfo(self, xelement):
+    @classmethod
+    def parse_scaninfo(cls, scaninfo_data):
+        if isinstance(scaninfo_data, str):
+            try:
+                xelement = ET.fromstring(scaninfo_data)
+            except:
+                raise Exception("Error while trying to instanciate XML Element from string")
+        elif isintance(scaninfo_data, ET.Element):
+            xelement = scaninfo_data
+        else:
+            raise Exception("Error while trying to parse supplied data: unsupported format")
+
         return xelement.attrib
 
-    def parse_host(self, xelement):
+    @classmethod
+    def parse_host(cls, scanhost_data):
+        if isinstance(scanhost_data, str):
+            try:
+                xelement = ET.fromstring(scanhost_data)
+            except:
+                raise Exception("Error while trying to instanciate NmapHost XML Element from string")
+        elif isintance(scanhost_data, ET.Element):
+            xelement = scanhost_data
+        else:
+            raise Exception("Error while trying to parse supplied data: unsupported format")
+
         nhost = NmapHost()
         for xh in xelement:
             if xh.tag == 'hostnames':
-                for hostname in self.parse_hostnames(xh):
+                for hostname in cls.parse_hostnames(xh):
                         nhost.add_hostname(hostname)
             elif xh.tag == 'ports':
-                for port in self.parse_ports(xh):
+                for port in cls.parse_ports(xh):
                     nhost.add_service(port)
-            elif xh.tag in ('status', 'address'): setattr(nhost, xh.tag, xh.attrib)
+            elif xh.tag in ('status', 'address'):
+                setattr(nhost, xh.tag, xh.attrib)
             #else: print "struct host unknown attr: %s value: %s" % (h.tag, h.get(h.tag))
         return nhost
 
