@@ -23,7 +23,10 @@ class NmapProcess:
         self._nmap_dynamic_options = options
 
         self._nmap_command_line = self.get_command_line()
-        self._nmap_event_callback = event_callback if event_callback and callable(event_callback) else None
+        if event_callback and callable(event_callback):
+            self._nmap_event_callback = event_callback
+        else:
+            self._nmap_event_callback = None
         (self.DONE, self.READY, self.RUNNING, self.CANCELLED, self.FAILED) = range(5)
 
         # API usable in callback function
@@ -62,7 +65,10 @@ class NmapProcess:
         return None
 
     def get_command_line(self):
-        return "%s %s %s %s %s".lstrip() % (self._sudo_run, self._nmap_binary, self._nmap_fixed_options, self._nmap_dynamic_options, " ".join(self._nmap_targets))
+        return "%s %s %s %s %s".lstrip() % (self._sudo_run, self._nmap_binary,
+                                            self._nmap_fixed_options,
+                                            self._nmap_dynamic_options,
+                                            " ".join(self._nmap_targets))
 
     def set_command_line(self, targets, options='-sT'):
         self._nmap_targets = targets.split()
@@ -100,12 +106,16 @@ class NmapProcess:
     def wait(self):
         thread_stream = ''
         while self._nmap_proc.poll() is None or not self.__io_queue.empty():
-            try: thread_stream = self.__io_queue.get(timeout=1)
-            except Empty: pass
-            except KeyboardInterrupt: break
+            try:
+                thread_stream = self.__io_queue.get(timeout=1)
+            except Empty:
+                pass
+            except KeyboardInterrupt:
+                break
             else:
                 e = self.process_event(thread_stream)
-                if self._nmap_event_callback and e: self._nmap_event_callback(self, thread_stream)
+                if self._nmap_event_callback and e:
+                    self._nmap_event_callback(self, thread_stream)
                 self._nmap_results += thread_stream
 
         self._nmap_rc = self._nmap_proc.poll()
