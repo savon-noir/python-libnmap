@@ -102,7 +102,13 @@ class NmapHost(object):
 
 class NmapService(object):
     def __init__(self, portid, protocol='tcp', state={}, service={}):
-        self._portid = portid
+        try:
+            self._portid = int(portid or 0)
+        except ValueError, TypeError:
+            raise
+        if self._portid <= 0 or self._portid > 65535:
+            raise ValueError
+
         self._protocol = protocol
         self._state = state
         self._service = service
@@ -130,28 +136,34 @@ class NmapService(object):
 
     @property
     def state(self):
-        return self._state['state']
+        return self._state['state'] if 'state' in self._state else None
+
+    def add_state(self, state={}): 
+        self._state = state
 
     @property
     def service(self):
-        return self._service['name'] if self._service.has_key('name') else ''
+        return self._service['name'] if 'name' in self._service else None
+
+    def add_service(self, service={}):
+        self._service = service
 
     def open(self):
         return True if self._state['state'] and self._state['state'] == 'open' else False
     
-    def getStateChanged(self,other):
+    def getStateChanged(self, other):
         'return a set of keys for which the value has changed'
         return DictDiffer(self._state,other._state).changed() if self.port == other.port and self.protocol == other.protocol else ()
 
-    def getStateUnChanged(self,other):
+    def getStateUnChanged(self, other):
         'return a set of key for which the value hasn t changed value'
         return DictDiffer(self._state,other._state).unchanged() if self.port == other.port and self.protocol == other.protocol else ()
     
-    def getServiceDetailsChanged(self,other):
+    def getServiceDetailsChanged(self, other):
         'return a set of keys for which the value has changed'
         return DictDiffer(self._service,other._service).changed() if self.port == other.port and self.protocol == other.protocol else ()
  
-    def getServiceDetailsUnChanged(self,other):
+    def getServiceDetailsUnChanged(self, other):
         'return a set of key for which the value hasn t changed value'
         return DictDiffer(self._service,other._service).unchanged() if self.port == other.port and self.protocol == other.protocol else ()
 

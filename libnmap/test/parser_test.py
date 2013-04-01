@@ -4,7 +4,7 @@ import unittest
 import os, sys
 
 #sys.path.append("".join([os.path.dirname(__file__), "/../"]))
-from libnmap import NmapParser
+from libnmap import NmapParser, NmapParserException
 
 class TestNmapParser(unittest.TestCase):
     def setUp(self):
@@ -27,10 +27,26 @@ class TestNmapParser(unittest.TestCase):
 <port protocol="tcp" portid="25"><state state="filtered" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="smtp" method="table" conf="3"/></port>
 <port protocol="tcp" portid="80"><state state="open" reason="syn-ack" reason_ttl="51"/><service name="http" method="table" conf="3"/></port>
 <port protocol="tcp" portid="9929"><state state="open" reason="syn-ack" reason_ttl="53"/><service name="nping-echo" method="table" conf="3"/></port>
-</ports>
-                       """
+</ports>"""
+        self.ports_string2 = """<ports><extraports state="closed" count="996">
+<extrareasons reason="resets" count="996"/>
+</extraports>
+<port protocol="tcp" portid="A2"><state state="open" reason="syn-ack" reason_ttl="53"/><service name="ssh" method="table" conf="3"/></port>
+<port protocol="tcp" portid="25"><state state="filtered" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="smtp" method="table" conf="3"/></port>
+<port protocol="tcp" portid="80"><state state="open" reason="syn-ack" reason_ttl="51"/><service name="http" method="table" conf="3"/></port>
+<port protocol="tcp" portid="9929"><state state="open" reason="syn-ack" reason_ttl="53"/><service name="nping-echo" method="table" conf="3"/></port>
+</ports>"""
+
 
         self.port_string = '<port protocol="tcp" portid="25"><state state="filtered" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="smtp" method="table" conf="3"/></port>'
+        self.port_string2 = '<port protocol="tcp" portid=""><state state="filtered" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="smtp" method="table" conf="3"/></port>'
+        self.port_string3 = '<port></port>'
+        self.port_string4 = ''
+        self.port_string5 = 'GINGERBREADMAN'
+        self.port_string6 = '<port protocol="tcp" portid="FOOL"><state state="filtered" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="smtp" method="table" conf="3"/></port>'
+        self.port_string7 = '<port protocol="tcp" portid="22"><stAAte state="filtered" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="smtp" method="table" conf="3"/></port>'
+        self.port_string8 = '<port protocol="tcp" portid="22"><service name="smtp" method="table" conf="3"/></port>'
+        self.port_string9 = '<port protocol="tcp" portid="22"><state/><service name="smtp" method="table" conf="3"/></port>'
 
     def test_class_parser(self):
         for testfile in self.flist:
@@ -38,16 +54,33 @@ class TestNmapParser(unittest.TestCase):
             s = fd.read()
             fd.close()
             r = NmapParser.parse(s)
-            print r
             #self.assertEqual(len(nr.get_hosts()), testfile['hosts'])
 
     def test_class_ports_parser(self):
-            print NmapParser.parse_ports(self.ports_string)
+            plist = NmapParser.parse_ports(self.ports_string)
+            self.assertEqual(len(plist), 4)
+            self.assertEqual(sorted([ p.port for p in plist ]), sorted([22, 25, 9929, 80 ]))
+            self.assertRaises(ValueError, NmapParser.parse_ports, self.ports_string2)
 
     def test_class_port_parser(self):
-            print NmapParser.parse_port(self.port_string)
+            p = NmapParser.parse_port(self.port_string)
+            self.assertEqual(p.port, 25)
+            self.assertNotEqual(p.state, "open")
+            self.assertEqual(p.state, "filtered")
+            self.assertEqual(p.service, "smtp")
+
+    def test_port_except(self):
+        self.assertRaises(ValueError, NmapParser.parse_port, self.port_string2)
+        self.assertRaises(ValueError, NmapParser.parse_port, self.port_string3)
+        self.assertRaises(NmapParserException, NmapParser.parse_port, self.port_string4)
+        self.assertRaises(NmapParserException, NmapParser.parse_port, self.port_string5)
+        self.assertRaises(ValueError, NmapParser.parse_port, self.port_string6)
+        self.assertRaises(NmapParserException, NmapParser.parse_port, self.port_string7)
+        self.assertRaises(NmapParserException, NmapParser.parse_port, self.port_string8)
+        self.assertRaises(NmapParserException, NmapParser.parse_port, self.port_string9)
+              
 if __name__ == '__main__':
-    test_suite = [ 'test_class_parser', 'test_class_ports_parser' , 'test_class_port_parser']
+    test_suite = [ 'test_class_parser', 'test_class_ports_parser' , 'test_class_port_parser', 'test_port_except']
 #    io_file = StringIO()
     suite = unittest.TestSuite(map(TestNmapParser, test_suite))
     test_result = unittest.TextTestRunner(verbosity=2).run(suite) ## for more verbosity uncomment this line and comment next line

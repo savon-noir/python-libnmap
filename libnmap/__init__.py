@@ -4,3 +4,4 @@ __version__ = '0.1'
 from common import *
 from process import *
 from parser import *
+from report import *
