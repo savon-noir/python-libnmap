@@ -1,3 +1,10 @@
+v0.1.3, 04/04/2013 -- Full refactory of NmapParser with static method
+                    - added support for diffing NmapHost and NmapService
+                    - corrected en hardened code for NmapParser
+                    - added NmapParserException class
+                    - added NmapReport class
+                    - added unittest for report api
+                    - added unittest for parser
 v0.1.2, 13/03/2013 -- Bug Fixes and improvement after refactory
                     - added scaninfo parsing
                     - corrected unused variables and wrong unittests

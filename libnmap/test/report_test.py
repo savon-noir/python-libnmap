@@ -38,6 +38,10 @@ class TestNmapParser(unittest.TestCase):
         } ]
 
         self.flist = self.flist_full
+        self.port_string = '<port protocol="tcp" portid="25"><state state="filtered" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="smtp" method="table" conf="3"/></port>'
+        self.port_string_other2 = '<port protocol="tcp" portid="25"><state state="open" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="smtp" method="table" conf="3"/></port>'
+        self.port_string_other3 = '<port protocol="tcp" portid="22"><state state="open" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="smtp" method="table" conf="3"/></port>'
+        self.port_string_other4 = '<port protocol="tcp" portid="22"><state state="willy_woncka" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="smtp" method="table" conf="3"/></port>'
 
     def test_report_constructor(self):
         for testfile in self.flist:
@@ -160,11 +164,44 @@ class TestNmapParser(unittest.TestCase):
             host1.services[0]._portid ='23'
             self.assertEqual(host1 , host2)
 
+    def test_port_state_changed(self):
+        nservice1 = NmapParser.parse_port(self.port_string)
+        nservice2 = NmapParser.parse_port(self.port_string_other2)
+        nservice3 = NmapParser.parse_port(self.port_string_other3)
+        nservice4 = NmapParser.parse_port(self.port_string_other4)
+
+        self.assertEqual(nservice1.get_state_changed(nservice2).pop(), 'state')
+        self.assertEqual(nservice1.get_state_changed(nservice3), set())
+        self.assertEqual(nservice1.get_state_changed(nservice4), set())
+
+        self.assertEqual(nservice2.get_state_changed(nservice3), set())
+
+        self.assertEqual(nservice3.get_state_changed(nservice4).pop(), 'state')
+### FIXME: <open question>
+#          - the whole _state dict is evaluate for diff. Is this what we really want? 
+#            Shouldn't we create a new dict to diff based on some keys ?
+    def test_port_state_unchanged(self):
+        nservice1 = NmapParser.parse_port(self.port_string)
+        nservice2 = NmapParser.parse_port(self.port_string_other2)
+        nservice3 = NmapParser.parse_port(self.port_string_other3)
+        nservice4 = NmapParser.parse_port(self.port_string_other4)
+
+     #   self.assertEqual(nservice1.get_state_unchanged(nservice2), set())
+     #   self.assertEqual(nservice1.get_state_unchanged(nservice3).pop(), 'state')
+     #   self.assertEqual(nservice1.get_state_unchanged(nservice4).pop(), 'state')
+
+     #  self.assertEqual(nservice2.get_state_unchanged(nservice3).pop(), 'state')
+
+     #   self.assertEqual(nservice3.get_state_unchanged(nservice4), set())
+
 
 
 if __name__ == '__main__':
 #    test_suite = ['test_get_hosts' , 'test_get_ports', 'test_runstats', 'test_banner', 'test_serviceEqual', 'test_serviceNotEqual', 'test_HostNotEqual', 'test_HostEqual']
-    test_suite = ['test_report_constructor', 'test_get_ports', 'test_runstats', 'test_banner' , 'test_service_equal', 'test_service_not_equal', 'test_host_not_equal' , 'test_host_equal' ] 
+    test_suite = ['test_report_constructor', 'test_get_ports', 'test_runstats',
+                  'test_banner' , 'test_service_equal', 'test_service_not_equal', 
+                  'test_host_not_equal' , 'test_host_equal', 'test_port_state_changed',
+                  'test_port_state_unchanged' ] 
 #    io_file = StringIO()
     suite = unittest.TestSuite(map(TestNmapParser, test_suite))
     test_result = unittest.TextTestRunner(verbosity=2).run(suite) ## for more verbosity uncomment this line and comment next line

@@ -103,10 +103,10 @@ class NmapHost(object):
 class NmapService(object):
     def __init__(self, portid, protocol='tcp', state={}, service={}):
         try:
-            self._portid = int(portid or 0)
+            self._portid = int(portid or -1)
         except ValueError, TypeError:
             raise
-        if self._portid <= 0 or self._portid > 65535:
+        if self._portid < 0 or self._portid > 65535:
             raise ValueError
 
         self._protocol = protocol
@@ -151,21 +151,21 @@ class NmapService(object):
     def open(self):
         return True if self._state['state'] and self._state['state'] == 'open' else False
     
-    def getStateChanged(self, other):
+    def get_state_changed(self, other):
         'return a set of keys for which the value has changed'
-        return DictDiffer(self._state,other._state).changed() if self.port == other.port and self.protocol == other.protocol else ()
+        return DictDiffer(self._state, other._state).changed() if self.port == other.port and self.protocol == other.protocol else set()
 
-    def getStateUnChanged(self, other):
+    def get_state_unchanged(self, other):
         'return a set of key for which the value hasn t changed value'
-        return DictDiffer(self._state,other._state).unchanged() if self.port == other.port and self.protocol == other.protocol else ()
+        return DictDiffer(self._state, other._state).unchanged() if self.port == other.port and self.protocol == other.protocol else set()
     
     def getServiceDetailsChanged(self, other):
         'return a set of keys for which the value has changed'
-        return DictDiffer(self._service,other._service).changed() if self.port == other.port and self.protocol == other.protocol else ()
+        return DictDiffer(self._service, other._service).changed() if self.port == other.port and self.protocol == other.protocol else set()
  
     def getServiceDetailsUnChanged(self, other):
         'return a set of key for which the value hasn t changed value'
-        return DictDiffer(self._service,other._service).unchanged() if self.port == other.port and self.protocol == other.protocol else ()
+        return DictDiffer(self._service, other._service).unchanged() if self.port == other.port and self.protocol == other.protocol else set()
 
     def get_banner(self):
         notrelevant = ['name', 'method', 'conf' ]
