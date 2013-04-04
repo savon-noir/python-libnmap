@@ -88,7 +88,11 @@ class NmapProcess:
         except KeyError:
             raise
 
-        self._sudo_run = "sudo -u %s" % (sudo_user)
+        sudo_path = self._whereis("sudo")
+        if sudo_path is None:
+            raise EnvironmentError(2, "sudo is not installed or could not be found in system path: cannot run nmap with sudo")
+
+        self._sudo_run = "%s -u %s" % (sudo_path, sudo_user)
         rc = self.run()
         self._sudo_run = ""
 
