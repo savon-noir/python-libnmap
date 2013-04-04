@@ -25,7 +25,13 @@ class NmapHost(object):
                                          self.services,
                                          self.status)
 
-    def statusChanged(self, other):
+    def address_changed(self, other):
+        return DictDiffer(self._address, other._address).changed()
+
+    def address_unchanged(self, other):
+        return DictDiffer(self._address, other._address).unchanged()
+
+    def status_changed(self, other):
         setdiff = DictDiffer(self.status, other.status)
         return setdiff.changed()
 
@@ -68,6 +74,10 @@ class NmapHost(object):
     def status(self):
         return self._status
 
+    @property
+    def hostname(self):
+        return self._hostnames[0] if len(self._hostnames) else self.address
+
     @status.setter
     def status(self, statusdict):
         self._status = statusdict
@@ -84,9 +94,6 @@ class NmapHost(object):
             raise Exception("Object type should be NmapService \
                             for add_service")
         return v
-
-    def get_hostname(self):
-        return self._hostnames[0] if len(self._hostnames) else self.address
 
     def get_ports(self):
         return [p.port for p in self._services]
@@ -115,11 +122,11 @@ class NmapService(object):
 
     def __eq__(self, other):
         return  (self.port == other.port and self.protocol == other.protocol and \
-                len(DictDiffer(self._state,other._state).changed()) == 0)
+                    len(DictDiffer(self._state,other._state).changed()) == 0)
 
     def __ne__(self, other):
         return  self.port != other.port or self.protocol != other.protocol or \
-                len(DictDiffer(self._state,other._state).changed()) > 0
+                    len(DictDiffer(self._state,other._state).changed()) > 0
 
     def __repr__(self):
         return "%s(%s - %s - %s -%s)" % (self.__class__, self._portid, self._protocol, self._service, self._state)

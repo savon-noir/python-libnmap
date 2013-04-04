@@ -31,6 +31,7 @@ class NmapReport(object):
     def name(self):
         return self._name
 
+    ### implement with iterators 
     @property
     def scanned_hosts(self):
         return self._hosts
