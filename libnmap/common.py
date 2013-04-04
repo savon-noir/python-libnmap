@@ -114,11 +114,12 @@ class NmapService(object):
         self._service = service
 
     def __eq__(self, other):
-        return  (self._portid == other._portid  and
+        return  (self.port == other.port and self.protocol == other.protocol and \
                 len(DictDiffer(self._state,other._state).changed()) == 0)
 
     def __ne__(self, other):
-        return  self._portid != other._portid  or len(DictDiffer(self._state,other._state).changed()) > 0
+        return  self.port != other.port or self.protocol != other.protocol or \
+                len(DictDiffer(self._state,other._state).changed()) > 0
 
     def __repr__(self):
         return "%s(%s - %s - %s -%s)" % (self.__class__, self._portid, self._protocol, self._service, self._state)
@@ -159,7 +160,7 @@ class NmapService(object):
         'return a set of key for which the value hasn t changed value'
         return DictDiffer(self._state, other._state).unchanged() if self.port == other.port and self.protocol == other.protocol else set()
     
-    def getServiceDetailsChanged(self, other):
+    def get_service_changed(self, other):
         'return a set of keys for which the value has changed'
         return DictDiffer(self._service, other._service).changed() if self.port == other.port and self.protocol == other.protocol else set()
  
@@ -167,7 +168,8 @@ class NmapService(object):
         'return a set of key for which the value hasn t changed value'
         return DictDiffer(self._service, other._service).unchanged() if self.port == other.port and self.protocol == other.protocol else set()
 
-    def get_banner(self):
+    @property
+    def banner(self):
         notrelevant = ['name', 'method', 'conf' ]
         b = ''
         if self._service and self._service['method'] == "probed":

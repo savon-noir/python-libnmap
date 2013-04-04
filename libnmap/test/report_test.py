@@ -40,8 +40,14 @@ class TestNmapParser(unittest.TestCase):
         self.flist = self.flist_full
         self.port_string = '<port protocol="tcp" portid="25"><state state="filtered" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="smtp" method="table" conf="3"/></port>'
         self.port_string_other2 = '<port protocol="tcp" portid="25"><state state="open" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="smtp" method="table" conf="3"/></port>'
-        self.port_string_other3 = '<port protocol="tcp" portid="22"><state state="open" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="smtp" method="table" conf="3"/></port>'
-        self.port_string_other4 = '<port protocol="tcp" portid="22"><state state="willy_woncka" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="smtp" method="table" conf="3"/></port>'
+        self.port_string_other3 = '<port protocol="tcp" portid="22"><state state="open" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="ssh" method="table" conf="3"/></port>'
+        self.port_string_other4 = '<port protocol="tcp" portid="22"><state state="willy_woncka" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="willywoncka" method="table" conf="3"/></port>'
+
+        self.port_string_other5 = '<port protocol="tcp" portid="22"><state state="willy_woncka" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="ssh" method="table" conf="3"/></port>'
+        self.port_string_other6 = '<port protocol="tcp" portid="25"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="smtp" product="Postfix smtpd" hostname=" jambon.localdomain" method="probed" conf="10"/></port>'
+        self.port_string_other7 = '<port protocol="tcp" portid="111"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="rpcbind" method="probed" conf="10"/></port>'
+        self.port_string_other8 = '<port protocol="tcp" portid="631"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="ipp" product="CUPS" version="1.4" method="probed" conf="10"/></port>'
+        self.port_string_other9 = '<port protocol="tcp" portid="631"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="ipp" product="COPS" version="1.4" method="probed" conf="10"/></port>'
 
     def test_report_constructor(self):
         for testfile in self.flist:
@@ -94,7 +100,7 @@ class TestNmapParser(unittest.TestCase):
 
             for h in nr.scanned_hosts:
                 for service in h.services:
-                    b = service.get_banner()
+                    b = service.banner
                     self.assertEqual(b, testfile['banner'][str(service.port)]) 
     
     def test_service_equal(self):
@@ -113,7 +119,7 @@ class TestNmapParser(unittest.TestCase):
                 self.assertEqual(hash(host1.services[i]),hash(host2.services[i]))
                 self.assertEqual(host1.services[i] , host2.services[i])
 
-            print host1.serviceChanged(host2)
+            #print host1.serviceChanged(host2)
 
 
     def test_service_not_equal(self):
@@ -130,9 +136,9 @@ class TestNmapParser(unittest.TestCase):
             for i in range(len(host1.services)): 
                 host1.services[i]._state['state'] = 'changed'
                 self.assertNotEqual(host1.services[i] , host2.services[i])
-            print "-----------" 
-            print host1.serviceChanged(host2)
-            print "-----------"
+            #print "-----------" 
+            #print host1.serviceChanged(host2)
+            #print "-----------"
 
     def test_host_not_equal(self):
         for testfile in self.flist:
@@ -180,28 +186,58 @@ class TestNmapParser(unittest.TestCase):
 ### FIXME: <open question>
 #          - the whole _state dict is evaluate for diff. Is this what we really want? 
 #            Shouldn't we create a new dict to diff based on some keys ?
+#"""
+#1 = '<port protocol="tcp" portid="25"><state state="filtered" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/>
+#    <service name="smtp" method="table" conf="3"/></port>'
+#2 = '<port protocol="tcp" portid="25"><state state="open" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/>
+#     <service name="smtp" method="table" conf="3"/></port>'
+#3 = '<port protocol="tcp" portid="22"><state state="open" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/>
+#     <service name="smtp" method="table" conf="3"/></port>'
+#4 = '<port protocol="tcp" portid="22"><state state="willy_woncka" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/>
+#     <service name="smtp" method="table" conf="3"/></port>'
+#"""
+
     def test_port_state_unchanged(self):
         nservice1 = NmapParser.parse_port(self.port_string)
         nservice2 = NmapParser.parse_port(self.port_string_other2)
         nservice3 = NmapParser.parse_port(self.port_string_other3)
         nservice4 = NmapParser.parse_port(self.port_string_other4)
 
-     #   self.assertEqual(nservice1.get_state_unchanged(nservice2), set())
-     #   self.assertEqual(nservice1.get_state_unchanged(nservice3).pop(), 'state')
-     #   self.assertEqual(nservice1.get_state_unchanged(nservice4).pop(), 'state')
+        self.assertEqual(nservice1.get_state_unchanged(nservice2), set(['reason', 'reason_ttl', 'reason_ip']))
+        self.assertEqual(nservice1.get_state_unchanged(nservice3), set())
+        self.assertEqual(nservice1.get_state_unchanged(nservice4), set())
 
-     #  self.assertEqual(nservice2.get_state_unchanged(nservice3).pop(), 'state')
+        self.assertEqual(nservice1.get_state_unchanged(nservice2), set(['reason', 'reason_ttl', 'reason_ip']))
+#
+#1 '<port protocol="tcp" portid="25"><state state="filtered" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="smtp" method="table" conf="3"/></port>'
+#2 = '<port protocol="tcp" portid="25"><state state="open" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="smtp" method="table" conf="3"/></port>'
+#3 = '<port protocol="tcp" portid="22"><state state="open" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="ssh" method="table" conf="3"/></port>'
+#4 = '<port protocol="tcp" portid="22"><state state="willy_woncka" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="willywoncka" method="table" conf="3"/></port>'
+#
+#5 = '<port protocol="tcp" portid="22"><state state="willy_woncka" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="ssh" method="table" conf="3"/></port>'
+#6 = '<port protocol="tcp" portid="25"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="smtp" product="Postfix smtpd" hostname=" jambon.localdomain" method="probed" conf="10"/></port>'
+#7 = '<port protocol="tcp" portid="111"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="rpcbind" method="probed" conf="10"/></port>'
+#8 = '<port protocol="tcp" portid="631"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="ipp" product="CUPS" version="1.4" method="probed" conf="10"/></port>'
+    def test_port_service_changed(self):
+        nservice1 = NmapParser.parse_port(self.port_string)
+        nservice2 = NmapParser.parse_port(self.port_string_other2)
+        nservice4 = NmapParser.parse_port(self.port_string_other4)
+        nservice5 = NmapParser.parse_port(self.port_string_other5)
+        nservice8 = NmapParser.parse_port(self.port_string_other8)
+        nservice9 = NmapParser.parse_port(self.port_string_other9)
 
-     #   self.assertEqual(nservice3.get_state_unchanged(nservice4), set())
-
-
+        self.assertEqual(nservice1.get_service_changed(nservice2), set())
+        self.assertEqual(nservice5.get_service_changed(nservice4).pop(), 'name')
+        # banner changed
+        self.assertEqual(nservice8.get_service_changed(nservice9).pop(), 'product')
+#
 
 if __name__ == '__main__':
 #    test_suite = ['test_get_hosts' , 'test_get_ports', 'test_runstats', 'test_banner', 'test_serviceEqual', 'test_serviceNotEqual', 'test_HostNotEqual', 'test_HostEqual']
     test_suite = ['test_report_constructor', 'test_get_ports', 'test_runstats',
                   'test_banner' , 'test_service_equal', 'test_service_not_equal', 
                   'test_host_not_equal' , 'test_host_equal', 'test_port_state_changed',
-                  'test_port_state_unchanged' ] 
+                  'test_port_state_unchanged', 'test_port_service_changed' ] 
 #    io_file = StringIO()
     suite = unittest.TestSuite(map(TestNmapParser, test_suite))
     test_result = unittest.TextTestRunner(verbosity=2).run(suite) ## for more verbosity uncomment this line and comment next line
