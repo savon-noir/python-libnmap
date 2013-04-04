@@ -1,5 +1,8 @@
 #!/usr/bin/env python 
-import os, sys, shlex
+import os
+import sys
+import pwd
+import shlex
 import time
 import subprocess
 from threading  import Thread
@@ -18,12 +21,18 @@ class NmapProcess:
         self._nmap_binary_name = "nmap"
         self._nmap_fixed_options = "-oX - -vvv --stats-every 2s"
         self._nmap_binary = self._whereis(self._nmap_binary_name)
+        if self._nmap_binary is None:
+            raise EnvironmentError(1, "nmap is not installed or could not be found in system path")
+        
         self._sudo_run = ""
         self._nmap_targets = targets.split() if isinstance(targets, str) else targets
         self._nmap_dynamic_options = options
 
         self._nmap_command_line = self.get_command_line()
-        self._nmap_event_callback = event_callback if event_callback and callable(event_callback) else None
+        if event_callback and callable(event_callback):
+            self._nmap_event_callback = event_callback
+        else:
+            self._nmap_event_callback = None
         (self.DONE, self.READY, self.RUNNING, self.CANCELLED, self.FAILED) = range(5)
 
         # API usable in callback function
@@ -62,7 +71,10 @@ class NmapProcess:
         return None
 
     def get_command_line(self):
-        return "%s %s %s %s %s".lstrip() % (self._sudo_run, self._nmap_binary, self._nmap_fixed_options, self._nmap_dynamic_options, " ".join(self._nmap_targets))
+        return "%s %s %s %s %s".lstrip() % (self._sudo_run, self._nmap_binary,
+                                            self._nmap_fixed_options,
+                                            self._nmap_dynamic_options,
+                                            " ".join(self._nmap_targets))
 
     def set_command_line(self, targets, options='-sT'):
         self._nmap_targets = targets.split()
@@ -70,7 +82,17 @@ class NmapProcess:
         self._nmap_command_line = self.get_command_line()
 
     def sudo_run(self, run_as='root'):
-        self._sudo_run = "sudo -u %s" % (run_as)
+        sudo_user = run_as.split(" ").pop()
+        try:
+            s_uid = pwd.getpwnam(sudo_user).pw_uid
+        except KeyError:
+            raise
+
+        sudo_path = self._whereis("sudo")
+        if sudo_path is None:
+            raise EnvironmentError(2, "sudo is not installed or could not be found in system path: cannot run nmap with sudo")
+
+        self._sudo_run = "%s -u %s" % (sudo_path, sudo_user)
         rc = self.run()
         self._sudo_run = ""
 
@@ -100,12 +122,16 @@ class NmapProcess:
     def wait(self):
         thread_stream = ''
         while self._nmap_proc.poll() is None or not self.__io_queue.empty():
-            try: thread_stream = self.__io_queue.get(timeout=1)
-            except Empty: pass
-            except KeyboardInterrupt: break
+            try:
+                thread_stream = self.__io_queue.get(timeout=1)
+            except Empty:
+                pass
+            except KeyboardInterrupt:
+                break
             else:
                 e = self.process_event(thread_stream)
-                if self._nmap_event_callback and e: self._nmap_event_callback(self, thread_stream)
+                if self._nmap_event_callback and e:
+                    self._nmap_event_callback(self, thread_stream)
                 self._nmap_results += thread_stream
 
         self._nmap_rc = self._nmap_proc.poll()
@@ -164,7 +190,6 @@ def main(argv):
             print "Progress: %s %% - ETC: %s" % (nmapscan.progress, nmapscan.etc)
 
     nm = NmapProcess("localhost", options="-sT", event_callback=mycallback)
-    print nm.get_command_line()
     rc = nm.run()
 
     if rc == 0:
