@@ -25,7 +25,13 @@ class NmapHost(object):
                                          self.services,
                                          self.status)
 
-    def statusChanged(self, other):
+    def address_changed(self, other):
+        return DictDiffer(self._address, other._address).changed()
+
+    def address_unchanged(self, other):
+        return DictDiffer(self._address, other._address).unchanged()
+
+    def status_changed(self, other):
         setdiff = DictDiffer(self.status, other.status)
         return setdiff.changed()
 
@@ -68,6 +74,10 @@ class NmapHost(object):
     def status(self):
         return self._status
 
+    @property
+    def hostname(self):
+        return self._hostnames[0] if len(self._hostnames) else self.address
+
     @status.setter
     def status(self, statusdict):
         self._status = statusdict
@@ -81,12 +91,9 @@ class NmapHost(object):
             self._services.append(nmapservice)
             v = True
         else:
-            raise Exception("Object type should be NmapService
+            raise Exception("Object type should be NmapService \
                             for add_service")
         return v
-
-    def get_hostname(self):
-        return self._hostnames[0] if len(self._hostnames) else self.address
 
     def get_ports(self):
         return [p.port for p in self._services]
@@ -102,17 +109,24 @@ class NmapHost(object):
 
 class NmapService(object):
     def __init__(self, portid, protocol='tcp', state={}, service={}):
-        self._portid = portid
+        try:
+            self._portid = int(portid or -1)
+        except ValueError, TypeError:
+            raise
+        if self._portid < 0 or self._portid > 65535:
+            raise ValueError
+
         self._protocol = protocol
         self._state = state
         self._service = service
 
     def __eq__(self, other):
-        return  (self._portid == other._portid  and
-                len(DictDiffer(self._state,other._state).changed()) == 0)
+        return  (self.port == other.port and self.protocol == other.protocol and \
+                    len(DictDiffer(self._state,other._state).changed()) == 0)
 
     def __ne__(self, other):
-        return  self._portid != other._portid  or len(DictDiffer(self._state,other._state).changed()) > 0
+        return  self.port != other.port or self.protocol != other.protocol or \
+                    len(DictDiffer(self._state,other._state).changed()) > 0
 
     def __repr__(self):
         return "%s(%s - %s - %s -%s)" % (self.__class__, self._portid, self._protocol, self._service, self._state)
@@ -130,32 +144,39 @@ class NmapService(object):
 
     @property
     def state(self):
-        return self._state['state']
+        return self._state['state'] if 'state' in self._state else None
+
+    def add_state(self, state={}): 
+        self._state = state
 
     @property
     def service(self):
-        return self._service['name'] if self._service.has_key('name') else ''
+        return self._service['name'] if 'name' in self._service else None
+
+    def add_service(self, service={}):
+        self._service = service
 
     def open(self):
         return True if self._state['state'] and self._state['state'] == 'open' else False
     
-    def getStateChanged(self,other):
+    def get_state_changed(self, other):
         'return a set of keys for which the value has changed'
-        return DictDiffer(self._state,other._state).changed() if self.port == other.port and self.protocol == other.protocol else ()
+        return DictDiffer(self._state, other._state).changed() if self.port == other.port and self.protocol == other.protocol else set()
 
-    def getStateUnChanged(self,other):
+    def get_state_unchanged(self, other):
         'return a set of key for which the value hasn t changed value'
-        return DictDiffer(self._state,other._state).unchanged() if self.port == other.port and self.protocol == other.protocol else ()
+        return DictDiffer(self._state, other._state).unchanged() if self.port == other.port and self.protocol == other.protocol else set()
     
-    def getServiceDetailsChanged(self,other):
+    def get_service_changed(self, other):
         'return a set of keys for which the value has changed'
-        return DictDiffer(self._service,other._service).changed() if self.port == other.port and self.protocol == other.protocol else ()
+        return DictDiffer(self._service, other._service).changed() if self.port == other.port and self.protocol == other.protocol else set()
  
-    def getServiceDetailsUnChanged(self,other):
+    def getServiceDetailsUnChanged(self, other):
         'return a set of key for which the value hasn t changed value'
-        return DictDiffer(self._service,other._service).unchanged() if self.port == other.port and self.protocol == other.protocol else ()
+        return DictDiffer(self._service, other._service).unchanged() if self.port == other.port and self.protocol == other.protocol else set()
 
-    def get_banner(self):
+    @property
+    def banner(self):
         notrelevant = ['name', 'method', 'conf' ]
         b = ''
         if self._service and self._service['method'] == "probed":
