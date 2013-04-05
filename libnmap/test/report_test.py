@@ -8,18 +8,19 @@ from libnmap import NmapParser, NmapReport
 
 class TestNmapParser(unittest.TestCase):
     def setUp(self):
-        self.flist_full = [{'file': 'test/2_hosts.xml', 'hosts': 2}, {'file': 'test/1_hosts.xml', 'hosts': 1},
-                   {'file': 'test/1_hosts_banner_ports_notsyn.xml', 'hosts': 1},
-                  # {'file': 'test/1_hosts_banner_ports_xmas.xml', 'hosts': 1},
-                   {'file': 'test/1_hosts_banner_ports.xml', 'hosts': 1},
-                   {'file': 'test/1_hosts_banner.xml', 'hosts': 1},
-                   {'file': 'test/2_hosts_version.xml', 'hosts': 2},
-                  # {'file': 'test/2_null_hosts.xml', 'hosts': 2},
-                   {'file': 'test/2_tcp_hosts.xml', 'hosts': 2},
-                   {'file': 'test/1_hosts_nohostname.xml', 'hosts': 1},
+        fdir = os.path.dirname(os.path.realpath(__file__))
+        self.flist_full = [{'file': "%s/%s" % (fdir, 'files/2_hosts.xml'), 'hosts': 2}, {'file': "%s/%s" % (fdir, 'files/1_hosts.xml'), 'hosts': 1},
+                   {'file': "%s/%s" % (fdir, 'files/1_hosts_banner_ports_notsyn.xml'), 'hosts': 1},
+                  # {'file':"%s/%s" % (fdir,  files//1_hosts_banner_ports_xmas.xml'), 'hosts': 1},
+                   {'file': "%s/%s" % (fdir, 'files/1_hosts_banner_ports.xml'), 'hosts': 1},
+                   {'file': "%s/%s" % (fdir, 'files/1_hosts_banner.xml'), 'hosts': 1},
+                   {'file': "%s/%s" % (fdir, 'files/2_hosts_version.xml'), 'hosts': 2},
+                  # {'file':"%s/%s" % (fdir,  files//2_null_hosts.xml'), 'hosts': 2},
+                   {'file': "%s/%s" % (fdir, 'files/2_tcp_hosts.xml'), 'hosts': 2},
+                   {'file': "%s/%s" % (fdir, 'files/1_hosts_nohostname.xml'), 'hosts': 1},
         ]
-        self.flist_one = [{'file': 'test/1_hosts_nohostname.xml', 'hosts': 1}]
-        self.flist_two = [{'file': 'test/2_hosts.xml', 'hosts': 2, 
+        self.flist_one = [{'file': "%s/%s" % (fdir, 'files/1_hosts_nohostname.xml'), 'hosts': 1}]
+        self.flist_two = [{'file': "%s/%s" % (fdir, 'files/2_hosts.xml'), 'hosts': 2, 
                            'elapsed': '134.36', 'endtime': "1361738040", 
                            'summary': "Nmap done at Sun Feb 24 21:34:00 2013; 2 IP addresses (2 hosts up) scanned in 134.36 seconds"}]
 
@@ -28,7 +29,7 @@ class TestNmapParser(unittest.TestCase):
                           {'hostname': 'scanme.nmap.org', 'ports': 4, 'open': 3},
                           {'hostname': '1.1.1.1', 'ports': 2, 'open': 0},
         ]
-        self.flist_banner = [ {'file': 'test/1_hosts_banner.xml', 
+        self.flist_banner = [ {'file': "%s/%s" % (fdir, 'files/1_hosts_banner.xml'), 
                                'banner': { '631': 'product: CUPS version: 1.4',
                                            '3306': 'product: MySQL version: 5.1.61',
                                            '22': 'product: OpenSSH extrainfo: protocol 2.0 version: 5.3',
@@ -210,8 +211,9 @@ class TestNmapParser(unittest.TestCase):
         self.assertEqual(nservice8.get_service_changed(nservice9).pop(), 'product')
 
     def test_host_address_changed(self):
-        fd1 = open('test/1_hosts_down.xml', 'r')
-        fd2 = open('test/1_hosts.xml', 'r')
+        fdir = os.path.dirname(os.path.realpath(__file__))
+        fd1 = open("%s/%s" % (fdir, 'files/1_hosts_down.xml'), 'r')
+        fd2 = open("%s/%s" % (fdir, 'files/1_hosts.xml'), 'r')
         rd1 = NmapParser.parse(fd1.read())
         rd2 = NmapParser.parse(fd2.read())
         nr1 = NmapReport('r1', rd1)
@@ -220,9 +222,10 @@ class TestNmapParser(unittest.TestCase):
         self.assertEqual(nr1.scanned_hosts.pop().address_changed(nr2.scanned_hosts.pop()).pop(), 'addr')
 
     def test_host_address_unchanged(self):
-        fd1 = open('test/1_hosts_down.xml', 'r')
-        fd2 = open('test/1_hosts.xml', 'r')
-        fd3 = open('test/1_hosts.xml', 'r')
+        fdir = os.path.dirname(os.path.realpath(__file__))
+        fd1 = open("%s/%s" % (fdir, 'files/1_hosts_down.xml'), 'r')
+        fd2 = open("%s/%s" % (fdir, 'files/1_hosts.xml'), 'r')
+        fd3 = open("%s/%s" % (fdir, 'files/1_hosts.xml'), 'r')
         rd1 = NmapParser.parse(fd1.read())
         rd2 = NmapParser.parse(fd2.read())
         rd3 = NmapParser.parse(fd3.read())
