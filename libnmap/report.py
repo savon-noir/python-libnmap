@@ -1,9 +1,8 @@
 #!/usr/bin/env python
-
+from libnmap import NmapParser, NmapParserException, DictDiffer
 
 ## TODO:  del/add_host()
 #         add/del_service()
-
 class NmapReport(object):
     def __init__(self, name='', raw_data=None):
         self._name = name
@@ -15,11 +14,19 @@ class NmapReport(object):
             self.set_raw_data(raw_data)
 
     def report_import(self, file_path):
-        return 0
+        try:
+            set_raw_data(NmapParser.parse_fromfile(file_path))
+        except:
+            raise NmapParserException("Error while trying to import file: {0}".format(file_path))
+
     def report_export(self, file_path, output='csv'):
         return 0
+
     def diff(self, other):
-        return 0
+        diff_dict = {}
+        report_diffs = NmapDiff(self, other) 
+
+        return report_diffs
 
     def set_raw_data(self, raw_data):
         self._nmaprun = raw_data['nmaprun']
@@ -56,5 +63,27 @@ class NmapReport(object):
         }
         return raw_data
 
+    def is_consistent(self):
+        r = False
+        rd = self.get_raw_data()
+        if set(['nmaprun', 'scaninfo', 'hosts', 'runstats']) == set(rd.keys()) and \
+            len([ k for k in rd.keys() if rd[k] is not None ]) == 4:
+                r = True
+        return r
+
     def __repr__(self):
         return "{0} {1} hosts: {2} {3}".format(self._nmaprun, self._scaninfo, len(self._hosts), self._runstats)
+
+    def get_dict(self):
+        return dict([ (h.address, h) for h in self.scanned_hosts ])
+
+class NmapDiff(DictDiffer):
+    class NmapDiffException(Exception):
+        def __init__(self, msg):
+            self.msg = msg
+
+    def __init__(self, nmap_obj1, nmap_obj2):
+        self.object1 = nmap_obj1.get_dict()
+        self.object2 = nmap_obj2.get_dict()
+
+        DictDiffer.__init__(self, self.object1, self.object2)

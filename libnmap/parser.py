@@ -1,17 +1,21 @@
 #!/usr/bin/env python
+import os
 import xml.etree.ElementTree as ET
 from StringIO import StringIO
 from libnmap import NmapHost, NmapService
 
 class NmapParser(object):
     @classmethod
-    def parse(cls, nmap_xml_report=None, type='XML'):
+    def parse(cls, nmap_data=None, type='XML'):
         nmap_scan = { 'nmaprun': {}, 'scaninfo': {}, 'hosts': [], 'runstats': {} }
-        if not nmap_xml_report:
-            raise Exception("No report to parse")
+        if not nmap_data:
+            raise NmapParserException("No report data to parse: please provide a file")
 
         try:
-            tree = ET.parse(StringIO(nmap_xml_report))
+            if isinstance(nmap_data, str):
+                tree = ET.parse(StringIO(nmap_data))
+            elif isinstance(nmap_data, file):
+                tree = ET.parse(nmap_data)
         except:
             raise
 
@@ -19,7 +23,7 @@ class NmapParser(object):
         if root.tag == 'nmaprun':
                 nmap_scan['nmaprun'] = cls.__format_attributes(root)
         else:
-            raise Exception('Unpexpected data structure for XML root node')
+            raise NmapParserException('Unpexpected data structure for XML root node')
         for el in root:
             if el.tag == 'scaninfo':
                 nmap_scan['scaninfo'] = cls.parse_scaninfo(el)
@@ -29,6 +33,20 @@ class NmapParser(object):
                 nmap_scan['runstats'] = cls.parse_runstats(el)
             #else: print "struct pparse unknown attr: %s value: %s" % (el.tag, el.get(el.tag))
         return nmap_scan
+
+    @classmethod
+    def parse_fromstring(cls, nmap_data, type="XML"):
+        return cls.parse(nmap_data, type)
+
+    @classmethod
+    def parse_fromfile(cls, nmap_report_path, type="XML"):
+        if os.path.exists(nmap_report_path):
+            fd = open(nmap_report_path, 'r')
+            r = cls.parse(fd, type)
+            fd.close()
+        else:
+            raise NmapParserException("Nmap data file could not be found or permissions were not set correctly")
+        return r
 
     @classmethod
     def parse_scaninfo(cls, scaninfo_data):

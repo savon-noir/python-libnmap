@@ -79,9 +79,12 @@ class TestNmapParser(unittest.TestCase):
         self.assertRaises(NmapParserException, NmapParser.parse_port, self.port_string7)
         self.assertRaises(NmapParserException, NmapParser.parse_port, self.port_string8)
         self.assertRaises(NmapParserException, NmapParser.parse_port, self.port_string9)
+
+    def test_parser_generic(self):
+        plist = NmapParser.parse_fromstring(self.ports_string)
               
 if __name__ == '__main__':
-    test_suite = [ 'test_class_parser', 'test_class_ports_parser' , 'test_class_port_parser', 'test_port_except']
+    test_suite = [ 'test_class_parser', 'test_class_ports_parser' , 'test_class_port_parser', 'test_port_except', 'test_parser_generic']
 #    io_file = StringIO()
     suite = unittest.TestSuite(map(TestNmapParser, test_suite))
     test_result = unittest.TextTestRunner(verbosity=2).run(suite) ## for more verbosity uncomment this line and comment next line
