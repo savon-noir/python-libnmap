@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-from libnmap import NmapParser, NmapParserException, DictDiffer
-
+from libnmap import NmapParser, NmapParserException, NmapDiff
 ## TODO:  del/add_host()
 #         add/del_service()
 class NmapReport(object):
@@ -23,10 +22,11 @@ class NmapReport(object):
         return 0
 
     def diff(self, other):
-        diff_dict = {}
-        report_diffs = NmapDiff(self, other) 
-
-        return report_diffs
+        if self.is_consistent() and other.is_consistent():
+            r = NmapDiff(self, other)
+        else:
+            r = set()
+        return r
 
     def set_raw_data(self, raw_data):
         self._nmaprun = raw_data['nmaprun']
@@ -75,15 +75,4 @@ class NmapReport(object):
         return "{0} {1} hosts: {2} {3}".format(self._nmaprun, self._scaninfo, len(self._hosts), self._runstats)
 
     def get_dict(self):
-        return dict([ (h.address, h) for h in self.scanned_hosts ])
-
-class NmapDiff(DictDiffer):
-    class NmapDiffException(Exception):
-        def __init__(self, msg):
-            self.msg = msg
-
-    def __init__(self, nmap_obj1, nmap_obj2):
-        self.object1 = nmap_obj1.get_dict()
-        self.object2 = nmap_obj2.get_dict()
-
-        DictDiffer.__init__(self, self.object1, self.object2)
+        return dict([("%s.%s" % (h.__class__, h.id), hash(h)) for h in self.scanned_hosts ])

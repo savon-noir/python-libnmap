@@ -39,17 +39,6 @@ class TestNmapParser(unittest.TestCase):
         } ]
 
         self.flist = self.flist_full
-        self.port_string = '<port protocol="tcp" portid="25"><state state="filtered" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="smtp" method="table" conf="3"/></port>'
-        self.port_string_other2 = '<port protocol="tcp" portid="25"><state state="open" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="smtp" method="table" conf="3"/></port>'
-        self.port_string_other3 = '<port protocol="tcp" portid="22"><state state="open" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="ssh" method="table" conf="3"/></port>'
-        self.port_string_other4 = '<port protocol="tcp" portid="22"><state state="willy_woncka" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="willywoncka" method="table" conf="3"/></port>'
-
-        self.port_string_other5 = '<port protocol="tcp" portid="22"><state state="willy_woncka" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="ssh" method="table" conf="3"/></port>'
-        self.port_string_other6 = '<port protocol="tcp" portid="25"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="smtp" product="Postfix smtpd" hostname=" jambon.localdomain" method="probed" conf="10"/></port>'
-        self.port_string_other7 = '<port protocol="tcp" portid="111"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="rpcbind" method="probed" conf="10"/></port>'
-        self.port_string_other8 = '<port protocol="tcp" portid="631"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="ipp" product="CUPS" version="1.4" method="probed" conf="10"/></port>'
-        self.port_string_other9 = '<port protocol="tcp" portid="631"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="ipp" product="COPS" version="1.4" method="probed" conf="10"/></port>'
-
     def test_report_constructor(self):
         for testfile in self.flist:
             fd = open(testfile['file'], 'r')
@@ -170,45 +159,6 @@ class TestNmapParser(unittest.TestCase):
             
             host1.services[0]._portid ='23'
             self.assertEqual(host1 , host2)
-
-    def test_port_state_changed(self):
-        nservice1 = NmapParser.parse_port(self.port_string)
-        nservice2 = NmapParser.parse_port(self.port_string_other2)
-        nservice3 = NmapParser.parse_port(self.port_string_other3)
-        nservice4 = NmapParser.parse_port(self.port_string_other4)
-
-        self.assertEqual(nservice1.get_state_changed(nservice2).pop(), 'state')
-        self.assertEqual(nservice1.get_state_changed(nservice3), set())
-        self.assertEqual(nservice1.get_state_changed(nservice4), set())
-
-        self.assertEqual(nservice2.get_state_changed(nservice3), set())
-
-        self.assertEqual(nservice3.get_state_changed(nservice4).pop(), 'state')
-
-    def test_port_state_unchanged(self):
-        nservice1 = NmapParser.parse_port(self.port_string)
-        nservice2 = NmapParser.parse_port(self.port_string_other2)
-        nservice3 = NmapParser.parse_port(self.port_string_other3)
-        nservice4 = NmapParser.parse_port(self.port_string_other4)
-
-        self.assertEqual(nservice1.get_state_unchanged(nservice2), set(['reason', 'reason_ttl', 'reason_ip']))
-        self.assertEqual(nservice1.get_state_unchanged(nservice3), set())
-        self.assertEqual(nservice1.get_state_unchanged(nservice4), set())
-
-        self.assertEqual(nservice1.get_state_unchanged(nservice2), set(['reason', 'reason_ttl', 'reason_ip']))
-
-    def test_port_service_changed(self):
-        nservice1 = NmapParser.parse_port(self.port_string)
-        nservice2 = NmapParser.parse_port(self.port_string_other2)
-        nservice4 = NmapParser.parse_port(self.port_string_other4)
-        nservice5 = NmapParser.parse_port(self.port_string_other5)
-        nservice8 = NmapParser.parse_port(self.port_string_other8)
-        nservice9 = NmapParser.parse_port(self.port_string_other9)
-
-        self.assertEqual(nservice1.get_service_changed(nservice2), set())
-        self.assertEqual(nservice5.get_service_changed(nservice4).pop(), 'name')
-        # banner changed
-        self.assertEqual(nservice8.get_service_changed(nservice9).pop(), 'product')
 
     def test_host_address_changed(self):
         fdir = os.path.dirname(os.path.realpath(__file__))
