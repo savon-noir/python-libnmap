@@ -1,3 +1,10 @@
+<< WAIT
+
+This code is under development. Object's API are likely to change. 
+
+The below README is no more applicable. Will be updated soon.
+
+>>
 ================
 Python-Nmap-Libs
 ================
