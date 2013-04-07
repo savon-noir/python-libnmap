@@ -19,7 +19,8 @@ class NmapHost(object):
                 self.address != other.address) and self.changed(other))
 
     def __repr__(self):
-        return "{0}: [{1} ({2}) - {3}]".format(self.__class__, 
+        return "{0}: [{1} ({2}) - {3}]".format(self.__class__.__name__, 
+                                               self.address,
                                                " ".join(self.hostnames),
                                                self.status)
     def __hash__(self):
@@ -27,7 +28,7 @@ class NmapHost(object):
                 hash(frozenset(self._services)), hash(frozenset(self._hostnames)))
 
     def changed(self, other):
-        return len(self.diff(other))
+        return len(self.diff(other).changed())
 
     @property
     def hostnames(self):
@@ -101,9 +102,11 @@ class NmapHost(object):
     @property
     def id(self):
         return self.address
+
     def get_dict(self):
-        d = dict([("%s.%s" % (s.__class__, s.id), hash(s)) for s in self.services ])
-        d.update({ 'address': self.address, 'status': self.status })
+        d = dict([("%s.%s" % (s.__class__.__name__, s.id), hash(s)) for s in self.services ])
+        d.update({ 'address': self.address, 'status': self.status,
+                   'hostnames': " ".join(self.hostnames)})
         return d
 
     def diff(self, other):
@@ -129,7 +132,7 @@ class NmapService(object):
         return  (self.id != other.id or self.changed(other))
 
     def __repr__(self):
-        return "{0}: [{1} - {2}/{3} {4} ({5})]".format(self.__class__, self.state, 
+        return "{0}: [{1} - {2}/{3} {4} ({5})]".format(self.__class__.__name__, self.state, 
                                                      str(self.port), self.protocol,
                                                      self.service, self.banner)
 
@@ -183,26 +186,3 @@ class NmapService(object):
 
     def diff(self, other): 
         return NmapDiff(self, other)
-
-# if self.id == other.id else set()
-#        if self.id == other.id:
-#            r = NmapDiff(self, other)# if self.id == other.id else set()
-#        else:
-#            raise NmapDiffException("Comparing objects with non-matching id keys") 
-#        return r
-
-#    def get_state_changed(self, other):
-#        'return a set of keys for which the value has changed'
-#        return DictDiffer(self._state, other._state).changed() if self.port == other.port and self.protocol == other.protocol else set()
-#
-#    def get_state_unchanged(self, other):
-#        'return a set of key for which the value hasn t changed value'
-#        return DictDiffer(self._state, other._state).unchanged() if self.port == other.port and self.protocol == other.protocol else set()
-#    
-#    def get_service_changed(self, other):
-#        'return a set of keys for which the value has changed'
-#        return DictDiffer(self._service, other._service).changed() if self.port == other.port and self.protocol == other.protocol else set()
-# 
-#    def getServiceDetailsUnChanged(self, other):
-#        'return a set of key for which the value hasn t changed value'
-#        return DictDiffer(self._service, other._service).unchanged() if self.port == other.port and self.protocol == other.protocol else set()

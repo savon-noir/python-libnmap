@@ -75,4 +75,4 @@ class NmapReport(object):
         return "{0} {1} hosts: {2} {3}".format(self._nmaprun, self._scaninfo, len(self._hosts), self._runstats)
 
     def get_dict(self):
-        return dict([("%s.%s" % (h.__class__, h.id), hash(h)) for h in self.scanned_hosts ])
+        return dict([("%s.%s" % (h.__class__.__name__, h.id), hash(h)) for h in self.scanned_hosts ])
