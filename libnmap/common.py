@@ -86,7 +86,6 @@ class NmapHost(object):
     def get_open_ports(self):
         return [(p.port, p.protocol) for p in self._services if p.state == 'open']
 
-
     def get_service(self, portno, protocol='tcp'):
         plist = [p for p in self._services if
                  p.port == portno and p.protocol == protocol]
@@ -110,7 +109,7 @@ class NmapHost(object):
         return d
 
     def diff(self, other):
-        return NmapDiff(self, other) #if self.id == other.id else set()
+        return NmapDiff(self, other)
 
 class NmapService(object):
     def __init__(self, portid, protocol='tcp', state={}, service={}):

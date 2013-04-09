@@ -196,9 +196,9 @@ if __name__ == '__main__':
 #    test_suite = ['test_get_hosts' , 'test_get_ports', 'test_runstats', 'test_banner', 'test_serviceEqual', 'test_serviceNotEqual', 'test_HostNotEqual', 'test_HostEqual']
     test_suite = ['test_report_constructor', 'test_get_ports', 'test_runstats',
                   'test_banner' , 'test_service_equal', 'test_service_not_equal', 
-                  'test_host_not_equal' , 'test_host_equal', 'test_port_state_changed',
-                  'test_port_state_unchanged', 'test_port_service_changed',
-                  'test_host_address_changed', 'test_host_address_unchanged'] 
+                  'test_host_not_equal' , 'test_host_equal', ] #'test_port_state_changed',
+#                  'test_port_state_unchanged', 'test_port_service_changed',
+#                  'test_host_address_changed', 'test_host_address_unchanged'] 
 #    io_file = StringIO()
     suite = unittest.TestSuite(map(TestNmapParser, test_suite))
     test_result = unittest.TextTestRunner(verbosity=2).run(suite) ## for more verbosity uncomment this line and comment next line
