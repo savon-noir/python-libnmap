@@ -22,24 +22,22 @@ class TestNmapReportDiff(unittest.TestCase):
         r3 = NmapReport("r3", d1)
         r4 = NmapReport("r4", d3)
 
-        d = r1.diff(r2)
-        print "changed: %s" % (d.changed())
-        print "unchanged: %s" % (d.unchanged())
-        print "added: %s" % (d.added())
-	print "removed: %s" % (d.removed())
-        print "___________________________________"
-        d = r1.diff(r3)
-        print "changed: %s" % (d.changed())
-        print "unchanged: %s" % (d.unchanged())
-        print "added: %s" % (d.added())
-	print "removed: %s" % (d.removed())
-        print "___________________________________"
+        d1 = r1.diff(r2)
+        self.assertEqual(d1.changed(), set(['hosts_total', 'hosts_up']))
+        self.assertEqual(d1.unchanged(), set(['hosts_down', 'NmapHost.127.0.0.1']))
+        self.assertEqual(d1.removed(), set(['NmapHost.74.207.244.221']))
 
-        d = r2.diff(r4)
-        print "changed: %s" % (d.changed())
-        print "unchanged: %s" % (d.unchanged())
-        print "added: %s" % (d.added())
-	print "removed: %s" % (d.removed())
+        d2 = r1.diff(r3)
+        self.assertEqual(d2.changed(), set([]))
+        self.assertEqual(d2.unchanged(), set(['hosts_total', 'hosts_down', 'hosts_up', 'NmapHost.127.0.0.1']))
+        self.assertEqual(d2.added(), set([]))
+        self.assertEqual(d2.removed(), set([]))
+
+        d3 = r2.diff(r4)
+        self.assertEqual(d3.changed(), set(['NmapHost.127.0.0.1']))
+        self.assertEqual(d3.unchanged(), set(['hosts_total', 'NmapHost.74.207.244.221', 'hosts_up', 'hosts_down']))
+        self.assertEqual(d3.added(), set([]))
+        self.assertEqual(d3.removed(), set([]))
 
 if __name__ == '__main__':
     test_suite = [ 'test_diff_host_list' ]

@@ -16,13 +16,13 @@ class NmapReport(object):
         try:
             set_raw_data(NmapParser.parse_fromfile(file_path))
         except:
-            raise NmapParserException("Error while trying to import file: {0}".format(file_path))
+            raise Exception("Error while trying to import file: {0}".format(file_path))
 
     def report_export(self, file_path, output='csv'):
         return 0
 
     def diff(self, other):
-        if self.is_consistent() and other.is_consistent():
+        if self._is_consistent() and other._is_consistent():
             r = NmapDiff(self, other)
         else:
             r = set()
@@ -55,6 +55,16 @@ class NmapReport(object):
     def elapsed(self):
         return self._runstats['finished']['elapsed']
 
+    @property
+    def hosts_up(self):
+        return self._runstats['hosts']['up'] if 'hosts' in self._runstats else ''
+    @property
+    def hosts_down(self):
+        return self._runstats['hosts']['down'] if 'hosts' in self._runstats else ''
+    @property
+    def hosts_total(self):
+        return self._runstats['hosts']['total'] if 'hosts' in self._runstats else ''
+
     def get_raw_data(self):
         raw_data = { 'nmaprun': self._nmaprun,
                         'scaninfo': self._scaninfo,
@@ -63,7 +73,7 @@ class NmapReport(object):
         }
         return raw_data
 
-    def is_consistent(self):
+    def _is_consistent(self):
         r = False
         rd = self.get_raw_data()
         if set(['nmaprun', 'scaninfo', 'hosts', 'runstats']) == set(rd.keys()) and \
@@ -75,4 +85,12 @@ class NmapReport(object):
         return "{0} {1} hosts: {2} {3}".format(self._nmaprun, self._scaninfo, len(self._hosts), self._runstats)
 
     def get_dict(self):
-        return dict([("%s.%s" % (h.__class__.__name__, h.id), hash(h)) for h in self.scanned_hosts ])
+        d = dict([("%s.%s" % (h.__class__.__name__, str(h.id)), hash(h)) for h in self.scanned_hosts ])
+        d.update({ 'hosts_up': self.hosts_up, 'hosts_down': self.hosts_down,
+                   'hosts_total': self.hosts_total})
+        return d
+
+    # dummy return value: report have no unique id, all could be compared
+    @property
+    def id(self):
+        return hash(1)

@@ -4,7 +4,7 @@ import unittest
 import os, sys
 
 #sys.path.append("".join([os.path.dirname(__file__), "/../"]))
-from libnmap import NmapParser, NmapReport
+from libnmap import NmapParser, NmapReport, NmapDiffException
 
 class TestNmapParser(unittest.TestCase):
     def setUp(self):
@@ -168,8 +168,9 @@ class TestNmapParser(unittest.TestCase):
         rd2 = NmapParser.parse(fd2.read())
         nr1 = NmapReport('r1', rd1)
         nr2 = NmapReport('r2', rd2)
-
-        self.assertEqual(nr1.scanned_hosts.pop().address_changed(nr2.scanned_hosts.pop()).pop(), 'addr')
+        h1 = nr1.scanned_hosts[0]
+        h2 = nr2.scanned_hosts[0]
+        self.assertRaises(NmapDiffException, h1.diff, h2)
 
     def test_host_address_unchanged(self):
         fdir = os.path.dirname(os.path.realpath(__file__))
@@ -187,25 +188,17 @@ class TestNmapParser(unittest.TestCase):
         h2 = nr2.scanned_hosts.pop()
         h3 = nr3.scanned_hosts.pop()
 
-        self.assertEqual(h1.address_unchanged(h2), set(['addrtype']))
-        self.assertEqual(h2.address_unchanged(h3), set(['addr', 'addrtype']))
-#
-#
+        self.assertRaises(NmapDiffException, h1.diff, h2)
+        self.assertEqual(h2.diff(h3).changed(), set([]))
+        self.assertEqual(h2.diff(h3).added(), set([]))
+        self.assertEqual(h2.diff(h3).removed(), set([]))
+        self.assertEqual(h2.diff(h3).unchanged(), set(['status', 'NmapService.343309847', 'NmapService.343309848', 'NmapService.343309921', 'hostnames', 'NmapService.343309433', 'address', 'NmapService.343306980']))
 
 if __name__ == '__main__':
-#    test_suite = ['test_get_hosts' , 'test_get_ports', 'test_runstats', 'test_banner', 'test_serviceEqual', 'test_serviceNotEqual', 'test_HostNotEqual', 'test_HostEqual']
     test_suite = ['test_report_constructor', 'test_get_ports', 'test_runstats',
                   'test_banner' , 'test_service_equal', 'test_service_not_equal', 
-                  'test_host_not_equal' , 'test_host_equal', ] #'test_port_state_changed',
-#                  'test_port_state_unchanged', 'test_port_service_changed',
-#                  'test_host_address_changed', 'test_host_address_unchanged'] 
-#    io_file = StringIO()
+                  'test_host_not_equal' , 'test_host_equal', 'test_host_address_changed',
+                  'test_host_address_unchanged' ] 
+
     suite = unittest.TestSuite(map(TestNmapParser, test_suite))
-    test_result = unittest.TextTestRunner(verbosity=2).run(suite) ## for more verbosity uncomment this line and comment next line
-#    test_result = unittest.TextTestRunner(stream=io_file).run(suite)
-#    if len(test_result.failures) or len(test_result.errors):
-#  # uncomment for debugging info
-#        print_errs = raw_input("Errors detected. Do you want to print the errors (y/N)?")
-#        if print_errs == "y":
-#            print io_file.getvalue()
-#    io_file.close()
+    test_result = unittest.TextTestRunner(verbosity=2).run(suite)

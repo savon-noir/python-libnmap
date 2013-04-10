@@ -24,8 +24,8 @@ class NmapHost(object):
                                                " ".join(self.hostnames),
                                                self.status)
     def __hash__(self):
-        return (hash(self._status) ^ hash(self._address), 
-                hash(frozenset(self._services)), hash(frozenset(self._hostnames)))
+        return (hash(self.status) ^ hash(self.address) ^
+                hash(frozenset(self.services)) ^ hash(frozenset(" ".join(self.hostnames))))
 
     def changed(self, other):
         return len(self.diff(other).changed())
@@ -103,7 +103,7 @@ class NmapHost(object):
         return self.address
 
     def get_dict(self):
-        d = dict([("%s.%s" % (s.__class__.__name__, s.id), hash(s)) for s in self.services ])
+        d = dict([("%s.%s" % (s.__class__.__name__, str(s.id)), hash(s)) for s in self.services ])
         d.update({ 'address': self.address, 'status': self.status,
                    'hostnames': " ".join(self.hostnames)})
         return d

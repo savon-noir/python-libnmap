@@ -3,7 +3,10 @@ v0.1.5, 08/04/2013 -- Refactory of NmapDiff system
                     - added __hash__, id and get_dict() for common Nmap
                       Objects
                     - added NmapDiff class
-                    - full rework of unittests 
+                    - full rework of unittests
+                    - NmapParser now supports parsing from file
+                    - NmapParser is able to handle nmap XML portions
+                    - added import in reports
 v0.1.4, 05/04/2013 -- Bug Fixes and improvements
                     - unittest for diff on NmapHost
                     - unittest for diff on NmapService
