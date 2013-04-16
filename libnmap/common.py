@@ -2,13 +2,14 @@
 from libnmap import NmapDiff, NmapDiffException
 
 class NmapHost(object):
-    def __init__(self):
-        self._starttime = ''
-        self._endtime = ''
-        self._hostnames = []
-        self._status = {}
-        self._address = {}
-        self._services = []
+    def __init__(self, starttime='', endtime='', address=None, status=None, 
+                 hostnames=None, services=None):
+        self._starttime = starttime
+        self._endtime = endtime
+        self._hostnames = hostnames if hostnames is not None else []
+        self._status = status if status is not None else {}
+        self._address = address if address is not None else {}
+        self._services = services if services is not None else []
 
     def __eq__(self, other):
         return (self._hostnames == other._hostnames and
@@ -21,11 +22,11 @@ class NmapHost(object):
     def __repr__(self):
         return "{0}: [{1} ({2}) - {3}]".format(self.__class__.__name__, 
                                                self.address,
-                                               " ".join(self.hostnames),
+                                               " ".join(self._hostnames),
                                                self.status)
     def __hash__(self):
         return (hash(self.status) ^ hash(self.address) ^
-                hash(frozenset(self.services)) ^ hash(frozenset(" ".join(self.hostnames))))
+                hash(frozenset(self._services)) ^ hash(frozenset(" ".join(self._hostnames))))
 
     def changed(self, other):
         return len(self.diff(other).changed())
@@ -68,7 +69,7 @@ class NmapHost(object):
 
 
     def add_hostname(self, hostname):
-        self.hostnames.append(hostname)
+        self._hostnames.append(hostname)
 
     def add_service(self, nmapservice):
         v = False
@@ -105,14 +106,14 @@ class NmapHost(object):
     def get_dict(self):
         d = dict([("%s.%s" % (s.__class__.__name__, str(s.id)), hash(s)) for s in self.services ])
         d.update({ 'address': self.address, 'status': self.status,
-                   'hostnames': " ".join(self.hostnames)})
+                   'hostnames': " ".join(self._hostnames)})
         return d
 
     def diff(self, other):
         return NmapDiff(self, other)
 
 class NmapService(object):
-    def __init__(self, portid, protocol='tcp', state={}, service={}):
+    def __init__(self, portid, protocol='tcp', state=None, service=None):
         try:
             self._portid = int(portid or -1)
         except ValueError, TypeError:
@@ -121,8 +122,8 @@ class NmapService(object):
             raise ValueError
 
         self._protocol = protocol
-        self._state = state
-        self._service = service
+        self._state = state if state is not None else {}
+        self._service = service if service is not None else {}
 
     def __eq__(self, other):
         return  (self.id == other.id and self.changed(other) == 0)

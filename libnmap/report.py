@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-from libnmap import NmapParser, NmapParserException, NmapDiff
+import json
+from libnmap import NmapParser, NmapParserException, NmapDiff, NmapHost, NmapService
 ## TODO:  del/add_host()
 #         add/del_service()
 class NmapReport(object):
@@ -21,6 +22,22 @@ class NmapReport(object):
     def report_export(self, file_path, output='csv'):
         return 0
 
+    def read_fromfile(self, file_path):
+        self.report_import(file_path)
+        return self.get_raw_data()
+
+    def write_tofile(self, file_path, output='csv'):
+        return self.report_export(file_path, output)
+
+    def write_todb(self, plugin='mongodb'):
+        if plugin == 'mongodb':
+            from libnmap.plugins.mongodb import NmapMongoPlugin
+            db = NmapMongoPlugin()
+            jser = json.dumps(self, cls=ReportEncoder)
+            db.data_add(json.loads(jser))
+#        except:
+#            raise Exception("DB plugin {0} not available")
+ 
     def diff(self, other):
         if self._is_consistent() and other._is_consistent():
             r = NmapDiff(self, other)
@@ -29,10 +46,10 @@ class NmapReport(object):
         return r
 
     def set_raw_data(self, raw_data):
-        self._nmaprun = raw_data['nmaprun']
-        self._scaninfo = raw_data['scaninfo']
-        self._hosts = raw_data['hosts']
-        self._runstats = raw_data['runstats']
+        self._nmaprun = raw_data['_nmaprun']
+        self._scaninfo = raw_data['_scaninfo']
+        self._hosts = raw_data['_hosts']
+        self._runstats = raw_data['_runstats']
 
     @property
     def name(self):
@@ -66,17 +83,17 @@ class NmapReport(object):
         return self._runstats['hosts']['total'] if 'hosts' in self._runstats else ''
 
     def get_raw_data(self):
-        raw_data = { 'nmaprun': self._nmaprun,
-                        'scaninfo': self._scaninfo,
-                        'hosts': self._hosts, 
-                        'runstats': self._runstats,
+        raw_data = { '_nmaprun': self._nmaprun,
+                        '_scaninfo': self._scaninfo,
+                        '_hosts': self._hosts, 
+                        '_runstats': self._runstats,
         }
         return raw_data
 
     def _is_consistent(self):
         r = False
         rd = self.get_raw_data()
-        if set(['nmaprun', 'scaninfo', 'hosts', 'runstats']) == set(rd.keys()) and \
+        if set(['_nmaprun', '_scaninfo', '_hosts', '_runstats']) == set(rd.keys()) and \
             len([ k for k in rd.keys() if rd[k] is not None ]) == 4:
                 r = True
         return r
@@ -94,3 +111,17 @@ class NmapReport(object):
     @property
     def id(self):
         return hash(1)
+
+class ReportEncoder(json.JSONEncoder):
+    def default(self, obj):
+        otype = { 'NmapHost': NmapHost, 'NmapService': NmapService, 'NmapReport': NmapReport }
+        if isinstance(obj, tuple(otype.values())):
+            key = '__%s__' % obj.__class__.__name__
+            return { key: obj.__dict__ }
+        return json.JSONEncoder.default(self, obj)
+
+class ReportDecoder(json.JSONDecoder):
+    def decode(self, json_str):
+        raw_data = NmapParser.parse_fromdict(json.loads(json_str))
+        r = NmapReport(name=raw_data['_name'], raw_data=raw_data)
+        return r
