@@ -12,3 +12,5 @@ install:
 script:
   - cd libnmap
   - python test/diff_test.py
+  - python test/parser_test.py
+  - python test/report_test.py
