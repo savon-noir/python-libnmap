@@ -13,7 +13,7 @@ install:
 #     # command to run tests
 before_script:
   - "pep8 . --exclude test"
-  - "pyflakes ."
+#  - "pyflakes ."
 script:
   - cd libnmap
   - python test/diff_test.py
