@@ -1,0 +1,10 @@
+- Add Sphinx DocStrings
+- NmapParser should be able to be fully generic and return Objects
+- NmapParser should not need a XML root
+- NmapReport export(), import() should support plugins for csv (multi-format) mongodb, mysql, ...
+- support iterators for NmapReport::scanned_hosts
+- refactory NmapHost() constructor
+- add support for parsing os version and banner of port
+- expose a clear API for NmapHost, NmapService and NmapParser
+- add support for 'resume' capability
+- review thread management for NmapProcess

@@ -4,7 +4,7 @@ import unittest
 import os, sys
 
 #sys.path.append("".join([os.path.dirname(__file__), "/../"]))
-from libnmap import NmapParser, NmapReport
+from libnmap import NmapParser, NmapReport, NmapDiffException
 
 class TestNmapParser(unittest.TestCase):
     def setUp(self):
@@ -39,17 +39,6 @@ class TestNmapParser(unittest.TestCase):
         } ]
 
         self.flist = self.flist_full
-        self.port_string = '<port protocol="tcp" portid="25"><state state="filtered" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="smtp" method="table" conf="3"/></port>'
-        self.port_string_other2 = '<port protocol="tcp" portid="25"><state state="open" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="smtp" method="table" conf="3"/></port>'
-        self.port_string_other3 = '<port protocol="tcp" portid="22"><state state="open" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="ssh" method="table" conf="3"/></port>'
-        self.port_string_other4 = '<port protocol="tcp" portid="22"><state state="willy_woncka" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="willywoncka" method="table" conf="3"/></port>'
-
-        self.port_string_other5 = '<port protocol="tcp" portid="22"><state state="willy_woncka" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="ssh" method="table" conf="3"/></port>'
-        self.port_string_other6 = '<port protocol="tcp" portid="25"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="smtp" product="Postfix smtpd" hostname=" jambon.localdomain" method="probed" conf="10"/></port>'
-        self.port_string_other7 = '<port protocol="tcp" portid="111"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="rpcbind" method="probed" conf="10"/></port>'
-        self.port_string_other8 = '<port protocol="tcp" portid="631"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="ipp" product="CUPS" version="1.4" method="probed" conf="10"/></port>'
-        self.port_string_other9 = '<port protocol="tcp" portid="631"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="ipp" product="COPS" version="1.4" method="probed" conf="10"/></port>'
-
     def test_report_constructor(self):
         for testfile in self.flist:
             fd = open(testfile['file'], 'r')
@@ -171,45 +160,6 @@ class TestNmapParser(unittest.TestCase):
             host1.services[0]._portid ='23'
             self.assertEqual(host1 , host2)
 
-    def test_port_state_changed(self):
-        nservice1 = NmapParser.parse_port(self.port_string)
-        nservice2 = NmapParser.parse_port(self.port_string_other2)
-        nservice3 = NmapParser.parse_port(self.port_string_other3)
-        nservice4 = NmapParser.parse_port(self.port_string_other4)
-
-        self.assertEqual(nservice1.get_state_changed(nservice2).pop(), 'state')
-        self.assertEqual(nservice1.get_state_changed(nservice3), set())
-        self.assertEqual(nservice1.get_state_changed(nservice4), set())
-
-        self.assertEqual(nservice2.get_state_changed(nservice3), set())
-
-        self.assertEqual(nservice3.get_state_changed(nservice4).pop(), 'state')
-
-    def test_port_state_unchanged(self):
-        nservice1 = NmapParser.parse_port(self.port_string)
-        nservice2 = NmapParser.parse_port(self.port_string_other2)
-        nservice3 = NmapParser.parse_port(self.port_string_other3)
-        nservice4 = NmapParser.parse_port(self.port_string_other4)
-
-        self.assertEqual(nservice1.get_state_unchanged(nservice2), set(['reason', 'reason_ttl', 'reason_ip']))
-        self.assertEqual(nservice1.get_state_unchanged(nservice3), set())
-        self.assertEqual(nservice1.get_state_unchanged(nservice4), set())
-
-        self.assertEqual(nservice1.get_state_unchanged(nservice2), set(['reason', 'reason_ttl', 'reason_ip']))
-
-    def test_port_service_changed(self):
-        nservice1 = NmapParser.parse_port(self.port_string)
-        nservice2 = NmapParser.parse_port(self.port_string_other2)
-        nservice4 = NmapParser.parse_port(self.port_string_other4)
-        nservice5 = NmapParser.parse_port(self.port_string_other5)
-        nservice8 = NmapParser.parse_port(self.port_string_other8)
-        nservice9 = NmapParser.parse_port(self.port_string_other9)
-
-        self.assertEqual(nservice1.get_service_changed(nservice2), set())
-        self.assertEqual(nservice5.get_service_changed(nservice4).pop(), 'name')
-        # banner changed
-        self.assertEqual(nservice8.get_service_changed(nservice9).pop(), 'product')
-
     def test_host_address_changed(self):
         fdir = os.path.dirname(os.path.realpath(__file__))
         fd1 = open("%s/%s" % (fdir, 'files/1_hosts_down.xml'), 'r')
@@ -218,8 +168,9 @@ class TestNmapParser(unittest.TestCase):
         rd2 = NmapParser.parse(fd2.read())
         nr1 = NmapReport('r1', rd1)
         nr2 = NmapReport('r2', rd2)
-
-        self.assertEqual(nr1.scanned_hosts.pop().address_changed(nr2.scanned_hosts.pop()).pop(), 'addr')
+        h1 = nr1.scanned_hosts[0]
+        h2 = nr2.scanned_hosts[0]
+        self.assertRaises(NmapDiffException, h1.diff, h2)
 
     def test_host_address_unchanged(self):
         fdir = os.path.dirname(os.path.realpath(__file__))
@@ -237,25 +188,17 @@ class TestNmapParser(unittest.TestCase):
         h2 = nr2.scanned_hosts.pop()
         h3 = nr3.scanned_hosts.pop()
 
-        self.assertEqual(h1.address_unchanged(h2), set(['addrtype']))
-        self.assertEqual(h2.address_unchanged(h3), set(['addr', 'addrtype']))
-#
-#
+        self.assertRaises(NmapDiffException, h1.diff, h2)
+        self.assertEqual(h2.diff(h3).changed(), set([]))
+        self.assertEqual(h2.diff(h3).added(), set([]))
+        self.assertEqual(h2.diff(h3).removed(), set([]))
+        self.assertEqual(h2.diff(h3).unchanged(), set(['status', 'NmapService.343309847', 'NmapService.343309848', 'NmapService.343309921', 'hostnames', 'NmapService.343309433', 'address', 'NmapService.343306980']))
 
 if __name__ == '__main__':
-#    test_suite = ['test_get_hosts' , 'test_get_ports', 'test_runstats', 'test_banner', 'test_serviceEqual', 'test_serviceNotEqual', 'test_HostNotEqual', 'test_HostEqual']
     test_suite = ['test_report_constructor', 'test_get_ports', 'test_runstats',
                   'test_banner' , 'test_service_equal', 'test_service_not_equal', 
-                  'test_host_not_equal' , 'test_host_equal', 'test_port_state_changed',
-                  'test_port_state_unchanged', 'test_port_service_changed',
-                  'test_host_address_changed', 'test_host_address_unchanged'] 
-#    io_file = StringIO()
+                  'test_host_not_equal' , 'test_host_equal', 'test_host_address_changed',
+                  'test_host_address_unchanged' ] 
+
     suite = unittest.TestSuite(map(TestNmapParser, test_suite))
-    test_result = unittest.TextTestRunner(verbosity=2).run(suite) ## for more verbosity uncomment this line and comment next line
-#    test_result = unittest.TextTestRunner(stream=io_file).run(suite)
-#    if len(test_result.failures) or len(test_result.errors):
-#  # uncomment for debugging info
-#        print_errs = raw_input("Errors detected. Do you want to print the errors (y/N)?")
-#        if print_errs == "y":
-#            print io_file.getvalue()
-#    io_file.close()
+    test_result = unittest.TextTestRunner(verbosity=2).run(suite)

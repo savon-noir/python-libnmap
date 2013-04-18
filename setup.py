@@ -5,7 +5,7 @@ setup(
     version='0.1.4',
     author='Ronald Bister',
     author_email='mini.pelle@gmail.com',
-    packages=['libnmap', 'libnmap.test'],
+    packages=['libnmap', 'libnmap.plugins', 'libnmap.test'],
     url='http://pypi.python.org/pypi/libnmap/',
     license='LICENSE.txt',
     description='A Python NMAP librairy enabling you to launch nmap scans, parse and compare (diff) scan results',
