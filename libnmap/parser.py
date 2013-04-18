@@ -28,7 +28,8 @@ class NmapParser(object):
         if root.tag == 'nmaprun':
                 nmap_scan['nmaprun'] = cls.__format_attributes(root)
         else:
-            raise NmapParserException('Unpexpected data structure for XML root node')
+            raise NmapParserException(
+                'Unpexpected data structure for XML root node')
         for el in root:
             if el.tag == 'scaninfo':
                 nmap_scan['scaninfo'] = cls.parse_scaninfo(el)
