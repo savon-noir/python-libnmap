@@ -9,5 +9,5 @@ setup(
     url='http://pypi.python.org/pypi/libnmap/',
     license='LICENSE.txt',
     description='A Python NMAP librairy enabling you to launch nmap scans, parse and compare (diff) scan results',
-    long_description=open('README.txt').read(),
+    long_description=open('README.md').read(),
 )

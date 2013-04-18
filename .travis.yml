@@ -1,0 +1,21 @@
+language: python
+python:
+  - "2.5"
+  - "2.6"
+  - "2.7"
+  - "3.2"
+# command to install dependencies
+install:
+  - "pip install pep8 --use-mirrors"
+  - "pip install pyflakes --use-mirrors"
+  - "python setup.py install"
+#   - "pip install -r requirements.txt --use-mirrors"
+#     # command to run tests
+before_script:
+  - "pep8 ."
+  - "pyflakes ."
+script:
+  - cd libnmap
+  - python test/diff_test.py
+  - python test/parser_test.py
+  - python test/report_test.py
