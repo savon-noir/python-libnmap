@@ -1,12 +1,12 @@
 #!/usr/bin/env python
-from libnmap.plugins.interface import NmapDataPlugin
+from libnmap.plugins.dbplugin import NmapDBPlugin
 from pymongo import MongoClient
 
-class NmapMongoPlugin(NmapDataPlugin):
-    def __init__(self):
-        NmapDataPlugin.__init__(self)
+class NmapMongoPlugin(NmapDBPlugin):
+    def __init__(self, **kwargs):
+        NmapDBPlugin.__init__(self)
+        self.dbclient = MongoClient(**kwargs)
+        self.collection = self.dbclient[self.dbname][self.store]
 
-    def data_add(self, dict_data):
-        dbclient = MongoClient()
-        reports = dbclient[self.dbname][self.store]
-        reports.insert(dict_data)
+    def db_insert(self, dict_data):
+        self.collection.insert(dict_data)

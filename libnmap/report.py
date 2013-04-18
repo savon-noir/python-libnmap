@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 import json
+import sys
+import inspect
+import importlib
 from libnmap import NmapParser, NmapParserException, NmapDiff, NmapHost, NmapService
 ## TODO:  del/add_host()
 #         add/del_service()
@@ -29,12 +32,22 @@ class NmapReport(object):
     def write_tofile(self, file_path, output='csv'):
         return self.report_export(file_path, output)
 
-    def write_todb(self, plugin='mongodb'):
-        if plugin == 'mongodb':
-            from libnmap.plugins.mongodb import NmapMongoPlugin
-            db = NmapMongoPlugin()
-            jser = json.dumps(self, cls=ReportEncoder)
-            db.data_add(json.loads(jser))
+    def db(self, plugin_name="mongodb", **kwargs):
+        r = None
+        plugin_path = "libnmap.plugins.%s" % (plugin_name)
+        pluginobj = importlib.import_module(plugin_path)
+        pluginclasses = inspect.getmembers(pluginobj, inspect.isclass)
+        for classname, classobj in pluginclasses:
+            if inspect.getmodule(classobj).__name__.find(plugin_path) == 0:
+                r = classobj(**kwargs)
+        return r
+
+#    def dbinsert(self, plugin='mongodb'):
+#        if plugin == 'mongodb':
+#            from libnmap.plugins.mongodb import NmapMongoPlugin
+#            db = NmapMongoPlugin()
+#            jser = json.dumps(self, cls=ReportEncoder)
+#            db.data_add(json.loads(jser))
 #        except:
 #            raise Exception("DB plugin {0} not available")
  
