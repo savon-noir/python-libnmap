@@ -4,8 +4,7 @@ import sys
 import inspect
 import importlib
 from libnmap import NmapParser, NmapParserException, NmapDiff, NmapHost, NmapService
-## TODO:  del/add_host()
-#         add/del_service()
+
 class NmapReport(object):
     def __init__(self, name='', raw_data=None):
         self._name = name
@@ -42,15 +41,6 @@ class NmapReport(object):
                 r = classobj(**kwargs)
         return r
 
-#    def dbinsert(self, plugin='mongodb'):
-#        if plugin == 'mongodb':
-#            from libnmap.plugins.mongodb import NmapMongoPlugin
-#            db = NmapMongoPlugin()
-#            jser = json.dumps(self, cls=ReportEncoder)
-#            db.data_add(json.loads(jser))
-#        except:
-#            raise Exception("DB plugin {0} not available")
- 
     def diff(self, other):
         if self._is_consistent() and other._is_consistent():
             r = NmapDiff(self, other)
@@ -120,7 +110,6 @@ class NmapReport(object):
                    'hosts_total': self.hosts_total})
         return d
 
-    # dummy return value: report have no unique id, all could be compared
     @property
     def id(self):
         return hash(1)

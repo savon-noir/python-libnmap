@@ -1,3 +1,7 @@
+v0.2.0, 18/04/2013 -- Added Serialization and Plugin support
+                    - added serialization encoders and decoders for NmapReport
+                    - added basic plugin capability to NmapReport
+                    - added basic mongodb plugin to validate plugin setup
 v0.1.5, 08/04/2013 -- Refactory of NmapDiff system
                     - rework of NmapHost and NmapService API
                     - added __hash__, id and get_dict() for common Nmap
