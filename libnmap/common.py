@@ -121,18 +121,21 @@ class NmapService(object):
         self._service = service
 
     def __eq__(self, other):
-        return  (self.port == other.port and self.protocol == other.protocol and \
-                    len(DictDiffer(self._state,other._state).changed()) == 0)
+        return (self.port == other.port and
+                self.protocol == other.protocol and
+                len(DictDiffer(self._state, other._state).changed()) == 0)
 
     def __ne__(self, other):
-        return  self.port != other.port or self.protocol != other.protocol or \
-                    len(DictDiffer(self._state,other._state).changed()) > 0
+        return (self.port != other.port or self.protocol != other.protocol or
+                len(DictDiffer(self._state, other._state).changed()) > 0)
 
     def __repr__(self):
-        return "%s(%s - %s - %s -%s)" % (self.__class__, self._portid, self._protocol, self._service, self._state)
+        return "%s(%s - %s - %s -%s)" % (self.__class__, self._portid,
+               self._protocol, self._service, self._state)
 
     def __hash__(self):
-        return hash(self._portid) ^ hash(self._protocol) ^ hash(frozenset(self._state)) ^ hash(frozenset(self._service))
+        return (hash(self._portid) ^ hash(self._protocol) ^
+                hash(frozenset(self._state)) ^ hash(frozenset(self._service)))
 
     @property
     def port(self):
@@ -146,7 +149,7 @@ class NmapService(object):
     def state(self):
         return self._state['state'] if 'state' in self._state else None
 
-    def add_state(self, state={}): 
+    def add_state(self, state={}):
         self._state = state
 
     @property
@@ -157,30 +160,40 @@ class NmapService(object):
         self._service = service
 
     def open(self):
-        return True if self._state['state'] and self._state['state'] == 'open' else False
-    
+        return (True if self._state['state'] and self._state['state'] == 'open'
+                else False)
+
     def get_state_changed(self, other):
         'return a set of keys for which the value has changed'
-        return DictDiffer(self._state, other._state).changed() if self.port == other.port and self.protocol == other.protocol else set()
+        return (DictDiffer(self._state, other._state).changed()
+                if self.port == other.port and self.protocol == other.protocol
+                else set())
 
     def get_state_unchanged(self, other):
         'return a set of key for which the value hasn t changed value'
-        return DictDiffer(self._state, other._state).unchanged() if self.port == other.port and self.protocol == other.protocol else set()
-    
+        return (DictDiffer(self._state, other._state).unchanged()
+                if self.port == other.port and self.protocol == other.protocol
+                else set())
+
     def get_service_changed(self, other):
         'return a set of keys for which the value has changed'
-        return DictDiffer(self._service, other._service).changed() if self.port == other.port and self.protocol == other.protocol else set()
- 
+        return (DictDiffer(self._service, other._service).changed()
+                if self.port == other.port and self.protocol == other.protocol
+                else set())
+
     def getServiceDetailsUnChanged(self, other):
         'return a set of key for which the value hasn t changed value'
-        return DictDiffer(self._service, other._service).unchanged() if self.port == other.port and self.protocol == other.protocol else set()
+        return (DictDiffer(self._service, other._service).unchanged()
+                if self.port == other.port and self.protocol == other.protocol
+                else set())
 
     @property
     def banner(self):
-        notrelevant = ['name', 'method', 'conf' ]
+        notrelevant = ['name', 'method', 'conf']
         b = ''
         if self._service and self._service['method'] == "probed":
-            b = " ".join([ k + ": " + self._service[k] for k in self._service.keys() if k not in notrelevant ])
+            b = " ".join([k + ": " + self._service[k]
+                for k in self._service.keys() if k not in notrelevant])
         return b
 
 
@@ -194,13 +207,20 @@ class DictDiffer(object):
     """
     def __init__(self, current_dict, past_dict):
         self.current_dict, self.past_dict = current_dict, past_dict
-        self.set_current, self.set_past = set(current_dict.keys()), set(past_dict.keys())
+        self.set_current = set(current_dict.keys())
+        self.set_past = set(past_dict.keys())
         self.intersect = self.set_current.intersection(self.set_past)
+
     def added(self):
-        return self.set_current - self.intersect 
+        return self.set_current - self.intersect
+
     def removed(self):
-        return self.set_past - self.intersect 
+        return self.set_past - self.intersect
+
     def changed(self):
-        return set(o for o in self.intersect if self.past_dict[o] != self.current_dict[o])
+        return (set(o for o in self.intersect if self.past_dict[o] !=
+                self.current_dict[o]))
+
     def unchanged(self):
-        return set(o for o in self.intersect if self.past_dict[o] == self.current_dict[o])
+        return (set(o for o in self.intersect if self.past_dict[o] ==
+                self.current_dict[o]))
