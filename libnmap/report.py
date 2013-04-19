@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 import json
-import sys
 import inspect
 import importlib
-from libnmap import NmapParser, NmapParserException, NmapDiff, NmapHost, NmapService
+from libnmap import NmapParser
+from libnmap import NmapDiff, NmapHost, NmapService
+
 
 class NmapReport(object):
     def __init__(self, name='', raw_data=None):
@@ -17,9 +18,10 @@ class NmapReport(object):
 
     def report_import(self, file_path):
         try:
-            set_raw_data(NmapParser.parse_fromfile(file_path))
+            self.set_raw_data(NmapParser.parse_fromfile(file_path))
         except:
-            raise Exception("Error while trying to import file: {0}".format(file_path))
+            raise Exception("Error while trying to import file: {0}".format(
+                file_path))
 
     def report_export(self, file_path, output='csv'):
         return 0
@@ -58,7 +60,7 @@ class NmapReport(object):
     def name(self):
         return self._name
 
-    ### implement with iterators 
+    ### implement with iterators
     @property
     def scanned_hosts(self):
         return self._hosts
@@ -77,50 +79,65 @@ class NmapReport(object):
 
     @property
     def hosts_up(self):
-        return self._runstats['hosts']['up'] if 'hosts' in self._runstats else ''
+        return (self._runstats['hosts']['up']
+                if 'hosts' in self._runstats
+                else '')
+
     @property
     def hosts_down(self):
-        return self._runstats['hosts']['down'] if 'hosts' in self._runstats else ''
+        return (self._runstats['hosts']['down']
+                if 'hosts' in self._runstats
+                else '')
+
     @property
     def hosts_total(self):
-        return self._runstats['hosts']['total'] if 'hosts' in self._runstats else ''
+        return (self._runstats['hosts']['total']
+                if 'hosts' in self._runstats
+                else '')
 
     def get_raw_data(self):
-        raw_data = { '_nmaprun': self._nmaprun,
-                        '_scaninfo': self._scaninfo,
-                        '_hosts': self._hosts, 
-                        '_runstats': self._runstats,
-        }
+        raw_data = {'_nmaprun': self._nmaprun,
+                    '_scaninfo': self._scaninfo,
+                    '_hosts': self._hosts,
+                    '_runstats': self._runstats}
         return raw_data
 
     def _is_consistent(self):
         r = False
         rd = self.get_raw_data()
-        if set(['_nmaprun', '_scaninfo', '_hosts', '_runstats']) == set(rd.keys()) and \
-            len([ k for k in rd.keys() if rd[k] is not None ]) == 4:
+        _consistent_keys = ['_nmaprun', '_scaninfo', '_hosts', '_runstats']
+        if (set(_consistent_keys) == set(rd.keys()) and
+                len([k for k in rd.keys() if rd[k] is not None]) == 4):
                 r = True
         return r
 
     def __repr__(self):
-        return "{0} {1} hosts: {2} {3}".format(self._nmaprun, self._scaninfo, len(self._hosts), self._runstats)
+        return "{0} {1} hosts: {2} {3}".format(self._nmaprun, self._scaninfo,
+                                               len(self._hosts),
+                                               self._runstats)
 
     def get_dict(self):
-        d = dict([("%s.%s" % (h.__class__.__name__, str(h.id)), hash(h)) for h in self.scanned_hosts ])
-        d.update({ 'hosts_up': self.hosts_up, 'hosts_down': self.hosts_down,
-                   'hosts_total': self.hosts_total})
+        d = dict([("%s.%s" % (h.__class__.__name__, str(h.id)), hash(h))
+                 for h in self.scanned_hosts])
+        d.update({'hosts_up': self.hosts_up, 'hosts_down': self.hosts_down,
+                  'hosts_total': self.hosts_total})
         return d
 
     @property
     def id(self):
         return hash(1)
 
+
 class ReportEncoder(json.JSONEncoder):
     def default(self, obj):
-        otype = { 'NmapHost': NmapHost, 'NmapService': NmapService, 'NmapReport': NmapReport }
+        otype = {'NmapHost': NmapHost,
+                 'NmapService': NmapService,
+                 'NmapReport': NmapReport}
         if isinstance(obj, tuple(otype.values())):
             key = '__%s__' % obj.__class__.__name__
-            return { key: obj.__dict__ }
+            return {key: obj.__dict__}
         return json.JSONEncoder.default(self, obj)
+
 
 class ReportDecoder(json.JSONDecoder):
     def decode(self, json_str):

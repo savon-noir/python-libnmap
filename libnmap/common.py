@@ -1,8 +1,9 @@
 #!/usr/bin/env python
-from libnmap import NmapDiff, NmapDiffException
+from libnmap import NmapDiff
+
 
 class NmapHost(object):
-    def __init__(self, starttime='', endtime='', address=None, status=None, 
+    def __init__(self, starttime='', endtime='', address=None, status=None,
                  hostnames=None, services=None):
         self._starttime = starttime
         self._endtime = endtime
@@ -16,17 +17,19 @@ class NmapHost(object):
                 self.address == other.address and self.changed(other) == 0)
 
     def __ne__(self, other):
-        return ((self._hostnames != other._hostnames or 
+        return ((self._hostnames != other._hostnames or
                 self.address != other.address) and self.changed(other))
 
     def __repr__(self):
-        return "{0}: [{1} ({2}) - {3}]".format(self.__class__.__name__, 
+        return "{0}: [{1} ({2}) - {3}]".format(self.__class__.__name__,
                                                self.address,
                                                " ".join(self._hostnames),
                                                self.status)
+
     def __hash__(self):
         return (hash(self.status) ^ hash(self.address) ^
-                hash(frozenset(self._services)) ^ hash(frozenset(" ".join(self._hostnames))))
+                hash(frozenset(self._services)) ^
+                hash(frozenset(" ".join(self._hostnames))))
 
     def changed(self, other):
         return len(self.diff(other).changed())
@@ -67,7 +70,6 @@ class NmapHost(object):
     def endtime(self):
         return self._endtime
 
-
     def add_hostname(self, hostname):
         self._hostnames.append(hostname)
 
@@ -85,7 +87,8 @@ class NmapHost(object):
         return [(p.port, p.protocol) for p in self._services]
 
     def get_open_ports(self):
-        return [(p.port, p.protocol) for p in self._services if p.state == 'open']
+        return ([(p.port, p.protocol)
+                for p in self._services if p.state == 'open'])
 
     def get_service(self, portno, protocol='tcp'):
         plist = [p for p in self._services if
@@ -93,7 +96,7 @@ class NmapHost(object):
         return plist.pop() if len(plist) else None
 
     def get_service_byid(self, id):
-        service = [ s for s in self.service if s.id() == id ]
+        service = [s for s in self.service if s.id() == id]
         if len(service) > 1:
             raise Exception("Duplicate services found in NmapHost object")
 
@@ -104,19 +107,21 @@ class NmapHost(object):
         return self.address
 
     def get_dict(self):
-        d = dict([("%s.%s" % (s.__class__.__name__, str(s.id)), hash(s)) for s in self.services ])
-        d.update({ 'address': self.address, 'status': self.status,
-                   'hostnames': " ".join(self._hostnames)})
+        d = dict([("%s.%s" % (s.__class__.__name__,
+                   str(s.id)), hash(s)) for s in self.services])
+        d.update({'address': self.address, 'status': self.status,
+                  'hostnames': " ".join(self._hostnames)})
         return d
 
     def diff(self, other):
         return NmapDiff(self, other)
 
+
 class NmapService(object):
     def __init__(self, portid, protocol='tcp', state=None, service=None):
         try:
             self._portid = int(portid or -1)
-        except ValueError, TypeError:
+        except (ValueError, TypeError):
             raise
         if self._portid < 0 or self._portid > 65535:
             raise ValueError
@@ -126,18 +131,21 @@ class NmapService(object):
         self._service = service if service is not None else {}
 
     def __eq__(self, other):
-        return  (self.id == other.id and self.changed(other) == 0)
+        return (self.id == other.id and self.changed(other) == 0)
 
     def __ne__(self, other):
-        return  (self.id != other.id or self.changed(other))
+        return (self.id != other.id or self.changed(other))
 
     def __repr__(self):
-        return "{0}: [{1} - {2}/{3} {4} ({5})]".format(self.__class__.__name__, self.state, 
-                                                     str(self.port), self.protocol,
-                                                     self.service, self.banner)
+        return "{0}: [{1} {2}/{3} {4} ({5})]".format(self.__class__.__name__,
+                                                     self.state,
+                                                     str(self.port),
+                                                     self.protocol,
+                                                     self.service,
+                                                     self.banner)
 
     def __hash__(self):
-        return (hash(self.port) ^ hash(self.protocol) ^ hash(self.state) ^ 
+        return (hash(self.port) ^ hash(self.protocol) ^ hash(self.state) ^
                 hash(self.service) ^ hash(self.banner))
 
     def changed(self, other):
@@ -159,7 +167,7 @@ class NmapService(object):
     def state(self):
         return self._state['state'] if 'state' in self._state else None
 
-    def add_state(self, state={}): 
+    def add_state(self, state={}):
         self._state = state
 
     @property
@@ -170,19 +178,24 @@ class NmapService(object):
         self._service = service
 
     def open(self):
-        return True if self._state['state'] and self._state['state'] == 'open' else False
+        return (True
+                if self._state['state'] and self._state['state'] == 'open'
+                else False)
 
     @property
     def banner(self):
-        notrelevant = ['name', 'method', 'conf' ]
+        notrelevant = ['name', 'method', 'conf']
         b = ''
         if self._service and self._service['method'] == "probed":
-            b = " ".join([ k + ": " + self._service[k] for k in self._service.keys() if k not in notrelevant ])
+            b = " ".join([k + ": " + self._service[k]
+                          for k in self._service.keys()
+                              if k not in notrelevant])
         return b
 
     def get_dict(self):
-        return { 'id': self.id, 'port': str(self.port), 'protocol': self.protocol, 
-                 'banner': self.banner, 'service': self.service, 'state': self.state }
+        return ({'id': self.id, 'port': str(self.port),
+                'protocol': self.protocol, 'banner': self.banner,
+                'service': self.service, 'state': self.state})
 
-    def diff(self, other): 
+    def diff(self, other):
         return NmapDiff(self, other)
