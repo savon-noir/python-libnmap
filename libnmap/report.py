@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import json
+import sys
 import inspect
-import importlib
 from libnmap import NmapParser
 from libnmap import NmapDiff, NmapHost, NmapService
 
@@ -36,7 +36,8 @@ class NmapReport(object):
     def db(self, plugin_name="mongodb", **kwargs):
         r = None
         plugin_path = "libnmap.plugins.%s" % (plugin_name)
-        pluginobj = importlib.import_module(plugin_path)
+        __import__(plugin_path)
+        pluginobj = sys.modules[plugin_path]
         pluginclasses = inspect.getmembers(pluginobj, inspect.isclass)
         for classname, classobj in pluginclasses:
             if inspect.getmodule(classobj).__name__.find(plugin_path) == 0:
