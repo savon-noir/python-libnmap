@@ -5,10 +5,7 @@ import pwd
 import shlex
 import subprocess
 from threading import Thread
-try:
-    from Queue import Queue, Empty
-except ImportError:
-    from queue import Queue, Empty
+from Queue import Queue, Empty
 from xml.dom import pulldom
 
 

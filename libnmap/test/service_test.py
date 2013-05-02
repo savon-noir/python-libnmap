@@ -1,47 +1,125 @@
 #!/usr/bin/env python
 
 import unittest
-import os, sys
-
-from libnmap import NmapParser, NmapParserException, NmapReport, NmapDiffException
+from libnmap import NmapParser, NmapDiffException
 
 service1 = """
-<port protocol="tcp" portid="22"><state state="open" reason="syn-ack" reason_ttl="0"/><service name="ssh" method="table" conf="3"/></port>
+<port protocol="tcp" portid="22">
+    <state state="open" reason="syn-ack" reason_ttl="0"/>
+    <service name="ssh" method="table" conf="3"/>
+</port>
 """
-service2 = """
-<port protocol="udp" portid="22"><state state="open" reason="syn-ack" reason_ttl="0"/><service name="ssh" method="table" conf="3"/></port>
-"""
-service3 = """
-<port protocol="udp" portid="53"><state state="open" reason="syn-ack" reason_ttl="0"/><service name="ssh" method="table" conf="3"/></port>
-"""
-service4 = """
-<port protocol="tcp" portid="22"><state state="closed" reason="syn-ack" reason_ttl="0"/><service name="ssh" method="table" conf="3"/></port>
-"""
-service5 = """
-<port protocol="tcp" portid="3306"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="mysql" product="MySQL" version="5.1.62" method="probed" conf="10"/></port>
-"""
-service6 = """
-<port protocol="tcp" portid="3306"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="mysql" product="MySQL" version="5.1.61" method="probed" conf="10"/></port>
-"""
-service7 = """
-<port protocol="tcp" portid="3306"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="mysql" product="MySQL" version="5.1.61" method="probed" conf="10"/></port>
-"""
-port_string = '<port protocol="tcp" portid="25"><state state="filtered" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="smtp" method="table" conf="3"/></port>'
-port_string_other2 = '<port protocol="tcp" portid="25"><state state="open" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="smtp" method="table" conf="3"/></port>'
-port_string_other3 = '<port protocol="tcp" portid="22"><state state="open" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="ssh" method="table" conf="3"/></port>'
-port_string_other4 = '<port protocol="tcp" portid="22"><state state="willy_woncka" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="willywoncka" method="table" conf="3"/></port>'
 
-port_string_other5 = '<port protocol="tcp" portid="22"><state state="willy_woncka" reason="admin-prohibited" reason_ttl="253" reason_ip="109.133.192.1"/><service name="ssh" method="table" conf="3"/></port>'
-port_string_other6 = '<port protocol="tcp" portid="25"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="smtp" product="Postfix smtpd" hostname=" jambon.localdomain" method="probed" conf="10"/></port>'
-port_string_other7 = '<port protocol="tcp" portid="111"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="rpcbind" method="probed" conf="10"/></port>'
-port_string_other8 = '<port protocol="tcp" portid="631"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="ipp" product="CUPS" version="1.4" method="probed" conf="10"/></port>'
-port_string_other9 = '<port protocol="tcp" portid="631"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="ipp" product="COPS" version="1.4" method="probed" conf="10"/></port>'
+service2 = """
+<port protocol="udp" portid="22">
+    <state state="open" reason="syn-ack" reason_ttl="0"/>
+    <service name="ssh" method="table" conf="3"/>
+</port>
+"""
+
+service3 = """
+<port protocol="udp" portid="53">
+    <state state="open" reason="syn-ack" reason_ttl="0"/>
+    <service name="ssh" method="table" conf="3"/>
+</port>
+"""
+
+service4 = """
+<port protocol="tcp" portid="22">
+    <state state="closed" reason="syn-ack" reason_ttl="0"/>
+    <service name="ssh" method="table" conf="3"/>
+</port>
+"""
+
+service5 = """
+<port protocol="tcp" portid="3306">
+    <state state="open" reason="syn-ack" reason_ttl="64"/>
+    <service name="mysql" product="MySQL" version="5.1.62"
+            method="probed" conf="10"/>
+</port>
+"""
+
+service6 = """
+<port protocol="tcp" portid="3306">
+    <state state="open" reason="syn-ack" reason_ttl="64"/>
+    <service name="mysql" product="MySQL"
+        version="5.1.61" method="probed" conf="10"/>
+</port>
+"""
+
+service7 = """
+<port protocol="tcp" portid="3306">
+    <state state="open" reason="syn-ack" reason_ttl="64"/>
+    <service name="mysql"
+        product="MySQL" version="5.1.61" method="probed" conf="10"/>
+</port>
+"""
+
+port_string = """
+<port protocol="tcp" portid="25">
+    <state state="filtered" reason="admin-prohibited"
+        reason_ttl="253" reason_ip="109.133.192.1"/>
+    <service name="smtp" method="table" conf="3"/>
+</port>"""
+
+port_string_other2 = """
+<port protocol="tcp" portid="25">
+    <state state="open" reason="admin-prohibited"
+        reason_ttl="253" reason_ip="109.133.192.1"/>
+    <service name="smtp" method="table" conf="3"/>
+</port>"""
+
+port_string_other3 = """
+<port protocol="tcp" portid="22">
+    <state state="open" reason="admin-prohibited"
+        reason_ttl="253" reason_ip="109.133.192.1"/>
+    <service name="ssh" method="table" conf="3"/>
+</port>"""
+
+port_string_other4 = """
+<port protocol="tcp" portid="22">
+    <state state="willy_woncka" reason="admin-prohibited"
+        reason_ttl="253" reason_ip="109.133.192.1"/>
+    <service name="willywoncka" method="table" conf="3"/>
+</port>"""
+
+port_string_other5 = """
+<port protocol="tcp" portid="22">
+    <state state="willy_woncka" reason="admin-prohibited"
+        reason_ttl="253" reason_ip="109.133.192.1"/>
+    <service name="ssh" method="table" conf="3"/>
+</port>"""
+
+port_string_other6 = """
+<port protocol="tcp" portid="25">
+    <state state="open" reason="syn-ack" reason_ttl="64"/>
+    <service name="smtp" product="Postfix smtpd"
+        hostname=" jambon.localdomain" method="probed" conf="10"/>
+</port>"""
+
+port_string_other7 = """
+<port protocol="tcp" portid="111">
+    <state state="open" reason="syn-ack" reason_ttl="64"/>
+    <service name="rpcbind" method="probed" conf="10"/>
+</port>"""
+
+port_string_other8 = """
+<port protocol="tcp" portid="631">
+    <state state="open" reason="syn-ack" reason_ttl="64"/>
+    <service name="ipp" product="CUPS" version="1.4"
+        method="probed" conf="10"/>
+</port>"""
+
+port_string_other9 = """
+<port protocol="tcp" portid="631">
+    <state state="open" reason="syn-ack" reason_ttl="64"/>
+    <service name="ipp" product="COPS" version="1.4"
+        method="probed" conf="10"/>
+</port>"""
+
 
 class TestNmapService(unittest.TestCase):
     def setUp(self):
-        fdir = os.path.dirname(os.path.realpath(__file__))
-  #      self.flist_full = [{'file': "%s/%s" % (fdir, 'files/2_hosts.xml'), 'hosts': 2}, {'file': "%s/%s" % (fdir,'files/1_hosts.xml'), 'hosts': 1},]
-  #      self.flist = self.flist_full
         self.s1 = NmapParser.parse_port(service1)
         self.s2 = NmapParser.parse_port(service2)
         self.s3 = NmapParser.parse_port(service3)
@@ -61,16 +139,18 @@ class TestNmapService(unittest.TestCase):
         self.assertRaises(NmapDiffException, nservice1.diff, nservice4)
 #
         self.assertRaises(NmapDiffException, nservice2.diff, nservice3)
-        self.assertEqual(nservice3.diff(nservice4).changed(), set(['state', 'service']))
+        self.assertEqual(nservice3.diff(nservice4).changed(),
+                         set(['state', 'service']))
 
     def test_port_state_unchanged(self):
         nservice1 = NmapParser.parse_port(port_string)
         nservice2 = NmapParser.parse_port(port_string_other2)
-        nservice3 = NmapParser.parse_port(port_string_other3)
-        nservice4 = NmapParser.parse_port(port_string_other4)
+        #nservice3 = NmapParser.parse_port(port_string_other3)
+        #nservice4 = NmapParser.parse_port(port_string_other4)
 
-        self.assertEqual(nservice1.diff(nservice2).unchanged(), set(['banner', 'protocol', 'port', 'service', 'id']))
-#
+        self.assertEqual(nservice1.diff(nservice2).unchanged(),
+                         set(['banner', 'protocol', 'port', 'service', 'id']))
+
     def test_port_service_changed(self):
         nservice1 = NmapParser.parse_port(port_string)
         nservice2 = NmapParser.parse_port(port_string_other2)
@@ -79,10 +159,13 @@ class TestNmapService(unittest.TestCase):
         nservice8 = NmapParser.parse_port(port_string_other8)
         nservice9 = NmapParser.parse_port(port_string_other9)
 
-        self.assertEqual(nservice1.diff(nservice2).changed(), set(['state']))
-        self.assertEqual(nservice5.diff(nservice4).changed(), set(['service']))
+        self.assertEqual(nservice1.diff(nservice2).changed(),
+                         set(['state']))
+        self.assertEqual(nservice5.diff(nservice4).changed(),
+                         set(['service']))
         # banner changed
-        self.assertEqual(nservice8.diff(nservice9).changed(), set(['banner']))
+        self.assertEqual(nservice8.diff(nservice9).changed(),
+                         set(['banner']))
 
     def test_eq_service(self):
         self.assertNotEqual(self.s1, self.s2)
@@ -96,12 +179,15 @@ class TestNmapService(unittest.TestCase):
         self.assertRaises(NmapDiffException, self.s1.diff, self.s2)
         self.assertRaises(NmapDiffException, self.s1.diff, self.s3)
         self.assertEqual(self.s1.diff(self.s4).changed(), set(['state']))
-        self.assertEqual(self.s1.diff(self.s4).unchanged(), set(['banner', 'protocol', 'port', 'service', 'id']))
+        self.assertEqual(self.s1.diff(self.s4).unchanged(),
+                         set(['banner', 'protocol', 'port', 'service', 'id']))
 
         self.assertEqual(self.s5.diff(self.s6).changed(), set(['banner']))
         self.assertEqual(self.s6.diff(self.s6).changed(), set([]))
 
 if __name__ == '__main__':
-    test_suite = [ 'test_port_state_changed' , 'test_port_state_unchanged', 'test_port_service_changed', 'test_eq_service', 'test_diff_service' ]
+    test_suite = ['test_port_state_changed', 'test_port_state_unchanged',
+                  'test_port_service_changed', 'test_eq_service',
+                  'test_diff_service']
     suite = unittest.TestSuite(map(TestNmapService, test_suite))
-    test_result = unittest.TextTestRunner(verbosity=2).run(suite) ## for more verbosity uncomment this line and comment next line
+    test_result = unittest.TextTestRunner(verbosity=2).run(suite)
