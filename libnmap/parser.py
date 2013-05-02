@@ -7,7 +7,7 @@ from libnmap import NmapHost, NmapService
 
 class NmapParser(object):
     @classmethod
-    def parse(cls, nmap_data=None, type='XML'):
+    def parse(cls, nmap_data=None, data_type='XML'):
         nmap_scan = {'_nmaprun': {}, '_scaninfo': {},
                      '_hosts': [], '_runstats': {}}
         if not nmap_data:
@@ -24,7 +24,7 @@ class NmapParser(object):
 
         root = tree.getroot()
         if root.tag == 'nmaprun':
-                nmap_scan['_nmaprun'] = cls.__format_attributes(root)
+            nmap_scan['_nmaprun'] = cls.__format_attributes(root)
         else:
             raise NmapParserException("Unpexpected data structure \
                                        for XML root node")
@@ -41,14 +41,14 @@ class NmapParser(object):
         return nmap_scan
 
     @classmethod
-    def parse_fromstring(cls, nmap_data, type="XML"):
-        return cls.parse(nmap_data, type)
+    def parse_fromstring(cls, nmap_data, data_type="XML"):
+        return cls.parse(nmap_data, data_type)
 
     @classmethod
-    def parse_fromfile(cls, nmap_report_path, type="XML"):
+    def parse_fromfile(cls, nmap_report_path, data_type="XML"):
         if os.path.exists(nmap_report_path):
             fd = open(nmap_report_path, 'r')
-            r = cls.parse(fd, type)
+            r = cls.parse(fd, data_type)
             fd.close()
         else:
             raise NmapParserException("Nmap data file could not be found \

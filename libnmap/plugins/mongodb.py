@@ -5,8 +5,12 @@ from bson.objectid import ObjectId
 
 
 class NmapMongoPlugin(NmapDBPlugin):
-    def __init__(self, **kwargs):
+    def __init__(self, dbname=None, store=None, **kwargs):
         NmapDBPlugin.__init__(self)
+        if dbname is not None:
+            self.dbname = dbname
+        if store is not None:
+            self.store = store
         self.dbclient = MongoClient(**kwargs)
         self.collection = self.dbclient[self.dbname][self.store]
 
