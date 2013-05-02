@@ -21,6 +21,25 @@ libnmap is a python toolkit for manipulating nmap. It currently offers the follo
     - elastic search: todo
     - csv: todo
 
-How
-===
-Will be added very soon but I have to go get some sushis first :)
+## How
+
+### Launch a nmap scan
+
+
+### De/Serialize NmapReport
+Easy:
+```python
+from libnmap import NmapParser, NmapReport
+from libnmap import ReportDecoder, ReportEncoder
+import json
+ 
+d = NmapParser.parse_fromfile('/root/dev/python-nmap-lib/libnmap/test/files/1_hosts.xml')
+r = NmapReport('t1', d)
+ 
+# create a json object from an NmapReport instance
+j = json.dumps(r, cls=ReportEncoder)
+  
+# create a NmapReport instance from a json object
+nmapreport = json.loads(j, cls=ReportDecoder)
+nmapreport.name
+```
