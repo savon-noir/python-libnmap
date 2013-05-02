@@ -23,4 +23,4 @@ libnmap is a python toolkit for manipulating nmap. It currently offers the follo
 
 How
 ===
-Will be added very soon but I have to go get some sushis first
+Will be added very soon but I have to go get some sushis first :)
