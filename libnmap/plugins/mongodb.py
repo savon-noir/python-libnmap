@@ -1,12 +1,12 @@
 #!/usr/bin/env python
-from libnmap.plugins.dbplugin import NmapDBPlugin
+from libnmap.plugins.backendplugin import NmapBackendPlugin
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 
 
-class NmapMongoPlugin(NmapDBPlugin):
+class NmapMongoPlugin(NmapBackendPlugin):
     def __init__(self, dbname=None, store=None, **kwargs):
-        NmapDBPlugin.__init__(self)
+        NmapBackendPlugin.__init__(self)
         if dbname is not None:
             self.dbname = dbname
         if store is not None:
@@ -14,10 +14,10 @@ class NmapMongoPlugin(NmapDBPlugin):
         self.dbclient = MongoClient(**kwargs)
         self.collection = self.dbclient[self.dbname][self.store]
 
-    def db_insert(self, dict_data):
+    def insert(self, dict_data):
         self.collection.insert(dict_data)
 
-    def db_get(self, report_id=None):
+    def get(self, report_id=None):
         rid = report_id
         if report_id is not None and isinstance(report_id, str):
             rid = ObjectId(report_id)
@@ -28,7 +28,7 @@ class NmapMongoPlugin(NmapDBPlugin):
             r = self.collection.find()
         return r
 
-    def db_delete(self, report_id=None):
+    def delete(self, report_id=None):
         if report_id is not None and isinstance(report_id, str):
             self.collection.remove({'_id': ObjectId(report_id)})
         else:

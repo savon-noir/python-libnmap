@@ -12,4 +12,5 @@ from diff import NmapDiff, DictDiffer, NmapDiffException
 from common import NmapHost, NmapService
 from process import NmapProcess
 from parser import NmapParser, NmapParserException
-from report import NmapReport, ReportDecoder, ReportEncoder
+from report import NmapReport
+from reportjson import ReportDecoder, ReportEncoder
