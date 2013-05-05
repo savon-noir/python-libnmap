@@ -50,7 +50,7 @@ class NmapReport(object):
         """
         if backend is not None:
             #do stuff
-            backend.insert(self)
+            backend.insert(self._hosts)
         else:
             raise RuntimeError
 

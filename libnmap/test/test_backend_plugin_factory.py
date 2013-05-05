@@ -3,7 +3,12 @@
 import unittest
 import os
 from libnmap import NmapParser, NmapReport
-from libnmap import BackendPluginFactory, NmapBackendPlugin, NmapMongoPlugin
+from libnmap.plugins.backendplugin import NmapBackendPlugin
+from libnmap.plugins.backendpluginFactory import BackendPluginFactory
+
+#define all plugin that need test
+from libnmap.plugins.mongodb import NmapMongoPlugin
+from libnmap.plugins.sqlite import NmapSqlitePlugin
 
 
 class TestNmapBackendPlugin(unittest.TestCase):
@@ -70,6 +75,7 @@ class TestNmapBackendPlugin(unittest.TestCase):
         mongodb = factory.create(plugin_name="mongodb")
         self.assertEqual(isinstance(mongodb, NmapBackendPlugin), True)
         self.assertEqual(isinstance(mongodb, NmapMongoPlugin), True)
+        self.assertEqual(isinstance(mongodb, NmapSqlitePlugin), False)
 
     def mongo_test_insert(self):
         """best way to insert is to call save() of nmapreport"""
@@ -83,7 +89,8 @@ class TestNmapBackendPlugin(unittest.TestCase):
             factory = BackendPluginFactory()
             mongodb = factory.create(plugin_name="mongodb")
             nr.save(mongodb)
-        pass
+            print mongodb.dbclient
+            print mongodb.collection
 
     def mongo_test_update(self):
         pass
@@ -109,6 +116,6 @@ if __name__ == '__main__':
                            'test_getall',
                            'test_find']
 
-    test_suite = ['test_factory', 'test_insert']
+    test_suite = ['mongo_test_factory', 'mongo_test_insert']
     suite = unittest.TestSuite(map(TestNmapBackendPlugin, test_suite))
-    test_result = unittest.TextTestRunner(verbosity=2).run(suite)
+    test_result = unittest.TextTestRunner(verbosity=5).run(suite)
