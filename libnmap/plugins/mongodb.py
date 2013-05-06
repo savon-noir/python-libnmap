@@ -1,7 +1,10 @@
 #!/usr/bin/env python
-from libnmap.plugins.backendplugin import NmapBackendPlugin
+import json
 from pymongo import MongoClient
 from bson.objectid import ObjectId
+
+from libnmap import ReportDecoder, ReportEncoder
+from libnmap.plugins.backendplugin import NmapBackendPlugin
 
 
 class NmapMongoPlugin(NmapBackendPlugin):
@@ -14,8 +17,15 @@ class NmapMongoPlugin(NmapBackendPlugin):
         self.dbclient = MongoClient(**kwargs)
         self.collection = self.dbclient[self.dbname][self.store]
 
-    def insert(self, dict_data):
-        self.collection.insert(dict_data)
+    def insert(self, report):
+        # create a json object from an NmapReport instance
+        j = json.dumps(report, cls=ReportEncoder)
+        try:
+            id = self.collection.insert(json.loads(j))
+        except:
+            print "MONGODB cannot insert"
+            raise
+        return id
 
     def get(self, report_id=None):
         rid = report_id
@@ -24,6 +34,7 @@ class NmapMongoPlugin(NmapBackendPlugin):
 
         if isinstance(rid, ObjectId):
             r = self.collection.find({'_id': rid})
+            nmapreport = json.loads(r, cls=ReportDecoder)
         else:
             r = self.collection.find()
         return r

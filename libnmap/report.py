@@ -2,9 +2,9 @@
 import sys
 import inspect
 from libnmap import NmapParser
-from libnmap import NmapDiff, NmapHost, NmapService
-#from plugins import backendpluginFactory
-from plugins import backendplugin
+from libnmap import NmapDiff
+from libnmap.plugins.backendplugin import NmapBackendPlugin
+#from libnmap.plugins.backendpluginFactory import BackendPluginFactory
 
 
 class NmapReport(object):
@@ -50,9 +50,10 @@ class NmapReport(object):
         """
         if backend is not None:
             #do stuff
-            backend.insert(self._hosts)
+            id = backend.insert(self)
         else:
             raise RuntimeError
+        return id
 
     def diff(self, other):
         if self._is_consistent() and other._is_consistent():

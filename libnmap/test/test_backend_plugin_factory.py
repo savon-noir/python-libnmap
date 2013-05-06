@@ -78,7 +78,7 @@ class TestNmapBackendPlugin(unittest.TestCase):
         self.assertEqual(isinstance(mongodb, NmapSqlitePlugin), False)
 
     def mongo_test_insert(self):
-        """best way to insert is to call save() of nmapreport"""
+        """"best way to insert is to call save() of nmapreport"""
         for testfile in self.flist:
             fd = open(testfile['file'], 'r')
             s = fd.read()
@@ -88,9 +88,7 @@ class TestNmapBackendPlugin(unittest.TestCase):
             #create the backend factory object
             factory = BackendPluginFactory()
             mongodb = factory.create(plugin_name="mongodb")
-            nr.save(mongodb)
-            print mongodb.dbclient
-            print mongodb.collection
+            self.assertNotEqual(nr.save(mongodb),None)
 
     def mongo_test_update(self):
         pass
