@@ -2,7 +2,8 @@
 
 import unittest
 import os
-from libnmap import NmapParser, NmapReport
+from libnmap.parser import NmapParser
+from libnmap.report import NmapReport
 from libnmap.plugins.backendplugin import NmapBackendPlugin
 from libnmap.plugins.backendpluginFactory import BackendPluginFactory
 

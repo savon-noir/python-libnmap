@@ -2,14 +2,17 @@
 import os
 import xml.etree.ElementTree as ET
 from StringIO import StringIO
-from libnmap import NmapHost, NmapService, NmapReport
+from libnmap.common import NmapHost, NmapService
+from libnmap.report import NmapReport
 
 
 class NmapParser(object):
     @classmethod
     def parse(cls, nmap_data=None, data_type='XML'):
+        nmapobj = None
         if data_type == "XML":
-            cls.parse_xml(nmap_data)
+            nmapobj = cls.parse_xml(nmap_data)
+        return nmapobj
 
     @classmethod
     def parse_xml(cls, nmap_data=None, data_type='XML'):
@@ -24,7 +27,7 @@ class NmapParser(object):
             elif isinstance(nmap_data, file):
                 tree = ET.parse(nmap_data)
         except:
-            raise
+            raise NmapParserException("Wrong XML structure: cannot parse data")
 
         root = tree.getroot()
         if root.tag == 'nmaprun':
@@ -58,10 +61,10 @@ class NmapParser(object):
                 nmap_scan['_hosts'].append(cls._parse_xml_host(el))
             elif el.tag == 'runstats':
                 nmap_scan['_runstats'] = cls._parse_runstats(el)
-            else:
-                print "struct pparse unknown attr: {0} value: {1}".format(
-                    el.tag,
-                    el.get(el.tag))
+            #else:
+            #    print "struct pparse unknown attr: {0} value: {1}".format(
+            #        el.tag,
+            #        el.get(el.tag))
         return NmapReport('dummy', nmap_scan)
 
     @classmethod

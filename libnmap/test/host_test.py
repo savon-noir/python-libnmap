@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import unittest
-from libnmap import NmapParser
+from libnmap.parser import NmapParser
 
 host1 = """
 <host starttime="1361738377" endtime="1361738377">
@@ -148,10 +148,10 @@ host4 = """
 
 class TestNmapHost(unittest.TestCase):
     def test_eq_host(self):
-        h1 = NmapParser.parse_host(host1)
-        h2 = NmapParser.parse_host(host2)
-        h3 = NmapParser.parse_host(host3)
-        h4 = NmapParser.parse_host(host4)
+        h1 = NmapParser.parse(host1)
+        h2 = NmapParser.parse(host2)
+        h3 = NmapParser.parse(host3)
+        h4 = NmapParser.parse(host4)
 
         self.assertNotEqual(h1, h2)
         self.assertEqual(h1, h1)
@@ -160,9 +160,9 @@ class TestNmapHost(unittest.TestCase):
         self.assertNotEqual(h2, h3)
 
     def test_diff_host(self):
-        h1 = NmapParser.parse_host(host1)
-        h2 = NmapParser.parse_host(host2)
-        h3 = NmapParser.parse_host(host3)
+        h1 = NmapParser.parse(host1)
+        h2 = NmapParser.parse(host2)
+        h3 = NmapParser.parse(host3)
 
         c1 = h1.diff(h2)
         c2 = h1.diff(h3)

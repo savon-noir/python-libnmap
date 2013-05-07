@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import sqlite3
 
-from libnmap import NmapReport
+from libnmap.report import NmapReport
 from libnmap.plugins.backendplugin import NmapBackendPlugin
 
 

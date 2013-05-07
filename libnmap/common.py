@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from libnmap import NmapDiff
+from libnmap.diff import NmapDiff
 
 
 class NmapHost(object):

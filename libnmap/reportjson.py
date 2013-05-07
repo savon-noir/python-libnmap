@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 import json
-from libnmap import NmapHost, NmapService, NmapReport, NmapParser
+from libnmap.common import NmapHost, NmapService
+from libnmap.report import NmapReport
+from libnmap.parser import NmapParser
 
 
 class ReportEncoder(json.JSONEncoder):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import sys
 import inspect
-from libnmap import NmapDiff
+from libnmap.diff import NmapDiff
 from libnmap.plugins.backendplugin import NmapBackendPlugin
 
 
