@@ -21,3 +21,4 @@ script:
   - python test/report_test.py
   - python test/report_diff_test.py
   - python test/service_test.py
+  - python test/test_backend_plugin_factory.py

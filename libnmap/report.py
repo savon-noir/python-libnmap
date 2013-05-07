@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-import json
 import sys
 import inspect
-from libnmap import NmapDiff, NmapHost, NmapService
+from libnmap import NmapDiff
+from libnmap.plugins.backendplugin import NmapBackendPlugin
 
 
 class NmapReport(object):
@@ -35,6 +35,16 @@ class NmapReport(object):
             if inspect.getmodule(classobj).__name__.find(plugin_path) == 0:
                 r = classobj(**kwargs)
         return r
+
+    def save(self, backend):
+        """this fct get an NmapBackendPlugin representing the backend
+        """
+        if backend is not None:
+            #do stuff
+            id = backend.insert(self)
+        else:
+            raise RuntimeError
+        return id
 
     def diff(self, other):
         if self._is_consistent() and other._is_consistent():
@@ -119,21 +129,3 @@ class NmapReport(object):
     @property
     def id(self):
         return hash(1)
-
-
-#class ReportEncoder(json.JSONEncoder):
-#    def default(self, obj):
-#        otype = {'NmapHost': NmapHost,
-#                 'NmapService': NmapService,
-#                 'NmapReport': NmapReport}
-#        if isinstance(obj, tuple(otype.values())):
-#            key = '__%s__' % obj.__class__.__name__
-#            return {key: obj.__dict__}
-#        return json.JSONEncoder.default(self, obj)
-#
-#
-#class ReportDecoder(json.JSONDecoder):
-#    def decode(self, json_str):
-#        raw_data = NmapParser.parse_fromdict(json.loads(json_str))
-#        r = NmapReport(name=raw_data['_name'], raw_data=raw_data)
-#        return r
