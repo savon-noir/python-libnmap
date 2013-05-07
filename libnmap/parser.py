@@ -2,14 +2,18 @@
 import os
 import xml.etree.ElementTree as ET
 from StringIO import StringIO
-from libnmap import NmapHost, NmapService
+from libnmap import NmapHost, NmapService, NmapReport
 
 
 class NmapParser(object):
     @classmethod
     def parse(cls, nmap_data=None, data_type='XML'):
-        nmap_scan = {'_nmaprun': {}, '_scaninfo': {},
-                     '_hosts': [], '_runstats': {}}
+        if data_type == "XML":
+            cls.parse_xml(nmap_data)
+
+    @classmethod
+    def parse_xml(cls, nmap_data=None, data_type='XML'):
+        nmapobj = None
         if not nmap_data:
             raise NmapParserException("No report data to parse: \
                                        please provide a file")
@@ -24,21 +28,41 @@ class NmapParser(object):
 
         root = tree.getroot()
         if root.tag == 'nmaprun':
-            nmap_scan['_nmaprun'] = cls.__format_attributes(root)
+            nmapobj = cls._parse_xml_report(root)
+        elif root.tag == 'host':
+            nmapobj = cls._parse_xml_host(root)
+        elif root.tag == 'ports':
+            nmapobj = cls._parse_xml_ports(root)
+        elif root.tag == 'port':
+            nmapobj = cls._parse_xml_port(root)
         else:
-            raise NmapParserException("Unpexpected data structure \
-                                       for XML root node")
+            raise NmapParserException("Unpexpected data structure for XML \
+                                       root node")
+        return nmapobj
+
+    # return NmapReport()
+    @classmethod
+    def _parse_xml_report(cls, root=None):
+        nmap_scan = {'_nmaprun': {}, '_scaninfo': {},
+                     '_hosts': [], '_runstats': {}}
+
+        if root is None:
+            raise NmapParserException("No root node provided to parse XML \
+                                       report")
+
+        nmap_scan['_nmaprun'] = cls.__format_attributes(root)
         for el in root:
             if el.tag == 'scaninfo':
-                nmap_scan['_scaninfo'] = cls.parse_scaninfo(el)
+                nmap_scan['_scaninfo'] = cls._parse_scaninfo(el)
             elif el.tag == 'host':
-                nmap_scan['_hosts'].append(cls.parse_host(el))
+                nmap_scan['_hosts'].append(cls._parse_xml_host(el))
             elif el.tag == 'runstats':
-                nmap_scan['_runstats'] = cls.parse_runstats(el)
-            #else:
-            #    print "struct pparse unknown attr: %s value: %s" %
-            #           (el.tag, el.get(el.tag))
-        return nmap_scan
+                nmap_scan['_runstats'] = cls._parse_runstats(el)
+            else:
+                print "struct pparse unknown attr: {0} value: {1}".format(
+                    el.tag,
+                    el.get(el.tag))
+        return NmapReport('dummy', nmap_scan)
 
     @classmethod
     def parse_fromstring(cls, nmap_data, data_type="XML"):
@@ -85,21 +109,21 @@ class NmapParser(object):
         return nreport
 
     @classmethod
-    def parse_scaninfo(cls, scaninfo_data):
+    def _parse_scaninfo(cls, scaninfo_data):
         xelement = cls.__format_element(scaninfo_data)
         return cls.__format_attributes(xelement)
 
     @classmethod
-    def parse_host(cls, scanhost_data):
+    def _parse_xml_host(cls, scanhost_data):
         xelement = cls.__format_element(scanhost_data)
 
         nhost = NmapHost()
         for xh in xelement:
             if xh.tag == 'hostnames':
-                for hostname in cls.parse_hostnames(xh):
+                for hostname in cls._parse_hostnames(xh):
                     nhost.add_hostname(hostname)
             elif xh.tag == 'ports':
-                for port in cls.parse_ports(xh):
+                for port in cls._parse_xml_ports(xh):
                     nhost.add_service(port)
             elif xh.tag in ('status', 'address'):
                 setattr(nhost, xh.tag, cls.__format_attributes(xh))
@@ -109,7 +133,7 @@ class NmapParser(object):
         return nhost
 
     @classmethod
-    def parse_hostnames(cls, scanhostnames_data):
+    def _parse_hostnames(cls, scanhostnames_data):
         xelement = cls.__format_element(scanhostnames_data)
         hostnames = []
         for hname in xelement:
@@ -118,13 +142,13 @@ class NmapParser(object):
         return hostnames
 
     @classmethod
-    def parse_ports(cls, scanports_data):
+    def _parse_xml_ports(cls, scanports_data):
         xelement = cls.__format_element(scanports_data)
 
         ports = []
         for xservice in xelement:
             if xservice.tag == 'port':
-                nport = cls.parse_port(xservice)
+                nport = cls._parse_xml_port(xservice)
                 ports.append(nport)
             #else:
             #    print "struct port unknown attr: %s value: %s" %
@@ -132,7 +156,7 @@ class NmapParser(object):
         return ports
 
     @classmethod
-    def parse_port(cls, scanport_data):
+    def _parse_xml_port(cls, scanport_data):
         xelement = cls.__format_element(scanport_data)
 
         nport = NmapService(portid=xelement.get('portid'),
@@ -151,7 +175,7 @@ class NmapParser(object):
         return nport
 
     @classmethod
-    def parse_runstats(cls, scanrunstats_data):
+    def _parse_runstats(cls, scanrunstats_data):
         xelement = cls.__format_element(scanrunstats_data)
 
         rdict = {'finished': {}, 'hosts': {}}
