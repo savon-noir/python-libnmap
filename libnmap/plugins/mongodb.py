@@ -34,7 +34,6 @@ class NmapMongoPlugin(NmapBackendPlugin):
 
         if isinstance(rid, ObjectId):
             r = self.collection.find({'_id': rid})
-            nmapreport = json.loads(r, cls=ReportDecoder)
         else:
             r = self.collection.find()
         return r
