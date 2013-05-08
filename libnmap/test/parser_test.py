@@ -79,14 +79,14 @@ class TestNmapParser(unittest.TestCase):
 
         self.port_string = """
         <port protocol="tcp" portid="25">
-        <state state="filtered" reason="admin-prohibited" \
+        <state state="filtered" reason="admin-prohibited"
                 reason_ttl="253" reason_ip="109.133.192.1"/>
         <service name="smtp" method="table" conf="3"/>
         </port>"""
 
         self.port_string2 = """
         <port protocol="tcp" portid="">
-            <state state="filtered" reason="admin-prohibited" \
+            <state state="filtered" reason="admin-prohibited"
                     reason_ttl="253" reason_ip="109.133.192.1"/>
             <service name="smtp" method="table" conf="3"/>
         </port>"""
@@ -96,14 +96,14 @@ class TestNmapParser(unittest.TestCase):
         self.port_string5 = 'GINGERBREADMAN'
         self.port_string6 = """
         <port protocol="tcp" portid="FOOL">
-        <state state="filtered" reason="admin-prohibited" \
+        <state state="filtered" reason="admin-prohibited"
                 reason_ttl="253" reason_ip="109.133.192.1"/>
         <service name="smtp" method="table" conf="3"/>
         </port>"""
 
         self.port_string7 = """
         <port protocol="tcp" portid="22">
-        <stAAte state="filtered" reason="admin-prohibited"\
+        <stAAte state="filtered" reason="admin-prohibited"
                 reason_ttl="253" reason_ip="109.133.192.1"/>
         <service name="smtp" method="table" conf="3"/></port>"""
 
@@ -144,7 +144,7 @@ class TestNmapParser(unittest.TestCase):
         self.assertRaises(ValueError,
                           NmapParser.parse,
                           self.port_string2)
-        self.assertRaises(ValueError,
+        self.assertRaises(NmapParserException,
                           NmapParser.parse,
                           self.port_string3)
         self.assertRaises(NmapParserException,
@@ -162,9 +162,8 @@ class TestNmapParser(unittest.TestCase):
         self.assertRaises(NmapParserException,
                           NmapParser.parse,
                           self.port_string8)
-        self.assertRaises(NmapParserException,
-                          NmapParser.parse,
-                          self.port_string9)
+        serv = NmapParser.parse(self.port_string9)
+        self.assertEqual(serv.state, None)
 
     def test_parser_generic(self):
         plist = NmapParser.parse_fromstring(self.ports_string)
