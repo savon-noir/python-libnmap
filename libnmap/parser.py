@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import os
 import xml.etree.ElementTree as ET
 from StringIO import StringIO
 from libnmap.common import NmapHost, NmapService
@@ -30,13 +29,17 @@ class NmapParser(object):
 
         nmapobj = None
         if data_type == "XML":
-            nmapobj = cls.parse_xml(nmap_data)
+            nmapobj = cls._parse_xml(nmap_data)
+        else:
+            raise NmapParserException("Unknown data type provided. "
+                                      "Please check documentation for "
+                                      "supported data types.")
         return nmapobj
 
     @classmethod
-    def parse_xml(cls, nmap_data=None):
+    def _parse_xml(cls, nmap_data=None):
         """
-            class method used to process a specific data type.
+            Protected class method used to process a specific data type.
             In this case: XML. This method is called by cls.parse class method
             and receives nmap scan results data (in XML).
 
@@ -58,20 +61,19 @@ class NmapParser(object):
                     or a list of NmapObject
         """
 
-        nmapobj = None
         if not nmap_data:
-            raise NmapParserException("No report data to parse: \
-                                       please provide a file")
+            raise NmapParserException("No report data to parse: please "
+                                      "provide a valid XML nmap report")
+        elif not isinstance(nmap_data, str):
+            raise NmapParserException("wrong nmap_data type given as "
+                                      "argument: cannot parse data")
 
         try:
-            if isinstance(nmap_data, str):
-                tree = ET.parse(StringIO(nmap_data))
-            elif isinstance(nmap_data, file):
-                tree = ET.parse(nmap_data)
+            root = ET.fromstring(nmap_data)
         except:
             raise NmapParserException("Wrong XML structure: cannot parse data")
 
-        root = tree.getroot()
+        nmapobj = None
         if root.tag == 'nmaprun':
             nmapobj = cls._parse_xml_report(root)
         elif root.tag == 'host':
@@ -81,8 +83,8 @@ class NmapParser(object):
         elif root.tag == 'port':
             nmapobj = cls._parse_xml_port(root)
         else:
-            raise NmapParserException("Unpexpected data structure for XML \
-                                       root node")
+            raise NmapParserException("Unpexpected data structure for XML "
+                                      "root node")
         return nmapobj
 
     @classmethod
@@ -152,14 +154,13 @@ class NmapParser(object):
             :return: NmapObject
         """
 
-        if os.path.exists(nmap_report_path):
-            fd = open(nmap_report_path, 'r')
-            r = cls.parse(fd, data_type)
-            fd.close()
-        else:
-            raise NmapParserException("Nmap data file could not be found \
-                                       or permissions were not set correctly")
-        return r
+        try:
+            with open(nmap_report_path, 'r') as fileobj:
+                fdata = fileobj.read()
+                rval = cls.parse(fdata, data_type)
+        except IOError:
+            raise
+        return rval
 
     @classmethod
     def parse_fromdict(cls, rdict):
