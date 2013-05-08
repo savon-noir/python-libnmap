@@ -3,7 +3,7 @@ import json
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 
-from libnmap.reportjson import ReportDecoder, ReportEncoder
+from libnmap.reportjson import ReportEncoder
 from libnmap.plugins.backendplugin import NmapBackendPlugin
 
 

@@ -16,8 +16,7 @@ class NmapSqlitePlugin(NmapBackendPlugin):
 
     def db_insert(self, nmap_report):
         nr = NmapReport()
-
-        pass
+        return nr
 
     def db_get(self, report_id=None):
         pass

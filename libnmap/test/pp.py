@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import unittest
-import os
 from libnmap.parser import NmapParser, NmapParserException
 
 baddatalist = ["<host>aaa", None, '', 123, "ports/>>>", "<port<>",
@@ -11,9 +10,12 @@ baddatalist = ["<host>aaa", None, '', 123, "ports/>>>", "<port<>",
 class TestNmapParser(unittest.TestCase):
     def test_parse(self):
         for baddata in baddatalist:
-            self.assertRaises(NmapParserException, NmapParser.parse, baddata, "zz")
-            self.assertRaises(NmapParserException, NmapParser.parse, baddata, "XML")
-            self.assertRaises(NmapParserException, NmapParser.parse, baddata, "YAML")
+            self.assertRaises(NmapParserException, NmapParser.parse,
+                              baddata, "zz")
+            self.assertRaises(NmapParserException, NmapParser.parse,
+                              baddata, "XML")
+            self.assertRaises(NmapParserException, NmapParser.parse,
+                              baddata, "YAML")
 
 if __name__ == '__main__':
     test_suite = ['test_parse']

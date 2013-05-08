@@ -2,7 +2,6 @@
 import sys
 import inspect
 from libnmap.diff import NmapDiff
-from libnmap.plugins.backendplugin import NmapBackendPlugin
 
 
 class NmapReport(object):

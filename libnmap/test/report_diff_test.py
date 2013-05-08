@@ -3,7 +3,6 @@
 import unittest
 import os
 from libnmap.parser import NmapParser
-from libnmap.report import NmapReport
 
 
 class TestNmapReportDiff(unittest.TestCase):
