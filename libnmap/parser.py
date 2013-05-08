@@ -7,51 +7,57 @@ from libnmap.report import NmapReport
 
 
 class NmapParser(object):
-    """ Generic class method of NmapParser class.
-        The data to be parsed does not need to be a complete nmap scan report.
-        You can possibly give <hosts>...</hosts> or <port> XML tags.
-
-        :param nmap_data: any portion of nmap scan result
-        can be given as argument. nmap_data should always be a string
-        representing a part or a complete nmap scan report.
-        :type nmap_data: string
-
-        :param data_type: specifies the type of data to be parsed.
-        As of today, only XML parsing is supported.
-        :type data_type: string ("XML"|"JSON"|"YAML")
-
-        :returns: NmapObject (NmapHost, NmapService or NmapReport)
-                or a list of NmapObject
-    """
     @classmethod
     def parse(cls, nmap_data=None, data_type='XML'):
+        """
+            Generic class method of NmapParser class.
+            The data to be parsed does not need to be a complete nmap
+            scan report. You can possibly give <hosts>...</hosts>
+            or <port> XML tags.
+
+            :param nmap_data: any portion of nmap scan result
+            can be given as argument. nmap_data should always be a string
+            representing a part or a complete nmap scan report.
+            :type nmap_data: string
+
+            :param data_type: specifies the type of data to be parsed.
+            As of today, only XML parsing is supported.
+            :type data_type: string ("XML"|"JSON"|"YAML")
+
+            :return: NmapObject (NmapHost, NmapService or NmapReport)
+                    or a list of NmapObject
+        """
+
         nmapobj = None
         if data_type == "XML":
             nmapobj = cls.parse_xml(nmap_data)
         return nmapobj
 
-    """ class method used to process a specific data type. In this case: XML.
-        This method is called by cls.parse class method and receives nmap scan
-        results data (in XML).
-
-        :param nmap_data: any portion of nmap scan result can be given
-        as argument. nmap_data should always be a string representing a part
-        or a complete nmap scan report.
-        :type nmap_data: string
-
-        This method checks which portion of a nmap scan is given as argument.
-        It could be:
-            1. a full nmap scan report;
-            2. a scanned host: <host> tag in a nmap scan report
-            3. a scanned service: <port> tag
-            4. a list of hosts: <hosts/> tag (TODO)
-            5. a list of ports: <ports/> tag
-
-        :returns: NmapObject (NmapHost, NmapService or NmapReport)
-                or a list of NmapObject
-    """
     @classmethod
     def parse_xml(cls, nmap_data=None):
+        """
+            class method used to process a specific data type.
+            In this case: XML. This method is called by cls.parse class method
+            and receives nmap scan results data (in XML).
+
+            :param nmap_data: any portion of nmap scan result can be given
+            as argument. nmap_data should always be a string representing
+            a part or a complete nmap scan report.
+            :type nmap_data: string
+
+            This method checks which portion of a nmap scan is given
+            as argument.
+            It could be:
+                1. a full nmap scan report;
+                2. a scanned host: <host> tag in a nmap scan report
+                3. a scanned service: <port> tag
+                4. a list of hosts: <hosts/> tag (TODO)
+                5. a list of ports: <ports/> tag
+
+            :return: NmapObject (NmapHost, NmapService or NmapReport)
+                    or a list of NmapObject
+        """
+
         nmapobj = None
         if not nmap_data:
             raise NmapParserException("No report data to parse: \
@@ -79,15 +85,18 @@ class NmapParser(object):
                                        root node")
         return nmapobj
 
-    """ This method parses out a full nmap scan report from its XML root
-        node: <nmaprun>.
-
-        :param root: Element from xml.ElementTree (top of XML the document)
-        :type root: Element
-        :returns: NmapReport object
-    """
     @classmethod
     def _parse_xml_report(cls, root=None):
+        """
+            This method parses out a full nmap scan report from its XML root
+            node: <nmaprun>.
+
+            :param root: Element from xml.ElementTree (top of XML the document)
+            :type root: Element
+
+            :return: NmapReport object
+        """
+
         nmap_scan = {'_nmaprun': {}, '_scaninfo': {},
                      '_hosts': [], '_runstats': {}}
 
@@ -109,35 +118,40 @@ class NmapParser(object):
             #        el.get(el.tag))
         return NmapReport('dummy', nmap_scan)
 
-    """ Call generic cls.parse() method and ensure that a string is passed on
-        as argument. If not, an exception is raised.
-
-        :param nmap_data: Same as for parse(), any portion of nmap scan reports
-        could be passed as argument. Data type _must_ be a string.
-        :type nmap_data: string
-        :param data_type: Specifies the type of data passed on as argument.
-
-        :returns: NmapObject
-    """
     @classmethod
     def parse_fromstring(cls, nmap_data, data_type="XML"):
+        """
+            Call generic cls.parse() method and ensure that a string is
+            passed on as argument. If not, an exception is raised.
+
+            :param nmap_data: Same as for parse(), any portion of nmap scan
+            reports could be passed as argument. Data type _must_ be a string.
+            :type nmap_data: string
+
+            :param data_type: Specifies the type of data passed on as argument.
+
+            :return: NmapObject
+        """
+
         if not isinstance(nmap_data, str):
             raise NmapParserException("bad argument type for \
                                        parse_fromstring(): should be a string")
         return cls.parse(nmap_data, data_type)
 
-    """ Call generic cls.parse() method and ensure that a correct file path is
-        given as argument. If not, an exception is raised.
-
-        :param nmap_data: Same as for parse(), any portion of nmap scan reports
-        could be passed as argument. Data type _must_ be a valid path to a file
-        containing nmap scan results.
-        :param data_type: Specifies the type of serialization in the file.
-
-        :returns: NmapObject
-    """
     @classmethod
     def parse_fromfile(cls, nmap_report_path, data_type="XML"):
+        """
+            Call generic cls.parse() method and ensure that a correct file
+            path is given as argument. If not, an exception is raised.
+
+            :param nmap_data: Same as for parse(), any portion of nmap
+            scan reports could be passed as argument. Data type _must be a
+            valid path to a file containing nmap scan results.
+            :param data_type: Specifies the type of serialization in the file.
+
+            :return: NmapObject
+        """
+
         if os.path.exists(nmap_report_path):
             fd = open(nmap_report_path, 'r')
             r = cls.parse(fd, data_type)
@@ -147,17 +161,20 @@ class NmapParser(object):
                                        or permissions were not set correctly")
         return r
 
-    """ Strange method which transforms a python dict
-        representation of a NmapReport and turns it into an NmapReport object.
-        Needs to be reviewed and possibly removed.
-
-        :param rdict: python dict representation of an NmapReport
-        :type rdict: dict
-
-        :returns: NmapReport
-    """
     @classmethod
     def parse_fromdict(cls, rdict):
+        """
+            Strange method which transforms a python dict
+            representation of a NmapReport and turns it into an
+            NmapReport object.
+            Needs to be reviewed and possibly removed.
+
+            :param rdict: python dict representation of an NmapReport
+            :type rdict: dict
+
+            :return: NmapReport
+        """
+
         nreport = {}
         if rdict.keys()[0] == '__NmapReport__':
             r = rdict['__NmapReport__']
@@ -186,30 +203,34 @@ class NmapParser(object):
             nmapobj = NmapReport('dummy', nreport)
         return nmapobj
 
-    """ Private method parsing a portion of a nmap scan result.
-        Receives a <scaninfo> XML tag.
-
-        :param scaninfo_data: <scaninfo> XML tag from a nmap scan
-        :type scaninfo_data: xml.ElementTree.Element
-
-        :returns: python dict representing the XML scaninfo tag
-    """
     @classmethod
     def __parse_scaninfo(cls, scaninfo_data):
+        """
+            Private method parsing a portion of a nmap scan result.
+            Receives a <scaninfo> XML tag.
+
+            :param scaninfo_data: <scaninfo> XML tag from a nmap scan
+            :type scaninfo_data: xml.ElementTree.Element
+
+            :return: python dict representing the XML scaninfo tag
+        """
+
         xelement = cls.__format_element(scaninfo_data)
         return cls.__format_attributes(xelement)
 
-    """ Protected method parsing a portion of a nmap scan result.
-        Receives a <host> XML tag representing a scanned host with
-        its services.
-
-        :param scaninfo_data: <host> XML tag from a nmap scan
-        :type scaninfo_data: xml.ElementTree.Element
-
-        :returns: NmapHost object
-    """
     @classmethod
     def _parse_xml_host(cls, scanhost_data):
+        """
+            Protected method parsing a portion of a nmap scan result.
+            Receives a <host> XML tag representing a scanned host with
+            its services.
+
+            :param scaninfo_data: <host> XML tag from a nmap scan
+            :type scaninfo_data: xml.ElementTree.Element
+
+            :return: NmapHost object
+        """
+
         xelement = cls.__format_element(scanhost_data)
 
         nhost = NmapHost()
@@ -227,15 +248,17 @@ class NmapParser(object):
             #           (h.tag, h.get(h.tag))
         return nhost
 
-    """ Private method parsing the hostnames list within a <host> XML tag.
-
-        :param scanhostnames_data: <hostnames> XML tag from a nmap scan
-        :type scanhostnames_data: xml.ElementTree.Element
-
-        :returns: list of hostnames
-    """
     @classmethod
     def __parse_hostnames(cls, scanhostnames_data):
+        """
+            Private method parsing the hostnames list within a <host> XML tag.
+
+            :param scanhostnames_data: <hostnames> XML tag from a nmap scan
+            :type scanhostnames_data: xml.ElementTree.Element
+
+            :return: list of hostnames
+        """
+
         xelement = cls.__format_element(scanhostnames_data)
         hostnames = []
         for hname in xelement:
@@ -243,19 +266,21 @@ class NmapParser(object):
                 hostnames.append(hname.get('name'))
         return hostnames
 
-    """ Protected method parsing the list of scanned services from
-        a targeted host. This protected method cannot be called directly
-        with a string. A <ports/> tag can be directly passed to parse()
-        and the below method will be called and return a list of nmap
-        scanned services
-
-        :param scanports_data: <ports> XML tag from a nmap scan
-        :type scanports_data: xml.ElementTree.Element
-
-        :returns: list of NmapService
-    """
     @classmethod
     def _parse_xml_ports(cls, scanports_data):
+        """
+            Protected method parsing the list of scanned services from
+            a targeted host. This protected method cannot be called directly
+            with a string. A <ports/> tag can be directly passed to parse()
+            and the below method will be called and return a list of nmap
+            scanned services
+
+            :param scanports_data: <ports> XML tag from a nmap scan
+            :type scanports_data: xml.ElementTree.Element
+
+            :return: list of NmapService
+        """
+
         xelement = cls.__format_element(scanports_data)
 
         ports = []
@@ -268,19 +293,21 @@ class NmapParser(object):
             #           (h.tag, h.get(h.tag))
         return ports
 
-    """ Protected method parsing a scanned service from a targeted host.
-        This protected method cannot be called directly.
-        A <port/> tag can be directly passed to parse() and the below
-        method will be called and return a NmapService object representing
-        the state of the service.
-
-        :param scanport_data: <port> XML tag from a nmap scan
-        :type scanport_data: xml.ElementTree.Element
-
-        :returns: NmapService
-    """
     @classmethod
     def _parse_xml_port(cls, scanport_data):
+        """
+            Protected method parsing a scanned service from a targeted host.
+            This protected method cannot be called directly.
+            A <port/> tag can be directly passed to parse() and the below
+            method will be called and return a NmapService object representing
+            the state of the service.
+
+            :param scanport_data: <port> XML tag from a nmap scan
+            :type scanport_data: xml.ElementTree.Element
+
+            :return: NmapService
+        """
+
         xelement = cls.__format_element(scanport_data)
 
         nport = NmapService(portid=xelement.get('portid'),
@@ -298,28 +325,24 @@ class NmapParser(object):
 
         return nport
 
-    """ Private method parsing a portion of a nmap scan result.
-        Receives a <runstats> XML tag.
-
-        :param scanrunstats_data: <runstats> XML tag from a nmap scan
-        :type scanrunstats_data: xml.ElementTree.Element
-
-        :returns: python dict representing the XML runstats tag
-    """
     @classmethod
     def __parse_runstats(cls, scanrunstats_data):
+        """
+            Private method parsing a portion of a nmap scan result.
+            Receives a <runstats> XML tag.
+
+            :param scanrunstats_data: <runstats> XML tag from a nmap scan
+            :type scanrunstats_data: xml.ElementTree.Element
+
+            :return: python dict representing the XML runstats tag
+        """
+
         xelement = cls.__format_element(scanrunstats_data)
 
-        rdict = {'finished': {}, 'hosts': {}}
-        for s in xelement:
-            if s.tag == 'finished':
-                rdict[s.tag]['time'] = s.get('time')
-                rdict[s.tag]['elapsed'] = s.get('elapsed')
-                rdict[s.tag]['summary'] = s.get('summary')
-            elif s.tag == 'hosts':
-                rdict[s.tag]['up'] = s.get('up')
-                rdict[s.tag]['down'] = s.get('down')
-                rdict[s.tag]['total'] = s.get('total')
+        rdict = {}
+        for xmltag in xelement:
+            if xmltag.tag in ['finished', 'hosts']:
+                rdict[xmltag.tag] = cls.__format_attributes(xmltag)
             else:
                 raise NmapParserException('Unpexpected data structure \
                                            for <runstats>')
@@ -328,6 +351,17 @@ class NmapParser(object):
 
     @staticmethod
     def __format_element(elt_data):
+        """
+            Private method which ensures that a XML portion to be parsed is
+            of type xml.etree.ElementTree.Element.
+            If elt_data is a string, then it is converted to an
+            XML Element type.
+
+            :param elt_data: XML Element to be parsed or string
+            to be converted to a XML Element
+
+            :return: Element
+        """
         if isinstance(elt_data, str):
             try:
                 xelement = ET.fromstring(elt_data)
@@ -344,21 +378,35 @@ class NmapParser(object):
 
     @staticmethod
     def __format_attributes(elt_data):
-        r = {}
+        """
+            Private method which converts a single XML tag to a python dict.
+            It also checks that the elt_data given as argument is of type
+            xml.etree.ElementTree.Element
+
+            :param elt_data: XML Element to be parsed or string
+            to be converted to a XML Element
+
+            :return: Element
+        """
+
+        rval = {}
         if not ET.iselement(elt_data):
             raise NmapParserException("Error while trying to parse supplied \
                                        data attributes: format is not XML")
         try:
-            for k in elt_data.keys():
-                r[k] = elt_data.get(k)
-                if r[k] is None:
+            for dkey in elt_data.keys():
+                rval[dkey] = elt_data.get(dkey)
+                if rval[dkey] is None:
                     raise NmapParserException("Error while trying to build-up \
                                                element attributes")
         except:
             raise
-        return r
+        return rval
 
 
 class NmapParserException(Exception):
     def __init__(self, msg):
         self.msg = msg
+
+    def __str__(self):
+        return self.msg

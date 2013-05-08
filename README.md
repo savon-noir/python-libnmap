@@ -27,7 +27,7 @@ libnmap is a python toolkit for manipulating nmap. It currently offers the follo
 Here a consequent example on how to use libnmap:
 ```python
 #!/usr/bin/env python
-from libnmap import NmapProcess, NmapParser, NmapReport, NmapParserException
+from libnmap import NmapProcess, NmapParser, NmapParserException
 
 
 # start a new nmap scan on localhost with some specific options
@@ -42,7 +42,7 @@ def do_scan(targets, options):
     except NmapParserException as e:
         print "Exception raised while parsing scan: %s" % (e.msg)
 
-    return NmapReport("report1", parsed)
+    return parsed
 
 
 # print scan results from a nmap report
@@ -82,8 +82,7 @@ from libnmap import NmapParser, NmapReport
 from libnmap import ReportDecoder, ReportEncoder
 import json
  
-d = NmapParser.parse_fromfile('/root/dev/python-nmap-lib/libnmap/test/files/1_hosts.xml')
-r = NmapReport('t1', d)
+r = NmapParser.parse_fromfile('/root/dev/python-nmap-lib/libnmap/test/files/1_hosts.xml')
  
 # create a json object from an NmapReport instance
 j = json.dumps(r, cls=ReportEncoder)
