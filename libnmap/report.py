@@ -2,7 +2,7 @@
 import sys
 import inspect
 from libnmap.diff import NmapDiff
-from libnmap.plugins.backendplugin import NmapBackendPlugin
+#from libnmap.plugins.backendplugin import NmapBackendPlugin
 
 
 class NmapReport(object):
@@ -16,16 +16,20 @@ class NmapReport(object):
             self.set_raw_data(raw_data)
 
     def report_export(self, file_path, output='csv'):
+        """DEPRECATED"""
         return 0
 
     def read_fromfile(self, file_path):
+        """DEPRECATED"""
         self.report_import(file_path)
         return self.get_raw_data()
 
     def write_tofile(self, file_path, output='csv'):
+        """DEPRECATED"""
         return self.report_export(file_path, output)
 
     def db(self, plugin_name="mongodb", **kwargs):
+        """DEPRECATED"""
         r = None
         plugin_path = "libnmap.plugins.%s" % (plugin_name)
         __import__(plugin_path)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import sqlite3
 
-from libnmap.report import NmapReport
+#from libnmap.report import NmapReport
 from libnmap.plugins.backendplugin import NmapBackendPlugin
 
 
@@ -15,8 +15,6 @@ class NmapSqlitePlugin(NmapBackendPlugin):
                 (date text, trans text, symbol text, qty real, price real)''')
 
     def db_insert(self, nmap_report):
-        nr = NmapReport()
-
         pass
 
     def db_get(self, report_id=None):
