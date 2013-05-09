@@ -447,7 +447,8 @@ def main(argv):
             print "Progress: %s %% - ETC: %s" % (nmapscan.progress,
                                                  nmapscan.etc)
 
-    nm = NmapProcess("scanme.nmap.org", options="-sV", event_callback=mycallback)
+    nm = NmapProcess("scanme.nmap.org", options="-sV",
+                     event_callback=mycallback)
     rc = nm.run()
 
     if rc == 0:

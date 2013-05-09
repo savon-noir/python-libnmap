@@ -260,7 +260,6 @@ class NmapService(object):
         return NmapDiff(self, other)
 
 
-
 class NmapReport(object):
     def __init__(self, name='', raw_data=None):
         self._name = name

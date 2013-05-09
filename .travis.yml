@@ -25,9 +25,9 @@ before_script:
   - "pyflakes ."
 script:
   - cd libnmap
-  - python test/host_test.py
-  - python test/parser_test.py
-  - python test/report_test.py
-  - python test/report_diff_test.py
-  - python test/service_test.py
+  - python test/test_host.py
+  - python test/test_parser.py
+  - python test/test_report.py
+  - python test/test_report_diff.py
+  - python test/test_service.py
   - python test/test_backend_plugin_factory.py
