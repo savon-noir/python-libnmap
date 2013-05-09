@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import json
-from libnmap.common import NmapHost, NmapService
-from libnmap.report import NmapReport
+from libnmap.objects import NmapHost, NmapService, NmapReport
 from libnmap.parser import NmapParser
 
 

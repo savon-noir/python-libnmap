@@ -112,54 +112,29 @@ class NmapHost(object):
     def endtime(self):
         return self._endtime
 
-    def add_hostname(self, hostname):
-        """
-            DEPRECATED must be done in constructor
-            (or send to private and called by the constructor
-            may be better for param validation)
-            :param  hostname: string
-        """
-        self._hostnames.append(hostname)
-
-    def add_service(self, nmapservice):
-        """
-            DEPRECATED must be done in constructor
-            (or send to private and called by the constructor
-            may be better for param validation)
-            Add a NmapService to the servicse table of NmapHost object
-            :param  nmapservice: NmapService
-            :return boolean:
-            :raise Exception: if wrong param
-        """
-        v = False
-        if isinstance(nmapservice, NmapService):
-            self._services.append(nmapservice)
-            v = True
-        else:
-            raise Exception("Object type should be NmapService \
-                            for add_service")
-        return v
-
     def get_ports(self):
         """
-            Retieve a list of the port used by each service of the NmapHost
-            :return list: of tuples (port,'proto') ie:[(22,'tcp'),(25, 'tcp')]
+            Retrieve a list of the port used by each service of the NmapHost
+
+            :return: list: of tuples (port,'proto') ie:[(22,'tcp'),(25, 'tcp')]
         """
         return [(p.port, p.protocol) for p in self._services]
 
     def get_open_ports(self):
         """
             Same as get_ports() but only for open ports
-            :return list: of tuples (port,'proto') ie:[(22,'tcp'),(25, 'tcp')]
+
+            :return: list: of tuples (port,'proto') ie:[(22,'tcp'),(25, 'tcp')]
         """
         return ([(p.port, p.protocol)
                 for p in self._services if p.state == 'open'])
 
     def get_service(self, portno, protocol='tcp'):
         """
-            :param  portno: int the portnumber
-            :param  protocol='tcp': string ('tcp','udp')
-            :return NmapService or None
+            :param portno: int the portnumber
+            :param protocol='tcp': string ('tcp','udp')
+
+            :return: NmapService or None
         """
         plist = [p for p in self._services if
                  p.port == portno and p.protocol == protocol]
@@ -283,3 +258,109 @@ class NmapService(object):
 
     def diff(self, other):
         return NmapDiff(self, other)
+
+
+
+class NmapReport(object):
+    def __init__(self, name='', raw_data=None):
+        self._name = name
+        self._nmaprun = {}
+        self._scaninfo = {}
+        self._hosts = []
+        self._runstats = {}
+        if raw_data is not None:
+            self.set_raw_data(raw_data)
+
+    def save(self, backend):
+        """this fct get an NmapBackendPlugin representing the backend
+        """
+        if backend is not None:
+            #do stuff
+            id = backend.insert(self)
+        else:
+            raise RuntimeError
+        return id
+
+    def diff(self, other):
+        if self.__is_consistent() and other.__is_consistent():
+            r = NmapDiff(self, other)
+        else:
+            r = set()
+        return r
+
+    def set_raw_data(self, raw_data):
+        self._nmaprun = raw_data['_nmaprun']
+        self._scaninfo = raw_data['_scaninfo']
+        self._hosts = raw_data['_hosts']
+        self._runstats = raw_data['_runstats']
+
+    @property
+    def name(self):
+        return self._name
+
+    ### implement with iterators
+    @property
+    def scanned_hosts(self):
+        return self._hosts
+
+    @property
+    def endtime(self):
+        return self._runstats['finished']['time']
+
+    @property
+    def summary(self):
+        return self._runstats['finished']['summary']
+
+    @property
+    def elapsed(self):
+        return self._runstats['finished']['elapsed']
+
+    @property
+    def hosts_up(self):
+        return (self._runstats['hosts']['up']
+                if 'hosts' in self._runstats
+                else '')
+
+    @property
+    def hosts_down(self):
+        return (self._runstats['hosts']['down']
+                if 'hosts' in self._runstats
+                else '')
+
+    @property
+    def hosts_total(self):
+        return (self._runstats['hosts']['total']
+                if 'hosts' in self._runstats
+                else '')
+
+    def get_raw_data(self):
+        raw_data = {'_nmaprun': self._nmaprun,
+                    '_scaninfo': self._scaninfo,
+                    '_hosts': self._hosts,
+                    '_runstats': self._runstats}
+        return raw_data
+
+    def __is_consistent(self):
+        r = False
+        rd = self.get_raw_data()
+        _consistent_keys = ['_nmaprun', '_scaninfo', '_hosts', '_runstats']
+        if (set(_consistent_keys) == set(rd.keys()) and
+                len([k for k in rd.keys() if rd[k] is not None]) == 4):
+                r = True
+        return r
+
+    def __repr__(self):
+        return "{0} {1} hosts: {2} {3}".format(self._nmaprun, self._scaninfo,
+                                               len(self._hosts),
+                                               self._runstats)
+
+    def get_dict(self):
+        d = dict([("%s.%s" % (h.__class__.__name__, str(h.id)), hash(h))
+                 for h in self.scanned_hosts])
+        d.update({'hosts_up': self.hosts_up, 'hosts_down': self.hosts_down,
+                  'hosts_total': self.hosts_total})
+        return d
+
+    @property
+    def id(self):
+        return hash(1)

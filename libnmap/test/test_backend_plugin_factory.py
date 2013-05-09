@@ -3,7 +3,6 @@
 import unittest
 import os
 from libnmap.parser import NmapParser
-from libnmap.report import NmapReport
 from libnmap.plugins.backendplugin import NmapBackendPlugin
 from libnmap.plugins.backendpluginFactory import BackendPluginFactory
 
@@ -85,7 +84,7 @@ class TestNmapBackendPlugin(unittest.TestCase):
             s = fd.read()
             fd.close()
 
-            nr = NmapReport(NmapParser.parse(s))
+            nr = NmapParser.parse(s)
             #create the backend factory object
             factory = BackendPluginFactory()
             mongodb = factory.create(plugin_name="mongodb")

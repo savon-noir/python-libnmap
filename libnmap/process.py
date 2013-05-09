@@ -73,22 +73,23 @@ class NmapProcess:
 
         self.__nmap_command_line = self.get_command_line()
         if event_callback and callable(event_callback):
-            self._nmap_event_callback = event_callback
+            self.__nmap_event_callback = event_callback
         else:
-            self._nmap_event_callback = None
+            self.__nmap_event_callback = None
         (self.DONE, self.READY, self.RUNNING,
          self.CANCELLED, self.FAILED) = range(5)
 
         # API usable in callback function
-        self.state = self.READY
-        self.starttime = 0
-        self.endtime = 0
+        self.__state = self.READY
+        self.__starttime = 0
+        self.__endtime = 0
+        self.__version = ''
         self.__progress = 0
         self.__etc = 0
-        self.elapsed = ''
-        self.summary = ''
-        self.stdout = ''
-        self.stderr = ''
+        self.__elapsed = ''
+        self.__summary = ''
+        self.__stdout = ''
+        self.__stderr = ''
 
     def _run_init(self):
         """
@@ -98,18 +99,18 @@ class NmapProcess:
         self.__nmap_proc = None
         self.__nmap_rc = -1
         self.__nmap_command_line = self.get_command_line()
-        self.state = self.READY
+        self.__state = self.READY
         self.__progress = 0
         self.__etc = 0
-        self.starttime = 0
-        self.endtime = 0
-        self.elapsed = ''
-        self.summary = ''
-        self.nmap_version = ''
+        self.__starttime = 0
+        self.__endtime = 0
+        self.__elapsed = ''
+        self.__summary = ''
+        self.__version = ''
         self.__io_queue = Queue()
         self.__ioerr_queue = Queue()
-        self.stdout = ''
-        self.stderr = ''
+        self.__stdout = ''
+        self.__stderr = ''
 
     def _whereis(self, program):
         """
@@ -211,9 +212,9 @@ class NmapProcess:
                           args=(self.__nmap_proc.stderr, self.__ioerr_queue))
             tout.start()
             terr.start()
-            self.state = self.RUNNING
+            self.__state = self.RUNNING
         except OSError:
-            self.state = self.FAILED
+            self.__state = self.FAILED
             raise
 
         return self.__wait()
@@ -240,19 +241,19 @@ class NmapProcess:
                 break
             else:
                 e = self.__process_event(thread_stream)
-                if self._nmap_event_callback and e:
-                    self._nmap_event_callback(self, thread_stream)
-                self.stdout += thread_stream
+                if self.__nmap_event_callback and e:
+                    self.__nmap_event_callback(self, thread_stream)
+                self.__stdout += thread_stream
 
         self.__nmap_rc = self.__nmap_proc.poll()
         if self.rc is None:
-            self.state = self.CANCELLED
+            self.__state = self.CANCELLED
         elif self.rc == 0:
-            self.state = self.DONE
+            self.__state = self.DONE
             self.__progress = 100
         else:
-            self.state = self.FAILED
-            self.stderr = self.__ioerr_queue.get(timeout=2)
+            self.__state = self.FAILED
+            self.__stderr = self.__ioerr_queue.get(timeout=2)
 
         return self.rc
 
@@ -302,6 +303,8 @@ class NmapProcess:
         3. finished: when nmap scan ends.
 
         :return: True is event is known.
+
+        :todo: handle parsing directly via NmapParser.parse()
         """
         rval = False
         try:
@@ -317,27 +320,68 @@ class NmapProcess:
                         rval = True
                     elif (xmlnode.nodeName == 'nmaprun' and
                             xmlnode.attributes.keys()):
-                        self.starttime = xmlnode.attributes['start'].value
-                        self.nmap_version = xmlnode.attributes['version'].value
+                        self.__starttime = xmlnode.attributes['start'].value
+                        self.__version = xmlnode.attributes['version'].value
                         rval = True
                     elif (xmlnode.nodeName == 'finished' and
                             xmlnode.attributes.keys()):
-                        self.endtime = xmlnode.attributes['time'].value
-                        self.elapsed = xmlnode.attributes['elapsed'].value
-                        self.summary = xmlnode.attributes['summary'].value
+                        self.__endtime = xmlnode.attributes['time'].value
+                        self.__elapsed = xmlnode.attributes['elapsed'].value
+                        self.__summary = xmlnode.attributes['summary'].value
                         rval = True
         except:
             pass
         return rval
 
     @property
-    def rc(self):
+    def state(self):
         """
-        Accessor for nmap execution's return code
+        Accessor for nmap execution state. Possible states are:
+        - self.READY
+        - self.RUNNING
+        - self.FAILED
+        - self.CANCELLED
+        - self.DONE
 
-        :return: nmap execution's return code
+        :return: integer (from above documented enum)
         """
-        return self.__nmap_rc
+        return self.__state
+
+    @property
+    def starttime(self):
+        """
+        Accessor for time when scan started
+
+        :return: string. Unix timestamp
+        """
+        return self.__starttime
+
+    @property
+    def endtime(self):
+        """
+        Accessor for time when scan ended
+
+        :return: string. Unix timestamp
+        """
+        return self.__endtime
+
+    @property
+    def elapsed(self):
+        """
+        Accessor returning for how long the scan ran (in seconds)
+
+        :return: string
+        """
+        return self.__elapsed
+
+    @property
+    def summary(self):
+        """
+        Accessor returning a short summary of the scan's results
+
+        :return: string
+        """
+        return self.__summary
 
     @property
     def etc(self):
@@ -349,6 +393,16 @@ class NmapProcess:
         return self.__etc
 
     @property
+    def version(self):
+        """
+        Accessor for nmap binary version number
+
+        :return: version number of nmap binary
+        :rtype: string
+        """
+        return self.__version
+
+    @property
     def progress(self):
         """
         Accessor for progress status in percentage
@@ -357,6 +411,35 @@ class NmapProcess:
         """
         return self.__progress
 
+    @property
+    def rc(self):
+        """
+        Accessor for nmap execution's return code
+
+        :return: nmap execution's return code
+        """
+        return self.__nmap_rc
+
+    @property
+    def stdout(self):
+        """
+        Accessor for nmap standart output
+
+        :return: output from nmap scan in XML
+        :rtype: string
+        """
+        return self.__stdout
+
+    @property
+    def stderr(self):
+        """
+        Accessor for nmap standart error
+
+        :return: output from nmap when errors occured.
+        :rtype: string
+        """
+        return self.__stderr
+
 
 def main(argv):
     def mycallback(nmapscan=None, data=""):
@@ -364,15 +447,17 @@ def main(argv):
             print "Progress: %s %% - ETC: %s" % (nmapscan.progress,
                                                  nmapscan.etc)
 
-    nm = NmapProcess("localhost", options="-sT", event_callback=mycallback)
+    nm = NmapProcess("scanme.nmap.org", options="-sV", event_callback=mycallback)
     rc = nm.run()
 
     if rc == 0:
-        print "Scan started {0} {1}".format(nm.starttime, nm.nmap_version)
+        print "Scan started at {0} nmap version: {1}".format(nm.starttime,
+                                                             nm.version)
+        print "state: {0} (rc: {1})".format(nm.state, nm.rc)
         print "results size: {0}".format(len(nm.stdout))
         print "Scan ended {0}: {1}".format(nm.endtime, nm.summary)
-        print "state: %s" % nm.state
     else:
+        print "state: {0} (rc: {1})".format(nm.state, nm.rc)
         print "Error: {stderr}".format(stderr=nm.stderr)
         print "Result: {0}".format(nm.stdout)
 

@@ -23,6 +23,44 @@ libnmap is a python toolkit for manipulating nmap. It currently offers the follo
 
 ## How
 
+### Launch a simple scan with event callback
+Below a simple example on how to run a nmap scan using a callback function.
+No advanced data manipulations with our parser. The callback will simply
+printout the percentage done and the etc. The event callback is triggered
+each time nmap outputs data. It is to note that a fixed options forces
+nmap to send its progress to the lib every two seconds. Consequently, at least
+every two seconds, the callback function is triggered even if nmap is not
+printing out stuff.
+
+```python
+#!/usr/bin/env python
+from libnmap import NmapProcess
+        
+def main(argv):
+    def mycallback(nmapscan=None, data=""):
+        if nmapscan.is_running():
+            print "Progress: %s %% - ETC: %s" % (nmapscan.progress,
+                                                 nmapscan.etc)
+
+    nm = NmapProcess("scanme.nmap.org", options="-sV", event_callback=mycallback)
+    rc = nm.run()
+
+    if rc == 0:
+        print "Scan started at {0} nmap version: {1}".format(nm.starttime,
+                                                             nm.version)
+        print "state: {0} (rc: {1})".format(nm.state, nm.rc)
+        print "results size: {0}".format(len(nm.stdout))
+        print "Scan ended {0}: {1}".format(nm.endtime, nm.summary)
+    else:
+        print "state: {0} (rc: {1})".format(nm.state, nm.rc)
+        print "Error: {stderr}".format(stderr=nm.stderr)
+        print "Result: {0}".format(nm.stdout)
+
+
+if __name__ == '__main__':
+    main(sys.argv[1:])
+```
+
 ### Launch a nmap scan
 Here a consequent example on how to use libnmap:
 ```python

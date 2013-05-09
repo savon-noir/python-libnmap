@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import xml.etree.ElementTree as ET
-from libnmap.common import NmapHost, NmapService
-from libnmap.report import NmapReport
+from libnmap.objects import NmapHost, NmapService, NmapReport
 
 
 class NmapParser(object):
