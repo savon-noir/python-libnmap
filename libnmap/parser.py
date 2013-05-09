@@ -23,6 +23,8 @@ class NmapParser(object):
 
             :return: NmapObject (NmapHost, NmapService or NmapReport)
                     or a list of NmapObject
+
+            :todo: check strtime, endtime parsing for NmapHost factory
         """
 
         nmapobj = None
@@ -209,7 +211,7 @@ class NmapParser(object):
             Receives a <scaninfo> XML tag.
 
             :param scaninfo_data: <scaninfo> XML tag from a nmap scan
-            :type scaninfo_data: xml.ElementTree.Element
+            :type scaninfo_data: xml.ElementTree.Element or a string
 
             :return: python dict representing the XML scaninfo tag
         """
@@ -225,7 +227,7 @@ class NmapParser(object):
             its services.
 
             :param scaninfo_data: <host> XML tag from a nmap scan
-            :type scaninfo_data: xml.ElementTree.Element
+            :type scaninfo_data: xml.ElementTree.Element or a string
 
             :return: NmapHost object
         """
@@ -236,6 +238,9 @@ class NmapParser(object):
         _services = []
         _status = {}
         _address = {}
+        _host_extras = {}
+        extra_tags = ['uptime', 'distance', 'tcpsequence',
+                      'ipidsequance', 'tcptssequence', 'times']
         for xh in xelement:
             if xh.tag == 'hostnames':
                 for hostname in cls.__parse_hostnames(xh):
@@ -247,10 +252,20 @@ class NmapParser(object):
                 _status = cls.__format_attributes(xh)
             elif xh.tag == 'address':
                 _address = cls.__format_attributes(xh)
+            elif xh.tag == 'os':
+                _os_extra = cls.__parse_os_fingerprint(xh)
+                _host_extras.update({'os': _os_extra})
+            elif xh.tag in extra_tags:
+                _host_extras[xh.tag] = cls.__format_attributes(xh)
             #else:
             #    print "struct host unknown attr: %s value: %s" %
             #           (h.tag, h.get(h.tag))
-        nhost = NmapHost('', '', _address, _status, _hostnames, _services)
+        nhost = NmapHost('', '',
+                         _address,
+                         _status,
+                         _hostnames,
+                         _services,
+                         _host_extras)
         return nhost
 
     @classmethod
@@ -259,7 +274,7 @@ class NmapParser(object):
             Private method parsing the hostnames list within a <host> XML tag.
 
             :param scanhostnames_data: <hostnames> XML tag from a nmap scan
-            :type scanhostnames_data: xml.ElementTree.Element
+            :type scanhostnames_data: xml.ElementTree.Element or a string
 
             :return: list of hostnames
         """
@@ -281,7 +296,7 @@ class NmapParser(object):
             scanned services
 
             :param scanports_data: <ports> XML tag from a nmap scan
-            :type scanports_data: xml.ElementTree.Element
+            :type scanports_data: xml.ElementTree.Element or a string
 
             :return: list of NmapService
         """
@@ -308,7 +323,7 @@ class NmapParser(object):
             the state of the service.
 
             :param scanport_data: <port> XML tag from a nmap scan
-            :type scanport_data: xml.ElementTree.Element
+            :type scanport_data: xml.ElementTree.Element or a string
 
             :return: NmapService
         """
@@ -330,13 +345,52 @@ class NmapParser(object):
         return nport
 
     @classmethod
+    def __parse_os_fingerprint(cls, os_data):
+        """
+            Private method parsing the data from an OS fingerprint (-O).
+            Contents of <os> is returned as a dict.
+
+            :param os_data: portion of XML describing the results of the
+            os fingerprinting attempt
+            :type os_data: xml.ElementTree.Element or a string
+
+            :return: python dict representing the XML os tag
+        """
+        rdict = {}
+        xelement = cls.__format_element(os_data)
+
+        os_class_probability = []
+        os_match_probability = []
+        os_ports_used = []
+        os_fp = {}
+        for xos in xelement:
+            if xos.tag == 'osclass':
+                os_class_proba = cls.__format_attributes(xos)
+                os_class_probability.append(os_class_proba)
+            elif xos.tag == 'osmatch':
+                os_match_proba = cls.__format_attributes(xos)
+                os_match_probability.append(os_match_proba)
+            elif xos.tag == 'portused':
+                os_portused = cls.__format_attributes(xos)
+                os_ports_used.append(os_portused)
+            elif xos.tag == 'osfingerprint':
+                os_fp = cls.__format_attributes(xos)
+
+        rdict['osmatch'] = os_match_probability
+        rdict['osclass'] = os_class_probability
+        rdict['ports_used'] = os_ports_used
+        rdict['osfingerprint'] = os_fp['fingerprint']
+
+        return rdict
+
+    @classmethod
     def __parse_runstats(cls, scanrunstats_data):
         """
             Private method parsing a portion of a nmap scan result.
             Receives a <runstats> XML tag.
 
             :param scanrunstats_data: <runstats> XML tag from a nmap scan
-            :type scanrunstats_data: xml.ElementTree.Element
+            :type scanrunstats_data: xml.ElementTree.Element or a string
 
             :return: python dict representing the XML runstats tag
         """

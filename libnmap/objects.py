@@ -7,7 +7,7 @@ class NmapHost(object):
         NmapHost is a class representing a host object of NmapReport
     """
     def __init__(self, starttime='', endtime='', address=None, status=None,
-                 hostnames=None, services=None):
+                 hostnames=None, services=None, extras=None):
         """
             NmapHost constructor
             :param  starttime: string
@@ -23,6 +23,7 @@ class NmapHost(object):
         self._status = status if status is not None else {}
         self._address = address if address is not None else {}
         self._services = services if services is not None else []
+        self._extras = extras if extras is not None else {}
 
     def __eq__(self, other):
         """
