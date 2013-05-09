@@ -23,8 +23,6 @@ class NmapParser(object):
 
             :return: NmapObject (NmapHost, NmapService or NmapReport)
                     or a list of NmapObject
-
-            :todo: check strtime, endtime parsing for NmapHost factory
         """
 
         nmapobj = None
@@ -234,6 +232,7 @@ class NmapParser(object):
 
         xelement = cls.__format_element(scanhost_data)
 
+        _host_header = cls.__format_attributes(xelement)
         _hostnames = []
         _services = []
         _status = {}
@@ -260,7 +259,8 @@ class NmapParser(object):
             #else:
             #    print "struct host unknown attr: %s value: %s" %
             #           (h.tag, h.get(h.tag))
-        nhost = NmapHost('', '',
+        nhost = NmapHost(_host_header['starttime'],
+                         _host_header['endtime'],
                          _address,
                          _status,
                          _hostnames,
