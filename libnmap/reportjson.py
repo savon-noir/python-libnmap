@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 import json
-from libnmap import NmapHost, NmapService, NmapReport, NmapParser
+from libnmap.common import NmapHost, NmapService
+from libnmap.report import NmapReport
+from libnmap.parser import NmapParser
 
 
 class ReportEncoder(json.JSONEncoder):
@@ -16,6 +18,5 @@ class ReportEncoder(json.JSONEncoder):
 
 class ReportDecoder(json.JSONDecoder):
     def decode(self, json_str):
-        raw_data = NmapParser.parse_fromdict(json.loads(json_str))
-        r = NmapReport(name=raw_data['_name'], raw_data=raw_data)
+        r = NmapParser.parse_fromdict(json.loads(json_str))
         return r

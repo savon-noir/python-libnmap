@@ -3,7 +3,7 @@ import json
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 
-from libnmap import ReportDecoder, ReportEncoder
+from libnmap.reportjson import ReportDecoder, ReportEncoder
 from libnmap.plugins.backendplugin import NmapBackendPlugin
 
 
@@ -34,7 +34,6 @@ class NmapMongoPlugin(NmapBackendPlugin):
 
         if isinstance(rid, ObjectId):
             r = self.collection.find({'_id': rid})
-            nmapreport = json.loads(r, cls=ReportDecoder)
         else:
             r = self.collection.find()
         return r

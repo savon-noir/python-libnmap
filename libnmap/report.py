@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 import sys
 import inspect
-from libnmap import NmapParser
-from libnmap import NmapDiff
+from libnmap.diff import NmapDiff
 from libnmap.plugins.backendplugin import NmapBackendPlugin
-#from libnmap.plugins.backendpluginFactory import BackendPluginFactory
 
 
 class NmapReport(object):
@@ -16,13 +14,6 @@ class NmapReport(object):
         self._runstats = {}
         if raw_data is not None:
             self.set_raw_data(raw_data)
-
-    def report_import(self, file_path):
-        try:
-            self.set_raw_data(NmapParser.parse_fromfile(file_path))
-        except:
-            raise Exception("Error while trying to import file: {0}".format(
-                file_path))
 
     def report_export(self, file_path, output='csv'):
         return 0
