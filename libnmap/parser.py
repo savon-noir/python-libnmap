@@ -344,7 +344,7 @@ class NmapParser(object):
                 _service = cls.__format_attributes(xport)
             elif xport.tag == 'script':
                 _script_dict = cls.__format_attributes(xport)
-                _service_extras.append(script_dict)
+                _service_extras.append(_script_dict)
 
         if(_portid is None or _protocol is None
                 or _state is None or _service is None):
