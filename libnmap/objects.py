@@ -39,11 +39,14 @@ class NmapHost(object):
                 - if an associated services has changed
             :return boolean:
         """
-        return (self._hostnames == other._hostnames and
-                self.address == other.address and self.changed(other) == 0)
-
-        return (self._hostnames == other._hostnames and
-                self.address == other.address)
+        rval = False
+        if(self.__class__ == other.__class__
+           and self.id == other.id
+           and self._hostnames == other._hostnames
+           and self.address == other.address
+           and self.changed(other) == 0):
+            rval = True
+        return rval
 
     def __ne__(self, other):
         """
@@ -53,8 +56,15 @@ class NmapHost(object):
                 - if an associated services has changed
             :return: boolean:
         """
-        return ((self._hostnames != other._hostnames or
-                self.address != other.address) and self.changed(other))
+        rval = False
+        if((self.__class__ == other.__class__
+           and self.id == other.id)
+           and (self.hostnames != other.hostnames
+           or self.address != other.address
+           or self.changed(other) > 0)):
+            rval = True
+
+        return rval
 
     def __repr__(self):
         """
@@ -166,7 +176,7 @@ class NmapHost(object):
         return self._extras['osfingerprint']
 
     def os_ports_used(self):
-        return self._extra['ports_used']
+        return self._extras['ports_used']
 
     @property
     def tcpsequence(self):
@@ -186,7 +196,7 @@ class NmapHost(object):
 
     @property
     def distance(self):
-        return self._etras['distance']['value']
+        return self._extras['distance']['value']
 
     @property
     def id(self):
@@ -230,10 +240,18 @@ class NmapService(object):
             self._service_extras = service_extras
 
     def __eq__(self, other):
-        return (self.id == other.id and self.changed(other) == 0)
+        rval = False
+        if((self.__class__ == other.__class__ and self.id == other.id) and
+           (self.changed(other) == 0)):
+            rval = True
+        return rval
 
     def __ne__(self, other):
-        return (self.id != other.id or self.changed(other))
+        rval = False
+        if((self.__class__ == other.__class__ and self.id == other.id) and
+           (self.changed(other) > 0)):
+            rval = True
+        return rval
 
     def __repr__(self):
         return "{0}: [{1} {2}/{3} {4} ({5})]".format(self.__class__.__name__,
@@ -249,10 +267,6 @@ class NmapService(object):
 
     def changed(self, other):
         return len(self.diff(other).changed())
-
-    @property
-    def id(self):
-        return (self.protocol, self.port)
 
     @property
     def port(self):
@@ -296,10 +310,14 @@ class NmapService(object):
             raise
         return scripts_dict
 
+    @property
+    def id(self):
+        return (self.protocol, self.port)
+
     def get_dict(self):
         return ({'id': str(self.id), 'port': str(self.port),
-                'protocol': self.protocol, 'banner': self.banner,
-                'service': self.service, 'state': self.state})
+                 'protocol': self.protocol, 'banner': self.banner,
+                 'service': self.service, 'state': self.state})
 
     def diff(self, other):
         return NmapDiff(self, other)

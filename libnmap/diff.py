@@ -33,7 +33,8 @@ class DictDiffer(object):
 
 class NmapDiff(DictDiffer):
     def __init__(self, nmap_obj1, nmap_obj2):
-        if nmap_obj1.id != nmap_obj2.id:
+        if(nmap_obj1.__class__ != nmap_obj2.__class__ or
+           nmap_obj1.id != nmap_obj2.id):
             raise NmapDiffException("Comparing objects with non-matching id")
 
         self.object1 = nmap_obj1.get_dict()
