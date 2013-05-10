@@ -268,8 +268,7 @@ class NmapService(object):
 
 
 class NmapReport(object):
-    def __init__(self, name='', raw_data=None):
-        self._name = name
+    def __init__(self, raw_data=None):
         self._nmaprun = {}
         self._scaninfo = {}
         self._hosts = []
@@ -301,12 +300,7 @@ class NmapReport(object):
         self._runstats = raw_data['_runstats']
 
     @property
-    def name(self):
-        return self._name
-
-    ### implement with iterators
-    @property
-    def scanned_hosts(self):
+    def hosts(self):
         return self._hosts
 
     @property
@@ -362,7 +356,7 @@ class NmapReport(object):
 
     def get_dict(self):
         d = dict([("%s.%s" % (h.__class__.__name__, str(h.id)), hash(h))
-                 for h in self.scanned_hosts])
+                 for h in self.hosts])
         d.update({'hosts_up': self.hosts_up, 'hosts_down': self.hosts_down,
                   'hosts_total': self.hosts_total})
         return d

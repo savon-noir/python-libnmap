@@ -116,7 +116,7 @@ class NmapParser(object):
             #    print "struct pparse unknown attr: {0} value: {1}".format(
             #        el.tag,
             #        el.get(el.tag))
-        return NmapReport('dummy', nmap_scan)
+        return NmapReport(nmap_scan)
 
     @classmethod
     def parse_fromstring(cls, nmap_data, data_type="XML"):
@@ -199,7 +199,7 @@ class NmapParser(object):
                               services=slist)
                 hlist.append(nh)
             nreport['_hosts'] = hlist
-            nmapobj = NmapReport('dummy', nreport)
+            nmapobj = NmapReport(nreport)
         return nmapobj
 
     @classmethod

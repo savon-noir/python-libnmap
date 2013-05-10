@@ -70,9 +70,9 @@ class TestNmapParser(unittest.TestCase):
             nr = NmapParser.parse(s)
             nr2 = NmapParser.parse(s)
 
-            self.assertEqual(len(nr.scanned_hosts), testfile['hosts'])
+            self.assertEqual(len(nr.hosts), testfile['hosts'])
 
-            self.assertEqual(len(nr2.scanned_hosts), testfile['hosts'])
+            self.assertEqual(len(nr2.hosts), testfile['hosts'])
             self.assertEqual(sorted(nr2.get_raw_data()),
                              sorted(nr.get_raw_data()))
 
@@ -83,7 +83,7 @@ class TestNmapParser(unittest.TestCase):
             fd.close()
 
             nr = NmapParser.parse(s)
-            for h in nr.scanned_hosts:
+            for h in nr.hosts:
                 for th in self.hlist:
                     if th['hostname'] == h.hostname:
                         self.assertEqual(th['ports'], len(h.get_ports()))
@@ -108,7 +108,7 @@ class TestNmapParser(unittest.TestCase):
             nr = NmapParser.parse(fd.read())
             fd.close()
 
-            for h in nr.scanned_hosts:
+            for h in nr.hosts:
                 for service in h.services:
                     b = service.banner
                     self.assertEqual(b, testfile['banner'][str(service.port)])
@@ -122,8 +122,8 @@ class TestNmapParser(unittest.TestCase):
             np2 = NmapParser.parse(fd.read())
             fd.close()
 
-            host1 = np1.scanned_hosts.pop()
-            host2 = np2.scanned_hosts.pop()
+            host1 = np1.hosts.pop()
+            host2 = np2.hosts.pop()
             """All the service of the host must be compared and
                the hash should be also the same"""
             for i in range(len(host1.services)):
@@ -143,8 +143,8 @@ class TestNmapParser(unittest.TestCase):
             np2 = NmapParser.parse(fd.read())
             fd.close()
 
-            host1 = np1.scanned_hosts.pop()
-            host2 = np2.scanned_hosts.pop()
+            host1 = np1.hosts.pop()
+            host2 = np2.hosts.pop()
             for i in range(len(host1.services)):
                 host1.services[i]._state['state'] = 'changed'
                 self.assertNotEqual(host1.services[i], host2.services[i])
@@ -161,8 +161,8 @@ class TestNmapParser(unittest.TestCase):
             np2 = NmapParser.parse(fd.read())
             fd.close()
 
-            host1 = np1.scanned_hosts.pop()
-            host2 = np2.scanned_hosts.pop()
+            host1 = np1.hosts.pop()
+            host2 = np2.hosts.pop()
 
             host1._address['addr'] = 'xxxxxx'
             self.assertNotEqual(host1, host2)
@@ -176,8 +176,8 @@ class TestNmapParser(unittest.TestCase):
             np2 = NmapParser.parse(fd.read())
             fd.close()
 
-            host1 = np1.scanned_hosts.pop()
-            host2 = np2.scanned_hosts.pop()
+            host1 = np1.hosts.pop()
+            host2 = np2.hosts.pop()
 
             host1.services[0]._portid = '23'
             self.assertEqual(host1, host2)
@@ -188,8 +188,8 @@ class TestNmapParser(unittest.TestCase):
         fd2 = open("%s/%s" % (fdir, 'files/1_hosts.xml'), 'r')
         nr1 = NmapParser.parse(fd1.read())
         nr2 = NmapParser.parse(fd2.read())
-        h1 = nr1.scanned_hosts[0]
-        h2 = nr2.scanned_hosts[0]
+        h1 = nr1.hosts[0]
+        h2 = nr2.hosts[0]
         self.assertRaises(NmapDiffException, h1.diff, h2)
 
     def test_host_address_unchanged(self):
@@ -201,9 +201,9 @@ class TestNmapParser(unittest.TestCase):
         nr2 = NmapParser.parse(fd2.read())
         nr3 = NmapParser.parse(fd3.read())
 
-        h1 = nr1.scanned_hosts.pop()
-        h2 = nr2.scanned_hosts.pop()
-        h3 = nr3.scanned_hosts.pop()
+        h1 = nr1.hosts.pop()
+        h2 = nr2.hosts.pop()
+        h3 = nr3.hosts.pop()
 
         self.assertRaises(NmapDiffException, h1.diff, h2)
         self.assertEqual(h2.diff(h3).changed(), set([]))

@@ -89,7 +89,7 @@ def print_scan(nmap_report):
         nmap_report._nmaprun['version'],
         nmap_report._nmaprun['startstr'])
 
-    for host in nmap_report.scanned_hosts:
+    for host in nmap_report.hosts:
         print "Nmap scan report for {0} ({1})".format(
             host.hostname,
             host.address)
