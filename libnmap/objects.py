@@ -10,10 +10,14 @@ class NmapHost(object):
                  hostnames=None, services=None, extras=None):
         """
             NmapHost constructor
-            :param  starttime: string
-            :param  endtime: string
-            :param  address: dict ie :{'addr': '127.0.0.1', 'addrtype': 'ipv4'}
-            :param  status: dict ie:{'reason': 'localhost-response',
+            :param starttime: unix timestamp of when the scan against
+            that host started
+            :type starttime: string
+            :param endtime: unix timestamp of when the scan against
+            that host ended
+            :type endtime: string
+            :param address: dict ie :{'addr': '127.0.0.1', 'addrtype': 'ipv4'}
+            :param status: dict ie:{'reason': 'localhost-response',
                                     'state': 'up'}
             :return: NmapHost:
         """
@@ -45,7 +49,7 @@ class NmapHost(object):
                 - hostnames
                 - address
                 - if an associated services has changed
-            :return boolean:
+            :return: boolean:
         """
         return ((self._hostnames != other._hostnames or
                 self.address != other.address) and self.changed(other))
@@ -53,7 +57,7 @@ class NmapHost(object):
     def __repr__(self):
         """
             String representing the object
-            :return string:
+            :return: string
         """
         return "{0}: [{1} ({2}) - {3}]".format(self.__class__.__name__,
                                                self.address,
@@ -63,7 +67,7 @@ class NmapHost(object):
     def __hash__(self):
         """
             Hash is needed to be able to use our object in sets
-            :return hash:
+            :return: hash
         """
         return (hash(self.status) ^ hash(self.address) ^
                 hash(frozenset(self._services)) ^
@@ -178,7 +182,8 @@ class NmapHost(object):
 
 
 class NmapService(object):
-    def __init__(self, portid, protocol='tcp', state=None, service=None):
+    def __init__(self, portid, protocol='tcp', state=None,
+                 service=None, service_extras=None):
         try:
             self._portid = int(portid or -1)
         except (ValueError, TypeError):
@@ -189,6 +194,7 @@ class NmapService(object):
         self._protocol = protocol
         self._state = state if state is not None else {}
         self._service = service if service is not None else {}
+        self._service_extras = service_extras if service_extras is not None else []
 
     def __eq__(self, other):
         return (self.id == other.id and self.changed(other) == 0)

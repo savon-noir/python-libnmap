@@ -330,18 +330,33 @@ class NmapParser(object):
 
         xelement = cls.__format_element(scanport_data)
 
-        portid = xelement.get('portid')
-        protocol = xelement.get('protocol')
-        state = cls.__format_attributes(xelement.find('state'))
-        service = cls.__format_attributes(xelement.find('service'))
+        _port = cls.__format_attributes(xelement)
+        _portid = _port['portid'] if 'portid' in _port else None
+        _protocol = _port['protocol'] if 'protocol' in _port else None
 
-        nport = NmapService(portid, protocol, state, service)
+        _state = None
+        _service = None
+        _service_extras = []
+        for xport in xelement:
+            if xport.tag == 'state':
+                _state = cls.__format_attributes(xport)
+            elif xport.tag == 'service':
+                _service = cls.__format_attributes(xport)
+            elif xport.tag == 'script':
+                _script_dict = cls.__format_attributes(xport)
+                _service_extras.append(script_dict)
 
-        if(portid is None or protocol is None
-                or state is None or service is None):
+        if(_portid is None or _protocol is None
+                or _state is None or _service is None):
             raise NmapParserException("XML <port> tag is incomplete. One "
                                       "of the following tags is missing: "
                                       "portid, protocol state or service.")
+
+        nport = NmapService(_portid,
+                            _protocol,
+                            _state,
+                            _service,
+                            _service_extras)
         return nport
 
     @classmethod
