@@ -5,6 +5,8 @@ from libnmap.diff import NmapDiff
 class NmapHost(object):
     """
         NmapHost is a class representing a host object of NmapReport
+
+        :todo: add tcpsequence
     """
     def __init__(self, starttime='', endtime='', address=None, status=None,
                  hostnames=None, services=None, extras=None):
@@ -82,12 +84,12 @@ class NmapHost(object):
         return len(self.diff(other).changed())
 
     @property
-    def hostnames(self):
-        return self._hostnames
+    def starttime(self):
+        return self._starttime
 
     @property
-    def services(self):
-        return self._services
+    def endtime(self):
+        return self._endtime
 
     @property
     def address(self):
@@ -98,10 +100,6 @@ class NmapHost(object):
         self._address = addrdict
 
     @property
-    def hostname(self):
-        return self._hostnames[0] if len(self._hostnames) else self.address
-
-    @property
     def status(self):
         return self._status['state']
 
@@ -110,12 +108,12 @@ class NmapHost(object):
         self._status = statusdict
 
     @property
-    def starttime(self):
-        return self._starttime
+    def hostnames(self):
+        return self._hostnames
 
     @property
-    def endtime(self):
-        return self._endtime
+    def services(self):
+        return self._services
 
     def get_ports(self):
         """
@@ -157,6 +155,39 @@ class NmapHost(object):
             raise Exception("Duplicate services found in NmapHost object")
         return service.pop() if len(service) == 1 else None
 
+    def os_class_probabilities(self):
+        return self._extras['osclass']
+
+    def os_match_probabilities(self):
+        return self._extras['osmatch']
+
+    @property
+    def os_fingerprint(self):
+        return self._extras['osfingerprint']
+
+    def os_ports_used(self):
+        return self._extra['ports_used']
+
+    @property
+    def tcpsequence(self):
+        return self._extras['tcpsequence']['difficulty']
+
+    @property
+    def ipsequence(self):
+        return self._extras['ipidsequance']['class']
+
+    @property
+    def uptime(self):
+        return self._extras['uptime']['seconds']
+
+    @property
+    def lastboot(self):
+        return self._extras['uptime']['lastboot']
+
+    @property
+    def distance(self):
+        return self._etras['distance']['value']
+
     @property
     def id(self):
         return self.address
@@ -194,7 +225,9 @@ class NmapService(object):
         self._protocol = protocol
         self._state = state if state is not None else {}
         self._service = service if service is not None else {}
-        self._service_extras = service_extras if service_extras is not None else []
+        self._service_extras = []
+        if service_extras is not None:
+            self._service_extras = service_extras
 
     def __eq__(self, other):
         return (self.id == other.id and self.changed(other) == 0)
@@ -240,23 +273,28 @@ class NmapService(object):
     def service(self):
         return self._service['name'] if 'name' in self._service else None
 
-    def add_service(self, service={}):
-        self._service = service
-
     def open(self):
         return (True
-                if self._state['state'] and self._state['state'] == 'open'
+                if 'state' in self._state and self._state['state'] == 'open'
                 else False)
 
     @property
     def banner(self):
         notrelevant = ['name', 'method', 'conf']
         b = ''
-        if self._service and self._service['method'] == "probed":
+        if 'method' in self._service and self._service['method'] == "probed":
             b = " ".join([k + ": " + self._service[k]
                           for k in self._service.keys()
                               if k not in notrelevant])
         return b
+
+    def scripts_results(self):
+        try:
+            scripts_dict = dict([(bdct['id'], bdct['output'])
+                                 for bdct in self._service_extras])
+        except KeyError:
+            raise
+        return scripts_dict
 
     def get_dict(self):
         return ({'id': str(self.id), 'port': str(self.port),
@@ -268,13 +306,17 @@ class NmapService(object):
 
 
 class NmapReport(object):
+    """
+        :todo:
+                - remove get_raw_data makes no sens
+    """
     def __init__(self, raw_data=None):
         self._nmaprun = {}
         self._scaninfo = {}
         self._hosts = []
         self._runstats = {}
         if raw_data is not None:
-            self.set_raw_data(raw_data)
+            self.__set_raw_data(raw_data)
 
     def save(self, backend):
         """this fct get an NmapBackendPlugin representing the backend
@@ -293,11 +335,21 @@ class NmapReport(object):
             r = set()
         return r
 
-    def set_raw_data(self, raw_data):
-        self._nmaprun = raw_data['_nmaprun']
-        self._scaninfo = raw_data['_scaninfo']
-        self._hosts = raw_data['_hosts']
-        self._runstats = raw_data['_runstats']
+    @property
+    def started(self):
+        return self._nmaprun['start']
+
+    @property
+    def commandline(self):
+        return self._nmaprun['args']
+
+    @property
+    def version(self):
+        return self._nmaprun['version']
+
+    @property
+    def scan_type(self):
+        return self._scaninfo['type']
 
     @property
     def hosts(self):
@@ -340,6 +392,12 @@ class NmapReport(object):
                     '_runstats': self._runstats}
         return raw_data
 
+    def __set_raw_data(self, raw_data):
+        self._nmaprun = raw_data['_nmaprun']
+        self._scaninfo = raw_data['_scaninfo']
+        self._hosts = raw_data['_hosts']
+        self._runstats = raw_data['_runstats']
+
     def __is_consistent(self):
         r = False
         rd = self.get_raw_data()
@@ -348,11 +406,6 @@ class NmapReport(object):
                 len([k for k in rd.keys() if rd[k] is not None]) == 4):
                 r = True
         return r
-
-    def __repr__(self):
-        return "{0} {1} hosts: {2} {3}".format(self._nmaprun, self._scaninfo,
-                                               len(self._hosts),
-                                               self._runstats)
 
     def get_dict(self):
         d = dict([("%s.%s" % (h.__class__.__name__, str(h.id)), hash(h))
@@ -364,3 +417,8 @@ class NmapReport(object):
     @property
     def id(self):
         return hash(1)
+
+    def __repr__(self):
+        return "{0} {1} hosts: {2} {3}".format(self._nmaprun, self._scaninfo,
+                                               len(self._hosts),
+                                               self._runstats)
