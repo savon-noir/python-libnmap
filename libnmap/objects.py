@@ -157,37 +157,82 @@ class NmapHost(object):
         return service.pop() if len(service) == 1 else None
 
     def os_class_probabilities(self):
-        return self._extras['osclass']
+        rval = []
+        try:
+            rval = self._extras['osclass']
+        except (KeyError, TypeError):
+            pass
+        return rval
 
     def os_match_probabilities(self):
-        return self._extras['osmatch']
+        rval = []
+        try:
+            rval = self._extras['osmatch']
+        except (KeyError, TypeError):
+            pass
+        return rval
 
     @property
     def os_fingerprint(self):
-        return self._extras['osfingerprint']
+        rval = ''
+        try:
+            rval = self._extras['osfingerprint']
+        except (KeyError, TypeError):
+            pass
+        return rval
 
     def os_ports_used(self):
-        return self._extras['ports_used']
+        rval = []
+        try:
+            rval = self._extras['ports_used']
+        except (KeyError, TypeError):
+            pass
+        return rval
 
     @property
     def tcpsequence(self):
-        return self._extras['tcpsequence']['difficulty']
+        rval = ''
+        try:
+            rval = self._extras['tcpsequence']['difficulty']
+        except (KeyError, TypeError):
+            pass
+        return rval
 
     @property
     def ipsequence(self):
-        return self._extras['ipidsequance']['class']
+        rval = ''
+        try:
+            rval = self._extras['ipidsequance']['class']
+        except (KeyError, TypeError):
+            pass
+        return rval
 
     @property
     def uptime(self):
-        return self._extras['uptime']['seconds']
+        rval = 0
+        try:
+            rval = int(self._extras['uptime']['seconds'])
+        except (KeyError, TypeError):
+            pass
+        return rval
 
     @property
     def lastboot(self):
-        return self._extras['uptime']['lastboot']
+        rval = ''
+        try:
+            rval = self._extras['uptime']['lastboot']
+        except (KeyError, TypeError):
+            pass
+        return rval
 
     @property
     def distance(self):
-        return self._extras['distance']['value']
+        rval = 0
+        try:
+            rval = int(self._extras['distance']['value'])
+        except (KeyError, TypeError):
+            pass
+        return rval
 
     @property
     def id(self):
@@ -292,11 +337,12 @@ class NmapService(object):
         return b
 
     def scripts_results(self):
+        scripts_dict = None
         try:
             scripts_dict = dict([(bdct['id'], bdct['output'])
                                  for bdct in self._service_extras])
-        except KeyError:
-            raise
+        except (KeyError, TypeError):
+            pass
         return scripts_dict
 
     @property
