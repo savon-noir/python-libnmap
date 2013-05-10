@@ -40,12 +40,8 @@ class NmapHost(object):
             :return boolean:
         """
         rval = False
-        if(self.__class__ == other.__class__
-           and self.id == other.id
-           and self._hostnames == other._hostnames
-           and self.address == other.address
-           and self.changed(other) == 0):
-            rval = True
+        if(self.__class__ == other.__class__ and self.id == other.id):
+            rval = (self.changed(other) == 0)
         return rval
 
     def __ne__(self, other):
@@ -56,14 +52,9 @@ class NmapHost(object):
                 - if an associated services has changed
             :return: boolean:
         """
-        rval = False
-        if((self.__class__ == other.__class__
-           and self.id == other.id)
-           and (self.hostnames != other.hostnames
-           or self.address != other.address
-           or self.changed(other) > 0)):
-            rval = True
-
+        rval = True
+        if(self.__class__ == other.__class__ and self.id == other.id):
+            rval = (self.changed(other) > 0)
         return rval
 
     def __repr__(self):
@@ -241,16 +232,14 @@ class NmapService(object):
 
     def __eq__(self, other):
         rval = False
-        if((self.__class__ == other.__class__ and self.id == other.id) and
-           (self.changed(other) == 0)):
-            rval = True
+        if(self.__class__ == other.__class__ and self.id == other.id):
+            rval = (self.changed(other) == 0)
         return rval
 
     def __ne__(self, other):
-        rval = False
-        if((self.__class__ == other.__class__ and self.id == other.id) and
-           (self.changed(other) > 0)):
-            rval = True
+        rval = True
+        if(self.__class__ == other.__class__ and self.id == other.id):
+            rval = (self.changed(other) > 0)
         return rval
 
     def __repr__(self):
