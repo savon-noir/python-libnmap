@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-import os
 import xml.etree.ElementTree as ET
-from StringIO import StringIO
 from libnmap.common import NmapHost, NmapService
 from libnmap.report import NmapReport
 
@@ -30,13 +28,17 @@ class NmapParser(object):
 
         nmapobj = None
         if data_type == "XML":
-            nmapobj = cls.parse_xml(nmap_data)
+            nmapobj = cls._parse_xml(nmap_data)
+        else:
+            raise NmapParserException("Unknown data type provided. "
+                                      "Please check documentation for "
+                                      "supported data types.")
         return nmapobj
 
     @classmethod
-    def parse_xml(cls, nmap_data=None):
+    def _parse_xml(cls, nmap_data=None):
         """
-            class method used to process a specific data type.
+            Protected class method used to process a specific data type.
             In this case: XML. This method is called by cls.parse class method
             and receives nmap scan results data (in XML).
 
@@ -58,20 +60,19 @@ class NmapParser(object):
                     or a list of NmapObject
         """
 
-        nmapobj = None
         if not nmap_data:
-            raise NmapParserException("No report data to parse: \
-                                       please provide a file")
+            raise NmapParserException("No report data to parse: please "
+                                      "provide a valid XML nmap report")
+        elif not isinstance(nmap_data, str):
+            raise NmapParserException("wrong nmap_data type given as "
+                                      "argument: cannot parse data")
 
         try:
-            if isinstance(nmap_data, str):
-                tree = ET.parse(StringIO(nmap_data))
-            elif isinstance(nmap_data, file):
-                tree = ET.parse(nmap_data)
+            root = ET.fromstring(nmap_data)
         except:
             raise NmapParserException("Wrong XML structure: cannot parse data")
 
-        root = tree.getroot()
+        nmapobj = None
         if root.tag == 'nmaprun':
             nmapobj = cls._parse_xml_report(root)
         elif root.tag == 'host':
@@ -81,8 +82,8 @@ class NmapParser(object):
         elif root.tag == 'port':
             nmapobj = cls._parse_xml_port(root)
         else:
-            raise NmapParserException("Unpexpected data structure for XML \
-                                       root node")
+            raise NmapParserException("Unpexpected data structure for XML "
+                                      "root node")
         return nmapobj
 
     @classmethod
@@ -101,8 +102,8 @@ class NmapParser(object):
                      '_hosts': [], '_runstats': {}}
 
         if root is None:
-            raise NmapParserException("No root node provided to parse XML \
-                                       report")
+            raise NmapParserException("No root node provided to parse XML "
+                                      "report")
 
         nmap_scan['_nmaprun'] = cls.__format_attributes(root)
         for el in root:
@@ -134,8 +135,8 @@ class NmapParser(object):
         """
 
         if not isinstance(nmap_data, str):
-            raise NmapParserException("bad argument type for \
-                                       parse_fromstring(): should be a string")
+            raise NmapParserException("bad argument type for "
+                                      "xarse_fromstring(): should be a string")
         return cls.parse(nmap_data, data_type)
 
     @classmethod
@@ -152,14 +153,13 @@ class NmapParser(object):
             :return: NmapObject
         """
 
-        if os.path.exists(nmap_report_path):
-            fd = open(nmap_report_path, 'r')
-            r = cls.parse(fd, data_type)
-            fd.close()
-        else:
-            raise NmapParserException("Nmap data file could not be found \
-                                       or permissions were not set correctly")
-        return r
+        try:
+            with open(nmap_report_path, 'r') as fileobj:
+                fdata = fileobj.read()
+                rval = cls.parse(fdata, data_type)
+        except IOError:
+            raise
+        return rval
 
     @classmethod
     def parse_fromdict(cls, rdict):
@@ -233,19 +233,25 @@ class NmapParser(object):
 
         xelement = cls.__format_element(scanhost_data)
 
-        nhost = NmapHost()
+        _hostnames = []
+        _services = []
+        _status = {}
+        _address = {}
         for xh in xelement:
             if xh.tag == 'hostnames':
                 for hostname in cls.__parse_hostnames(xh):
-                    nhost.add_hostname(hostname)
+                    _hostnames.append(hostname)
             elif xh.tag == 'ports':
                 for port in cls._parse_xml_ports(xh):
-                    nhost.add_service(port)
-            elif xh.tag in ('status', 'address'):
-                setattr(nhost, xh.tag, cls.__format_attributes(xh))
+                    _services.append(port)
+            elif xh.tag == 'status':
+                _status = cls.__format_attributes(xh)
+            elif xh.tag == 'address':
+                _address = cls.__format_attributes(xh)
             #else:
             #    print "struct host unknown attr: %s value: %s" %
             #           (h.tag, h.get(h.tag))
+        nhost = NmapHost('', '', _address, _status, _hostnames, _services)
         return nhost
 
     @classmethod
@@ -310,19 +316,18 @@ class NmapParser(object):
 
         xelement = cls.__format_element(scanport_data)
 
-        nport = NmapService(portid=xelement.get('portid'),
-                            protocol=xelement.get('protocol'))
+        portid = xelement.get('portid')
+        protocol = xelement.get('protocol')
+        state = cls.__format_attributes(xelement.find('state'))
+        service = cls.__format_attributes(xelement.find('service'))
 
-        nport.add_state(cls.__format_attributes(xelement.find('state')))
-        if not nport.state:
-            raise NmapParserException("Service state is not known \
-                                       or could not be parsed")
+        nport = NmapService(portid, protocol, state, service)
 
-        nport.add_service(cls.__format_attributes(xelement.find('service')))
-        if not nport.service:
-            raise NmapParserException("Service name is not known \
-                                       or could not be parsed")
-
+        if(portid is None or protocol is None
+                or state is None or service is None):
+            raise NmapParserException("XML <port> tag is incomplete. One "
+                                      "of the following tags is missing: "
+                                      "portid, protocol state or service.")
         return nport
 
     @classmethod
@@ -344,8 +349,8 @@ class NmapParser(object):
             if xmltag.tag in ['finished', 'hosts']:
                 rdict[xmltag.tag] = cls.__format_attributes(xmltag)
             else:
-                raise NmapParserException('Unpexpected data structure \
-                                           for <runstats>')
+                raise NmapParserException("Unpexpected data structure "
+                                          "for <runstats>")
 
         return rdict
 
@@ -366,14 +371,14 @@ class NmapParser(object):
             try:
                 xelement = ET.fromstring(elt_data)
             except:
-                raise NmapParserException("Error while trying \
-                                           to instanciate XML Element from \
-                                           string {0}".format(elt_data))
+                raise NmapParserException("Error while trying "
+                                          "to instanciate XML Element from "
+                                          "string {0}".format(elt_data))
         elif ET.iselement(elt_data):
             xelement = elt_data
         else:
-            raise NmapParserException("Error while trying to parse supplied \
-                                       data: unsupported format")
+            raise NmapParserException("Error while trying to parse supplied "
+                                      "data: unsupported format")
         return xelement
 
     @staticmethod
@@ -391,14 +396,16 @@ class NmapParser(object):
 
         rval = {}
         if not ET.iselement(elt_data):
-            raise NmapParserException("Error while trying to parse supplied \
-                                       data attributes: format is not XML")
+            raise NmapParserException("Error while trying to parse supplied "
+                                      "data attributes: format is not XML or "
+                                      "XML tag is empty")
         try:
             for dkey in elt_data.keys():
                 rval[dkey] = elt_data.get(dkey)
                 if rval[dkey] is None:
-                    raise NmapParserException("Error while trying to build-up \
-                                               element attributes")
+                    raise NmapParserException("Error while trying to build-up "
+                                              "element attributes: empty "
+                                              "attribute {0}".format(dkey))
         except:
             raise
         return rval
