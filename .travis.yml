@@ -22,7 +22,6 @@ install:
 before_script:
   - "pep8 . --exclude test"
   - "pyflakes ."
-  - "service mongod start"
 script:
   - cd libnmap
   - python test/host_test.py
