@@ -73,7 +73,8 @@ class TestNmapParser(unittest.TestCase):
             self.assertEqual(len(nr.scanned_hosts), testfile['hosts'])
 
             self.assertEqual(len(nr2.scanned_hosts), testfile['hosts'])
-            self.assertEqual(sorted(nr2.get_raw_data()), sorted(nr.get_raw_data()))
+            self.assertEqual(sorted(nr2.get_raw_data()),
+                             sorted(nr.get_raw_data()))
 
     def test_get_ports(self):
         for testfile in self.flist:
@@ -210,13 +211,13 @@ class TestNmapParser(unittest.TestCase):
         self.assertEqual(h2.diff(h3).removed(), set([]))
         self.assertEqual(h2.diff(h3).unchanged(),
                          set(['status',
-                              'NmapService.343309847',
-                              'NmapService.343309848',
-                              'NmapService.343309921',
+                              "NmapService.('tcp', 22)",
+                              "NmapService.('tcp', 111)",
+                              "NmapService.('tcp', 631)",
                               'hostnames',
-                              'NmapService.343309433',
+                              "NmapService.('tcp', 3306)",
                               'address',
-                              'NmapService.343306980']))
+                              "NmapService.('tcp', 25)"]))
 
 if __name__ == '__main__':
     test_suite = ['test_report_constructor', 'test_get_ports',

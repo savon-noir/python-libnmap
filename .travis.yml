@@ -8,6 +8,7 @@ python:
 install:
   - "pip install pep8 --use-mirrors"
   - "pip install pyflakes --use-mirrors"
+  - "pip install pymongo --use-mirrors"
   - "python setup.py install"
 #   - "pip install -r requirements.txt --use-mirrors"
 #     # command to run tests
