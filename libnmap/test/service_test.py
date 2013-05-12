@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 import unittest
-from libnmap import NmapParser, NmapDiffException
+from libnmap.parser import NmapParser
+from libnmap.diff import NmapDiffException
 
 service1 = """
 <port protocol="tcp" portid="22">
@@ -120,19 +121,19 @@ port_string_other9 = """
 
 class TestNmapService(unittest.TestCase):
     def setUp(self):
-        self.s1 = NmapParser.parse_port(service1)
-        self.s2 = NmapParser.parse_port(service2)
-        self.s3 = NmapParser.parse_port(service3)
-        self.s4 = NmapParser.parse_port(service4)
-        self.s5 = NmapParser.parse_port(service5)
-        self.s6 = NmapParser.parse_port(service6)
-        self.s7 = NmapParser.parse_port(service7)
+        self.s1 = NmapParser.parse(service1)
+        self.s2 = NmapParser.parse(service2)
+        self.s3 = NmapParser.parse(service3)
+        self.s4 = NmapParser.parse(service4)
+        self.s5 = NmapParser.parse(service5)
+        self.s6 = NmapParser.parse(service6)
+        self.s7 = NmapParser.parse(service7)
 
     def test_port_state_changed(self):
-        nservice1 = NmapParser.parse_port(port_string)
-        nservice2 = NmapParser.parse_port(port_string_other2)
-        nservice3 = NmapParser.parse_port(port_string_other3)
-        nservice4 = NmapParser.parse_port(port_string_other4)
+        nservice1 = NmapParser.parse(port_string)
+        nservice2 = NmapParser.parse(port_string_other2)
+        nservice3 = NmapParser.parse(port_string_other3)
+        nservice4 = NmapParser.parse(port_string_other4)
 
         self.assertEqual(nservice1.diff(nservice2).changed(), set(['state']))
         self.assertRaises(NmapDiffException, nservice1.diff, nservice3)
@@ -143,21 +144,21 @@ class TestNmapService(unittest.TestCase):
                          set(['state', 'service']))
 
     def test_port_state_unchanged(self):
-        nservice1 = NmapParser.parse_port(port_string)
-        nservice2 = NmapParser.parse_port(port_string_other2)
-        #nservice3 = NmapParser.parse_port(port_string_other3)
-        #nservice4 = NmapParser.parse_port(port_string_other4)
+        nservice1 = NmapParser.parse(port_string)
+        nservice2 = NmapParser.parse(port_string_other2)
+        #nservice3 = NmapParser.parse(port_string_other3)
+        #nservice4 = NmapParser.parse(port_string_other4)
 
         self.assertEqual(nservice1.diff(nservice2).unchanged(),
                          set(['banner', 'protocol', 'port', 'service', 'id']))
 
     def test_port_service_changed(self):
-        nservice1 = NmapParser.parse_port(port_string)
-        nservice2 = NmapParser.parse_port(port_string_other2)
-        nservice4 = NmapParser.parse_port(port_string_other4)
-        nservice5 = NmapParser.parse_port(port_string_other5)
-        nservice8 = NmapParser.parse_port(port_string_other8)
-        nservice9 = NmapParser.parse_port(port_string_other9)
+        nservice1 = NmapParser.parse(port_string)
+        nservice2 = NmapParser.parse(port_string_other2)
+        nservice4 = NmapParser.parse(port_string_other4)
+        nservice5 = NmapParser.parse(port_string_other5)
+        nservice8 = NmapParser.parse(port_string_other8)
+        nservice9 = NmapParser.parse(port_string_other9)
 
         self.assertEqual(nservice1.diff(nservice2).changed(),
                          set(['state']))

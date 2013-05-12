@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import unittest
-from libnmap import NmapParser
+from libnmap.parser import NmapParser
 
 host1 = """
 <host starttime="1361738377" endtime="1361738377">
@@ -148,10 +148,10 @@ host4 = """
 
 class TestNmapHost(unittest.TestCase):
     def test_eq_host(self):
-        h1 = NmapParser.parse_host(host1)
-        h2 = NmapParser.parse_host(host2)
-        h3 = NmapParser.parse_host(host3)
-        h4 = NmapParser.parse_host(host4)
+        h1 = NmapParser.parse(host1)
+        h2 = NmapParser.parse(host2)
+        h3 = NmapParser.parse(host3)
+        h4 = NmapParser.parse(host4)
 
         self.assertNotEqual(h1, h2)
         self.assertEqual(h1, h1)
@@ -160,9 +160,9 @@ class TestNmapHost(unittest.TestCase):
         self.assertNotEqual(h2, h3)
 
     def test_diff_host(self):
-        h1 = NmapParser.parse_host(host1)
-        h2 = NmapParser.parse_host(host2)
-        h3 = NmapParser.parse_host(host3)
+        h1 = NmapParser.parse(host1)
+        h2 = NmapParser.parse(host2)
+        h3 = NmapParser.parse(host3)
 
         c1 = h1.diff(h2)
         c2 = h1.diff(h3)
@@ -171,32 +171,33 @@ class TestNmapHost(unittest.TestCase):
         self.assertEqual(c1.changed(), set(['hostnames']))
         self.assertEqual(c1.added(), set([]))
         self.assertEqual(c1.removed(), set([]))
+
         self.assertEqual(c1.unchanged(), set(['status',
-                                              'NmapService.343309847',
-                                              'NmapService.343309848',
-                                              'NmapService.343309921',
-                                              'NmapService.343309433',
+                                              "NmapService.('tcp', 22)",
+                                              "NmapService.('tcp', 111)",
+                                              "NmapService.('tcp', 631)",
+                                              "NmapService.('tcp', 3306)",
                                               'address',
-                                              'NmapService.343306980']))
+                                              "NmapService.('tcp', 25)"]))
 
         self.assertEqual(c2.changed(), set(['status',
-                                            'NmapService.343306980']))
-        self.assertEqual(c2.added(), set(['NmapService.343309847']))
-        self.assertEqual(c2.removed(), set(['NmapService.343306981']))
-        self.assertEqual(c2.unchanged(), set(['hostnames',
-                                              'NmapService.343309848',
-                                              'NmapService.343309921',
-                                              'NmapService.343309433',
+                                            'NmapService.(\'tcp\', 3306)']))
+        self.assertEqual(c2.added(), set(['NmapService.(\'tcp\', 25)']))
+        self.assertEqual(c2.removed(), set(['NmapService.(\'tcp\', 3307)']))
+        self.assertEqual(c2.unchanged(), set(["NmapService.('tcp', 631)",
+                                              'hostnames',
+                                              "NmapService.('tcp', 22)",
+                                              "NmapService.('tcp', 111)",
                                               'address']))
 
         self.assertEqual(c3.changed(), set(['status', 'hostnames',
-                                            'NmapService.343306980']))
-        self.assertEqual(c3.added(), set(['NmapService.343309847']))
-        self.assertEqual(c3.removed(), set(['NmapService.343306981']))
-        self.assertEqual(c3.unchanged(), set(['NmapService.343309848',
-                                              'NmapService.343309921',
-                                              'NmapService.343309433',
-                                              'address']))
+                                            "NmapService.('tcp', 3306)"]))
+        self.assertEqual(c3.added(), set(["NmapService.('tcp', 25)"]))
+        self.assertEqual(c3.removed(), set(["NmapService.('tcp', 3307)"]))
+        self.assertEqual(c3.unchanged(), set(["NmapService.('tcp', 631)",
+                                             "NmapService.('tcp', 22)",
+                                             "NmapService.('tcp', 111)",
+                                             'address']))
 
 
 if __name__ == '__main__':

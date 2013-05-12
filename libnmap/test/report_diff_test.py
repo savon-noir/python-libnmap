@@ -2,7 +2,8 @@
 
 import unittest
 import os
-from libnmap import NmapParser, NmapReport
+from libnmap.parser import NmapParser
+#from libnmap.report import NmapReport
 
 
 class TestNmapReportDiff(unittest.TestCase):
@@ -16,15 +17,11 @@ class TestNmapReportDiff(unittest.TestCase):
 
     def test_diff_host_list(self):
         fdir = os.path.dirname(os.path.realpath(__file__))
-        d1 = NmapParser.parse_fromfile("%s/%s" % (fdir, 'files/1_hosts.xml'))
-        d2 = NmapParser.parse_fromfile("%s/%s" % (fdir, 'files/2_hosts.xml'))
-        d3 = NmapParser.parse_fromfile("%s/%s" % (fdir,
+        r1 = NmapParser.parse_fromfile("%s/%s" % (fdir, 'files/1_hosts.xml'))
+        r2 = NmapParser.parse_fromfile("%s/%s" % (fdir, 'files/2_hosts.xml'))
+        r3 = NmapParser.parse_fromfile("%s/%s" % (fdir, 'files/1_hosts.xml'))
+        r4 = NmapParser.parse_fromfile("%s/%s" % (fdir,
                                                   'files/2_hosts_achange.xml'))
-
-        r1 = NmapReport("r1", d1)
-        r2 = NmapReport("r2", d2)
-        r3 = NmapReport("r3", d1)
-        r4 = NmapReport("r4", d3)
 
         d1 = r1.diff(r2)
         self.assertEqual(d1.changed(), set(['hosts_total', 'hosts_up']))
