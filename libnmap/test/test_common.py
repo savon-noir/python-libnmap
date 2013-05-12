@@ -171,7 +171,6 @@ class TestNmapHost(unittest.TestCase):
         self.assertEqual(c1.changed(), set(['hostnames']))
         self.assertEqual(c1.added(), set([]))
         self.assertEqual(c1.removed(), set([]))
-
         self.assertEqual(c1.unchanged(), set(['status',
                                               'NmapService.343309847',
                                               'NmapService.343309848',

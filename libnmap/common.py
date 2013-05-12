@@ -35,6 +35,9 @@ class NmapHost(object):
         return (self._hostnames == other._hostnames and
                 self.address == other.address and self.changed(other) == 0)
 
+        return (self._hostnames == other._hostnames and
+                self.address == other.address)
+
     def __ne__(self, other):
         """
             Compare ne NmapHost based on :
@@ -169,7 +172,7 @@ class NmapHost(object):
             :param id: integer
             :return NmapService or None
         """
-        service = [s for s in self.service if s.id() == id]
+        service = [s for s in self.services if s.id() == id]
         if len(service) > 1:
             raise Exception("Duplicate services found in NmapHost object")
         return service.pop() if len(service) == 1 else None
@@ -234,7 +237,7 @@ class NmapService(object):
 
     @property
     def id(self):
-        return hash(self.port) ^ hash(self.protocol)
+        return (self.protocol, self.port)
 
     @property
     def port(self):
@@ -274,7 +277,7 @@ class NmapService(object):
         return b
 
     def get_dict(self):
-        return ({'id': self.id, 'port': str(self.port),
+        return ({'id': str(self.id), 'port': str(self.port),
                 'protocol': self.protocol, 'banner': self.banner,
                 'service': self.service, 'state': self.state})
 

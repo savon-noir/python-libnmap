@@ -42,8 +42,8 @@ class NmapDiff(DictDiffer):
         DictDiffer.__init__(self, self.object1, self.object2)
 
     def __repr__(self):
-        return ('added: [{0}] -- changed: [{1}] -- \
-                 unchanged: [{2}] -- removed [{3}]'.format(self.added(),
+        return ("added: [{0}] -- changed: [{1}] -- "
+                "unchanged: [{2}] -- removed [{3}]".format(self.added(),
                                                            self.changed(),
                                                            self.unchanged(),
                                                            self.removed()))
