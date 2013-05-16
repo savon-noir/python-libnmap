@@ -150,9 +150,9 @@ class NmapParser(object):
             path is given as argument. If not, an exception is raised.
 
             :param nmap_data: Same as for parse().
-            
+
             Any portion of nmap scan reports could be passed as argument.
-            
+
             Data type _must be a valid path to a file containing
             nmap scan results.
 
