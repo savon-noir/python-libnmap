@@ -34,7 +34,8 @@ printing out stuff.
 
 ```python
 #!/usr/bin/env python
-from libnmap import NmapProcess
+import sys
+from libnmap.process import NmapProcess
         
 def main(argv):
     def mycallback(nmapscan=None, data=""):
@@ -65,7 +66,9 @@ if __name__ == '__main__':
 Here a consequent example on how to use libnmap:
 ```python
 #!/usr/bin/env python
-from libnmap import NmapProcess, NmapParser, NmapParserException
+import sys
+from libnmap.process import NmapProcess
+from libnmap.parser import NmapParser, NmapParserException
 
 
 # start a new nmap scan on localhost with some specific options
@@ -90,8 +93,13 @@ def print_scan(nmap_report):
         nmap_report._nmaprun['startstr'])
 
     for host in nmap_report.hosts:
+        if len(host.hostnames):
+            tmp_host = host.hostnames.pop()
+        else:
+            tmp_host = host.address
+
         print "Nmap scan report for {0} ({1})".format(
-            host.hostname,
+            tmp_host,
             host.address)
         print "Host is {0}.".format(host.status)
         print "  PORT     STATE         SERVICE"
@@ -116,16 +124,15 @@ if __name__ == "__main__":
 ### De/Serialize NmapReport
 Easy:
 ```python
-from libnmap import NmapParser, NmapReport
-from libnmap import ReportDecoder, ReportEncoder
+from libnmap.parser import NmapParser
+from libnmap.reportjson import ReportDecoder, ReportEncoder
 import json
  
-r = NmapParser.parse_fromfile('/root/dev/python-nmap-lib/libnmap/test/files/1_hosts.xml')
+nmap_report_obj = NmapParser.parse_fromfile('/root/dev/python-nmap-lib/libnmap/test/files/1_hosts.xml')
  
 # create a json object from an NmapReport instance
-j = json.dumps(r, cls=ReportEncoder)
+nmap_report_json = json.dumps(nmap_report_obj, cls=ReportEncoder)
   
 # create a NmapReport instance from a json object
-nmapreport = json.loads(j, cls=ReportDecoder)
-nmapreport.name
+nmap_report_obj = json.loads(nmap_report_json, cls=ReportDecoder)
 ```

@@ -177,7 +177,6 @@ class NmapParser(object):
         nreport = {}
         if rdict.keys()[0] == '__NmapReport__':
             r = rdict['__NmapReport__']
-            nreport['_name'] = r['_name']
             nreport['_runstats'] = r['_runstats']
             nreport['_scaninfo'] = r['_scaninfo']
             nreport['_nmaprun'] = r['_nmaprun']
