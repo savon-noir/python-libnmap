@@ -386,29 +386,29 @@ class NmapService(object):
         if service_extras is not None:
             self._service_extras = service_extras
 
-    """
-        Compares two NmapService objects to see if they are the same or
-        if one of them changed.
-
-        :param other: NmapService
-
-        :return: boolean
-    """
     def __eq__(self, other):
+        """
+            Compares two NmapService objects to see if they are the same or
+            if one of them changed.
+
+            :param other: NmapService
+
+            :return: boolean
+        """
         rval = False
         if(self.__class__ == other.__class__ and self.id == other.id):
             rval = (self.changed(other) == 0)
         return rval
 
-    """
-        Compares two NmapService objects to see if they are different
-        if one of them changed.
-
-        :param other: NmapService
-
-        :return: boolean
-    """
     def __ne__(self, other):
+        """
+            Compares two NmapService objects to see if they are different
+            if one of them changed.
+
+            :param other: NmapService
+
+            :return: boolean
+        """
         rval = True
         if(self.__class__ == other.__class__ and self.id == other.id):
             rval = (self.changed(other) > 0)
@@ -426,70 +426,68 @@ class NmapService(object):
         return (hash(self.port) ^ hash(self.protocol) ^ hash(self.state) ^
                 hash(self.service) ^ hash(self.banner))
 
-    """
-        Checks if a NmapService is different from another.
-
-        :param other: NmapService
-
-        :return: boolean
-    """
     def changed(self, other):
+        """
+            Checks if a NmapService is different from another.
+
+            :param other: NmapService
+
+            :return: boolean
+        """
         return len(self.diff(other).changed())
 
-    """
-        Accessor for port.
-
-        :return: integer or -1
-    """
     @property
     def port(self):
+        """
+            Accessor for port.
+
+            :return: integer or -1
+        """
         return self._portid
 
-    """
-        Accessor for protocol
-
-        :return: string
-    """
     @property
     def protocol(self):
+        """
+            Accessor for protocol
+
+            :return: string
+        """
         return self._protocol
 
-    """
-        Accessor for service's state (open, filtered, closed,...)
-
-        :return: string
-    """
     @property
     def state(self):
+        """
+            Accessor for service's state (open, filtered, closed,...)
+
+            :return: string
+        """
         return self._state['state'] if 'state' in self._state else None
 
-    """
-        Accessor for service dictionnary.
-
-        :return: dict
-    """
     @property
     def service(self):
+        """
+            Accessor for service dictionnary.
+
+            :return: dict or None
+        """
         return self._service['name'] if 'name' in self._service else None
 
-    """
-        Tells if the port was open or not
-
-        :return: boolean
-    """
     def open(self):
-        return (True
-                if 'state' in self._state and self._state['state'] == 'open'
-                else False)
+        """
+            Tells if the port was open or not
 
-    """
-        Accessor for the service's banner. Only available if the nmap option
-        -sV or similar was used.
+            :return: boolean
+        """
+        return 'state' in self._state and self._state['state'] == 'open'
 
-        :return: string
-    """
     @property
     def banner(self):
+        """
+            Accessor for the service's banner. Only available
+            if the nmap option -sV or similar was used.
+
+            :return: string
+        """
         notrelevant = ['name', 'method', 'conf']
         b = ''
         if 'method' in self._service and self._service['method'] == "probed":
@@ -498,14 +496,14 @@ class NmapService(object):
                               if k not in notrelevant])
         return b
 
-    """
-        Gives a python dictionary of the nse scripts results.
-        The dict key is the name (id) of the nse script and
-        the value is the output of the script.
-
-        :return: dict
-    """
     def scripts_results(self):
+        """
+            Gives a python dictionary of the nse scripts results.
+            The dict key is the name (id) of the nse script and
+            the value is the output of the script.
+
+            :return: dict
+        """
         scripts_dict = None
         try:
             scripts_dict = dict([(bdct['id'], bdct['output'])
@@ -514,44 +512,43 @@ class NmapService(object):
             pass
         return scripts_dict
 
-    """
-        Accessor for the id() of the NmapService. This is used for
-        diff()ing NmapService object via NmapDiff.
-
-        :return: tuple
-    """
     @property
     def id(self):
+        """
+            Accessor for the id() of the NmapService. This is used for
+            diff()ing NmapService object via NmapDiff.
+
+            :return: tuple
+        """
         return (self.protocol, self.port)
 
-    """
-        Return a python dict representation of the NmapService object.
-        This is used to diff() NmapService objects via NmapDiff.
-
-        :return: dict
-    """
     def get_dict(self):
+        """
+            Return a python dict representation of the NmapService object.
+            This is used to diff() NmapService objects via NmapDiff.
+
+            :return: dict
+        """
         return ({'id': str(self.id), 'port': str(self.port),
                  'protocol': self.protocol, 'banner': self.banner,
                  'service': self.service, 'state': self.state})
 
-    """
-        Calls NmapDiff to check the difference between self and
-        another NmapService object.
-        Will return a NmapDiff object.
-        This objects return python set() of keys describing the elements
-        which have changed, were added, removed or kept unchanged.
-
-        :return: NmapDiff object
-    """
     def diff(self, other):
+        """
+            Calls NmapDiff to check the difference between self and
+            another NmapService object.
+            Will return a NmapDiff object.
+            This objects return python set() of keys describing the elements
+            which have changed, were added, removed or kept unchanged.
+
+            :return: NmapDiff object
+        """
         return NmapDiff(self, other)
 
 
 class NmapReport(object):
     """
-        :todo:
-                - remove get_raw_data makes no sens
+        :todo: remove get_raw_data makes no sense
     """
     def __init__(self, raw_data=None):
         self._nmaprun = {}
@@ -645,9 +642,9 @@ class NmapReport(object):
         r = False
         rd = self.get_raw_data()
         _consistent_keys = ['_nmaprun', '_scaninfo', '_hosts', '_runstats']
-        if (set(_consistent_keys) == set(rd.keys()) and
-                len([k for k in rd.keys() if rd[k] is not None]) == 4):
-                r = True
+        if(set(_consistent_keys) == set(rd.keys()) and
+           len([k for k in rd.keys() if rd[k] is not None]) == 4):
+            r = True
         return r
 
     def get_dict(self):

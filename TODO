@@ -1,12 +1,8 @@
-- Add Sphinx DocStrings
-- NmapParser should be able to be fully generic and return Objects
-- NmapParser should not need a XML root
+- complete unit tests
+- complete Sphinx DocStrings
 - Add new plugins to support import/export from mysql, couchdb, csv
-- support iterators for NmapReport::scanned_hosts
-- add support for parsing os version (fingerprint)
+- support iterators for NmapReport::hosts
 - add unittest for udp scans, ping sweeping
 - add support for 'resume' capability (see nmap --resume)
-- review thread management for NmapProcess
-- add a safe_run toggle in constructor of NmapProcess to cloak unsecure options like -oN, -oG, -oX 
 - add support for "not shown ports" (extra ports) in NmapHost (via NmapParser)
 - add API support in NmapReport for returning nmap_run data

@@ -1,3 +1,12 @@
+v0.2.1, 17/05/2013 -- Code Docstring and added support for additional data
+                    - added support for scripts in NmapService
+                    - added support for hosts extra data in NmapHost (uptime, distance,...)
+                    - added support for OS fingerprint data in NmapHost
+                    - added python docstrings for all modules
+                    - added sphinx documentation
+                    - reviewed API for libnmap objects
+                    - fixed errors with hash() in diff
+                    - fixed errors/exceptions in NmapParser
 v0.2.0, 18/04/2013 -- Added Serialization and Plugin support
                     - added serialization encoders and decoders for NmapReport
                     - added basic plugin capability to NmapReport
