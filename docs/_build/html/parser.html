@@ -24,6 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="libnmap 0.2 documentation" href="index.html" />
+    <link rel="next" title="libnmap.objects" href="objects.html" />
     <link rel="prev" title="libnmap.process" href="process.html" /> 
   </head>
   <body>
@@ -36,6 +37,9 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
+        <li class="right" >
+          <a href="objects.html" title="libnmap.objects"
+             accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="process.html" title="libnmap.process"
              accesskey="P">previous</a> |</li>
@@ -105,23 +109,21 @@ or &lt;port&gt; XML tags.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>nmap_data</strong> &#8211; any portion of nmap scan result</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>nmap_data</strong> &#8211; any portion of nmap scan result.</td>
 </tr>
 </tbody>
 </table>
-<p>can be given as argument. nmap_data should always be a string
-representing a part or a complete nmap scan report.
-:type nmap_data: string</p>
+<p>nmap_data should always be a string representing a part
+or a complete nmap scan report.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data_type</strong> &#8211; specifies the type of data to be parsed.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data_type</strong> (<em>string (&#8220;XML&#8221;|&#8221;JSON&#8221;|&#8221;YAML&#8221;).</em>) &#8211; specifies the type of data to be parsed.</td>
 </tr>
 </tbody>
 </table>
-<p>As of today, only XML parsing is supported.
-:type data_type: string (&#8220;XML&#8221;|&#8221;JSON&#8221;|&#8221;YAML&#8221;)</p>
+<p>As of today, only XML parsing is supported.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -160,18 +162,20 @@ path is given as argument. If not, an exception is raised.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>nmap_data</strong> &#8211; Same as for parse(), any portion of nmap</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>nmap_data</strong> &#8211; Same as for parse().</td>
 </tr>
 </tbody>
 </table>
-<p>scan reports could be passed as argument. Data type _must be a
-valid path to a file containing nmap scan results.
-:param data_type: Specifies the type of serialization in the file.</p>
+<p>Any portion of nmap scan reports could be passed as argument.</p>
+<p>Data type _must be a valid path to a file containing
+nmap scan results.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">NmapObject</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data_type</strong> &#8211; Specifies the type of serialization in the file.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">NmapObject</td>
 </tr>
 </tbody>
 </table>
@@ -186,12 +190,11 @@ passed on as argument. If not, an exception is raised.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>nmap_data</strong> &#8211; Same as for parse(), any portion of nmap scan</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>nmap_data</strong> &#8211; Same as for parse(), any portion of nmap scan.</td>
 </tr>
 </tbody>
 </table>
-<p>reports could be passed as argument. Data type _must_ be a string.
-:type nmap_data: string</p>
+<p>Reports could be passed as argument. Data type _must_ be a string.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -227,6 +230,9 @@ passed on as argument. If not, an exception is raised.</p>
   <h4>Previous topic</h4>
   <p class="topless"><a href="process.html"
                         title="previous chapter">libnmap.process</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="objects.html"
+                        title="next chapter">libnmap.objects</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/parser.txt"
@@ -258,6 +264,9 @@ passed on as argument. If not, an exception is raised.</p>
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
+        <li class="right" >
+          <a href="objects.html" title="libnmap.objects"
+             >next</a> |</li>
         <li class="right" >
           <a href="process.html" title="libnmap.process"
              >previous</a> |</li>

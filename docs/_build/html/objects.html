@@ -1,0 +1,419 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>libnmap.objects &mdash; libnmap 0.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="libnmap 0.2 documentation" href="index.html" />
+    <link rel="prev" title="libnmap.parser" href="parser.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="parser.html" title="libnmap.parser"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">libnmap 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="libnmap-objects">
+<h1>libnmap.objects<a class="headerlink" href="#libnmap-objects" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what">
+<h2>What<a class="headerlink" href="#what" title="Permalink to this headline">¶</a></h2>
+<p>please doc me here.</p>
+</div>
+<div class="section" id="module-libnmap.objects">
+<span id="code-api"></span><h2>Code API<a class="headerlink" href="#module-libnmap.objects" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="libnmap.objects.NmapHost">
+<em class="property">class </em><tt class="descclassname">libnmap.objects.</tt><tt class="descname">NmapHost</tt><big>(</big><em>starttime=''</em>, <em>endtime=''</em>, <em>address=None</em>, <em>status=None</em>, <em>hostnames=None</em>, <em>services=None</em>, <em>extras=None</em><big>)</big><a class="reference internal" href="_modules/libnmap/objects.html#NmapHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapHost" title="Permalink to this definition">¶</a></dt>
+<dd><p>NmapHost is a class representing a host object of NmapReport</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Todo :</th><td class="field-body">add ipsequence parsing (accessor implemented)</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="libnmap.objects.NmapHost.address">
+<tt class="descname">address</tt><a class="reference internal" href="_modules/libnmap/objects.html#NmapHost.address"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapHost.address" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor for the IP address of the scanned host</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">IP address as a string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libnmap.objects.NmapHost.changed">
+<tt class="descname">changed</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="_modules/libnmap/objects.html#NmapHost.changed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapHost.changed" title="Permalink to this definition">¶</a></dt>
+<dd><p>return the number of attribute who have changed
+:param other: NmapHost object to compare
+:return int</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="libnmap.objects.NmapHost.diff">
+<tt class="descname">diff</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="_modules/libnmap/objects.html#NmapHost.diff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapHost.diff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls NmapDiff to check the difference between self and
+another NmapHost object.</p>
+<p>Will return a NmapDiff object.</p>
+<p>This objects return python set() of keys describing the elements
+which have changed, were added, removed or kept unchanged.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>other</strong> &#8211; NmapHost to diff with</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">NmapDiff object</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libnmap.objects.NmapHost.distance">
+<tt class="descname">distance</tt><a class="reference internal" href="_modules/libnmap/objects.html#NmapHost.distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapHost.distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of hops to host</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libnmap.objects.NmapHost.endtime">
+<tt class="descname">endtime</tt><a class="reference internal" href="_modules/libnmap/objects.html#NmapHost.endtime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapHost.endtime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor for the unix timestamp of when the scan ended</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libnmap.objects.NmapHost.get_dict">
+<tt class="descname">get_dict</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/libnmap/objects.html#NmapHost.get_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapHost.get_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a dict representation of the object
+This is needed by NmapDiff to allow comparaison
+:return dict</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="libnmap.objects.NmapHost.get_open_ports">
+<tt class="descname">get_open_ports</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/libnmap/objects.html#NmapHost.get_open_ports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapHost.get_open_ports" title="Permalink to this definition">¶</a></dt>
+<dd><p>Same as get_ports() but only for open ports</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list: of tuples (port,&#8217;proto&#8217;) ie:[(22,&#8217;tcp&#8217;),(25, &#8216;tcp&#8217;)]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libnmap.objects.NmapHost.get_ports">
+<tt class="descname">get_ports</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/libnmap/objects.html#NmapHost.get_ports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapHost.get_ports" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a list of the port used by each service of the NmapHost</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list: of tuples (port,&#8217;proto&#8217;) ie:[(22,&#8217;tcp&#8217;),(25, &#8216;tcp&#8217;)]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libnmap.objects.NmapHost.get_service">
+<tt class="descname">get_service</tt><big>(</big><em>portno</em>, <em>protocol='tcp'</em><big>)</big><a class="reference internal" href="_modules/libnmap/objects.html#NmapHost.get_service"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapHost.get_service" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>portno</strong> &#8211; int the portnumber</li>
+<li><strong>protocol=&#8217;tcp&#8217;</strong> &#8211; string (&#8216;tcp&#8217;,&#8217;udp&#8217;)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">NmapService or None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libnmap.objects.NmapHost.id">
+<tt class="descname">id</tt><a class="reference internal" href="_modules/libnmap/objects.html#NmapHost.id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapHost.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>id of the host. Used for diff()ing NmapObjects</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libnmap.objects.NmapHost.ipsequence">
+<tt class="descname">ipsequence</tt><a class="reference internal" href="_modules/libnmap/objects.html#NmapHost.ipsequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapHost.ipsequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO. Not parsed yet.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libnmap.objects.NmapHost.lastboot">
+<tt class="descname">lastboot</tt><a class="reference internal" href="_modules/libnmap/objects.html#NmapHost.lastboot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapHost.lastboot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Since when the host was booted.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libnmap.objects.NmapHost.os_class_probabilities">
+<tt class="descname">os_class_probabilities</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/libnmap/objects.html#NmapHost.os_class_probabilities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapHost.os_class_probabilities" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array of possible OS class detected during
+the OS fingerprinting.</p>
+<dl class="docutils">
+<dt>Example [{&#8216;accuracy&#8217;: &#8216;96&#8217;, &#8216;osfamily&#8217;: &#8216;embedded&#8217;,</dt>
+<dd>&#8216;type&#8217;: &#8216;WAP&#8217;, &#8216;vendor&#8217;: &#8216;Netgear&#8217;}, {...}]</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">dict describing the OS class detected and the accuracy</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libnmap.objects.NmapHost.os_fingerprint">
+<tt class="descname">os_fingerprint</tt><a class="reference internal" href="_modules/libnmap/objects.html#NmapHost.os_fingerprint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapHost.os_fingerprint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the fingerprint of the scanned system.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libnmap.objects.NmapHost.os_match_probabilities">
+<tt class="descname">os_match_probabilities</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/libnmap/objects.html#NmapHost.os_match_probabilities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapHost.os_match_probabilities" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array of possible OS match detected during
+the OS fingerprinting</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">dict describing the OS version detected and the accuracy</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libnmap.objects.NmapHost.os_ports_used">
+<tt class="descname">os_ports_used</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/libnmap/objects.html#NmapHost.os_ports_used"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapHost.os_ports_used" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array of the ports used for OS fingerprinting</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">array of ports used: [{&#8216;portid&#8217;: &#8216;22&#8217;,
+&#8216;proto&#8217;: &#8216;tcp&#8217;,
+&#8216;state&#8217;: &#8216;open&#8217;},]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libnmap.objects.NmapHost.starttime">
+<tt class="descname">starttime</tt><a class="reference internal" href="_modules/libnmap/objects.html#NmapHost.starttime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapHost.starttime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor for the unix timestamp of when the scan was started</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libnmap.objects.NmapHost.status">
+<tt class="descname">status</tt><a class="reference internal" href="_modules/libnmap/objects.html#NmapHost.status"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapHost.status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor for the host&#8217;s status (up, down, unknown...)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libnmap.objects.NmapHost.tcpsequence">
+<tt class="descname">tcpsequence</tt><a class="reference internal" href="_modules/libnmap/objects.html#NmapHost.tcpsequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapHost.tcpsequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the difficulty to determine remotely predict
+the tcp sequencing.</p>
+<p>return: string</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libnmap.objects.NmapHost.uptime">
+<tt class="descname">uptime</tt><a class="reference internal" href="_modules/libnmap/objects.html#NmapHost.uptime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapHost.uptime" title="Permalink to this definition">¶</a></dt>
+<dd><p>uptime of the remote host (if nmap was able to determine it)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">string (in seconds)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="libnmap.objects.NmapService">
+<em class="property">class </em><tt class="descclassname">libnmap.objects.</tt><tt class="descname">NmapService</tt><big>(</big><em>portid</em>, <em>protocol='tcp'</em>, <em>state=None</em>, <em>service=None</em>, <em>service_extras=None</em><big>)</big><a class="reference internal" href="_modules/libnmap/objects.html#NmapService"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapService" title="Permalink to this definition">¶</a></dt>
+<dd><p>NmapService represents a nmap scanned service. Its id() is comprised
+of the protocol and the port.</p>
+<p>Depending on the scanning options, some additional details might be
+available or not. Like banner or extra datas from NSE (nmap scripts).</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">libnmap.objects</a><ul>
+<li><a class="reference internal" href="#what">What</a></li>
+<li><a class="reference internal" href="#module-libnmap.objects">Code API</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="parser.html"
+                        title="previous chapter">libnmap.parser</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/objects.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="parser.html" title="libnmap.parser"
+             >previous</a> |</li>
+        <li><a href="index.html">libnmap 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Ronald Bister.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

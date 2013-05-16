@@ -61,14 +61,18 @@
 <span class="sd">            scan report. You can possibly give &lt;hosts&gt;...&lt;/hosts&gt;</span>
 <span class="sd">            or &lt;port&gt; XML tags.</span>
 
-<span class="sd">            :param nmap_data: any portion of nmap scan result</span>
-<span class="sd">            can be given as argument. nmap_data should always be a string</span>
-<span class="sd">            representing a part or a complete nmap scan report.</span>
+<span class="sd">            :param nmap_data: any portion of nmap scan result.</span>
+
+<span class="sd">            nmap_data should always be a string representing a part</span>
+<span class="sd">            or a complete nmap scan report.</span>
+
 <span class="sd">            :type nmap_data: string</span>
 
 <span class="sd">            :param data_type: specifies the type of data to be parsed.</span>
+
+<span class="sd">            :type data_type: string (&quot;XML&quot;|&quot;JSON&quot;|&quot;YAML&quot;).</span>
+
 <span class="sd">            As of today, only XML parsing is supported.</span>
-<span class="sd">            :type data_type: string (&quot;XML&quot;|&quot;JSON&quot;|&quot;YAML&quot;)</span>
 
 <span class="sd">            :return: NmapObject (NmapHost, NmapService or NmapReport)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -83,7 +87,7 @@
         <span class="k">return</span> <span class="n">nmapobj</span>
 </div>
     <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="NmapParser._parse_xml"><a class="viewcode-back" href="../../parser.html#libnmap.parser.NmapParser._parse_xml">[docs]</a>    <span class="k">def</span> <span class="nf">_parse_xml</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">nmap_data</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_parse_xml</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">nmap_data</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Protected class method used to process a specific data type.</span>
 <span class="sd">            In this case: XML. This method is called by cls.parse class</span>
@@ -132,9 +136,9 @@
             <span class="k">raise</span> <span class="n">NmapParserException</span><span class="p">(</span><span class="s">&quot;Unpexpected data structure for XML &quot;</span>
                                       <span class="s">&quot;root node&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">nmapobj</span>
-</div>
+
     <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="NmapParser._parse_xml_report"><a class="viewcode-back" href="../../parser.html#libnmap.parser.NmapParser._parse_xml_report">[docs]</a>    <span class="k">def</span> <span class="nf">_parse_xml_report</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_parse_xml_report</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            This method parses out a full nmap scan report from its XML root</span>
 <span class="sd">            node: &lt;nmaprun&gt;.</span>
@@ -165,15 +169,17 @@
             <span class="c">#        el.tag,</span>
             <span class="c">#        el.get(el.tag))</span>
         <span class="k">return</span> <span class="n">NmapReport</span><span class="p">(</span><span class="n">nmap_scan</span><span class="p">)</span>
-</div>
+
     <span class="nd">@classmethod</span>
 <div class="viewcode-block" id="NmapParser.parse_fromstring"><a class="viewcode-back" href="../../parser.html#libnmap.parser.NmapParser.parse_fromstring">[docs]</a>    <span class="k">def</span> <span class="nf">parse_fromstring</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">nmap_data</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="s">&quot;XML&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Call generic cls.parse() method and ensure that a string is</span>
 <span class="sd">            passed on as argument. If not, an exception is raised.</span>
 
-<span class="sd">            :param nmap_data: Same as for parse(), any portion of nmap scan</span>
-<span class="sd">            reports could be passed as argument. Data type _must_ be a string.</span>
+<span class="sd">            :param nmap_data: Same as for parse(), any portion of nmap scan.</span>
+
+<span class="sd">            Reports could be passed as argument. Data type _must_ be a string.</span>
+
 <span class="sd">            :type nmap_data: string</span>
 
 <span class="sd">            :param data_type: Specifies the type of data passed on as argument.</span>
@@ -192,9 +198,13 @@
 <span class="sd">            Call generic cls.parse() method and ensure that a correct file</span>
 <span class="sd">            path is given as argument. If not, an exception is raised.</span>
 
-<span class="sd">            :param nmap_data: Same as for parse(), any portion of nmap</span>
-<span class="sd">            scan reports could be passed as argument. Data type _must be a</span>
-<span class="sd">            valid path to a file containing nmap scan results.</span>
+<span class="sd">            :param nmap_data: Same as for parse().</span>
+<span class="sd">            </span>
+<span class="sd">            Any portion of nmap scan reports could be passed as argument.</span>
+<span class="sd">            </span>
+<span class="sd">            Data type _must be a valid path to a file containing</span>
+<span class="sd">            nmap scan results.</span>
+
 <span class="sd">            :param data_type: Specifies the type of serialization in the file.</span>
 
 <span class="sd">            :return: NmapObject</span>
@@ -265,7 +275,7 @@
         <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">__format_attributes</span><span class="p">(</span><span class="n">xelement</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="NmapParser._parse_xml_host"><a class="viewcode-back" href="../../parser.html#libnmap.parser.NmapParser._parse_xml_host">[docs]</a>    <span class="k">def</span> <span class="nf">_parse_xml_host</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">scanhost_data</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_parse_xml_host</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">scanhost_data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Protected method parsing a portion of a nmap scan result.</span>
 <span class="sd">            Receives a &lt;host&gt; XML tag representing a scanned host with</span>
@@ -314,7 +324,7 @@
                          <span class="n">_services</span><span class="p">,</span>
                          <span class="n">_host_extras</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">nhost</span>
-</div>
+
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">__parse_hostnames</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">scanhostnames_data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -334,7 +344,7 @@
         <span class="k">return</span> <span class="n">hostnames</span>
 
     <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="NmapParser._parse_xml_ports"><a class="viewcode-back" href="../../parser.html#libnmap.parser.NmapParser._parse_xml_ports">[docs]</a>    <span class="k">def</span> <span class="nf">_parse_xml_ports</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">scanports_data</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_parse_xml_ports</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">scanports_data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Protected method parsing the list of scanned services from</span>
 <span class="sd">            a targeted host. This protected method cannot be called directly</span>
@@ -359,9 +369,9 @@
             <span class="c">#    print &quot;struct port unknown attr: %s value: %s&quot; %</span>
             <span class="c">#           (h.tag, h.get(h.tag))</span>
         <span class="k">return</span> <span class="n">ports</span>
-</div>
+
     <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="NmapParser._parse_xml_port"><a class="viewcode-back" href="../../parser.html#libnmap.parser.NmapParser._parse_xml_port">[docs]</a>    <span class="k">def</span> <span class="nf">_parse_xml_port</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">scanport_data</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_parse_xml_port</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">scanport_data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Protected method parsing a scanned service from a targeted host.</span>
 <span class="sd">            This protected method cannot be called directly.</span>
@@ -405,7 +415,7 @@
                             <span class="n">_service</span><span class="p">,</span>
                             <span class="n">_service_extras</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">nport</span>
-</div>
+
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">__parse_os_fingerprint</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">os_data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

@@ -28,11 +28,12 @@ The full `source code <https://github.com/savon-noir/python-nmap-lib>`_ is avail
 The different modules are documented below:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :glob:
 
    process
    parser
+   objects
 
 Indices and tables
 ==================

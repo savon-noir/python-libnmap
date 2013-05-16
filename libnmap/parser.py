@@ -12,14 +12,18 @@ class NmapParser(object):
             scan report. You can possibly give <hosts>...</hosts>
             or <port> XML tags.
 
-            :param nmap_data: any portion of nmap scan result
-            can be given as argument. nmap_data should always be a string
-            representing a part or a complete nmap scan report.
+            :param nmap_data: any portion of nmap scan result.
+
+            nmap_data should always be a string representing a part
+            or a complete nmap scan report.
+
             :type nmap_data: string
 
             :param data_type: specifies the type of data to be parsed.
+
+            :type data_type: string ("XML"|"JSON"|"YAML").
+
             As of today, only XML parsing is supported.
-            :type data_type: string ("XML"|"JSON"|"YAML")
 
             :return: NmapObject (NmapHost, NmapService or NmapReport)
         """
@@ -123,8 +127,10 @@ class NmapParser(object):
             Call generic cls.parse() method and ensure that a string is
             passed on as argument. If not, an exception is raised.
 
-            :param nmap_data: Same as for parse(), any portion of nmap scan
-            reports could be passed as argument. Data type _must_ be a string.
+            :param nmap_data: Same as for parse(), any portion of nmap scan.
+
+            Reports could be passed as argument. Data type _must_ be a string.
+
             :type nmap_data: string
 
             :param data_type: Specifies the type of data passed on as argument.
@@ -143,9 +149,13 @@ class NmapParser(object):
             Call generic cls.parse() method and ensure that a correct file
             path is given as argument. If not, an exception is raised.
 
-            :param nmap_data: Same as for parse(), any portion of nmap
-            scan reports could be passed as argument. Data type _must be a
-            valid path to a file containing nmap scan results.
+            :param nmap_data: Same as for parse().
+            
+            Any portion of nmap scan reports could be passed as argument.
+            
+            Data type _must be a valid path to a file containing
+            nmap scan results.
+
             :param data_type: Specifies the type of serialization in the file.
 
             :return: NmapObject
