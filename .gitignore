@@ -40,5 +40,3 @@ nosetests.xml
 .pydevproject
 .swp
 
-# kinky sphinx build dir
-_build/

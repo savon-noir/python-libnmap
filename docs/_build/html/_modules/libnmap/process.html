@@ -1,0 +1,558 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>libnmap.process &mdash; libnmap 0.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="libnmap 0.2 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">libnmap 0.2 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for libnmap.process</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">pwd</span>
+<span class="kn">import</span> <span class="nn">shlex</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Thread</span>
+<span class="kn">from</span> <span class="nn">Queue</span> <span class="kn">import</span> <span class="n">Queue</span><span class="p">,</span> <span class="n">Empty</span>
+<span class="kn">from</span> <span class="nn">xml.dom</span> <span class="kn">import</span> <span class="n">pulldom</span>
+
+
+<div class="viewcode-block" id="NmapProcess"><a class="viewcode-back" href="../../process.html#libnmap.process.NmapProcess">[docs]</a><span class="k">class</span> <span class="nc">NmapProcess</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    NmapProcess is a class which wraps around the nmap executable.</span>
+<span class="sd">    Consequently, in order to run an NmapProcess, nmap should be installed</span>
+<span class="sd">    on the host running the script. By default NmapProcess will produce</span>
+<span class="sd">    the output of the nmap scan in the nmap XML format. This could be then</span>
+<span class="sd">    parsed out via the NmapParser class from libnmap.parser module.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="s">&quot;127.0.0.1&quot;</span><span class="p">,</span>
+                 <span class="n">options</span><span class="o">=</span><span class="s">&quot;-sT&quot;</span><span class="p">,</span> <span class="n">event_callback</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">safe_mode</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor of NmapProcess class.</span>
+
+<span class="sd">        :param targets: hosts to be scanned. Could be a string of hosts</span>
+<span class="sd">        separated with a coma or a python list of hosts/ip.</span>
+<span class="sd">        :type targets: string or list</span>
+
+<span class="sd">        :param options: list of nmap options to be applied to scan.</span>
+<span class="sd">        These options are all documented in nmap&#39;s man pages.</span>
+
+<span class="sd">        :param event_callback: callable function which will be ran</span>
+<span class="sd">        each time nmap process outputs data. This function will receive</span>
+<span class="sd">        two parameters:</span>
+<span class="sd">            1. the nmap process object</span>
+<span class="sd">            2. the data produced by nmap process. See readme for examples.</span>
+
+<span class="sd">        :param safe_mode: parameter to protect unsafe options like -oN, -oG,</span>
+<span class="sd">        -iL, -oA,...</span>
+
+<span class="sd">        :return: NmapProcess object</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__nmap_proc</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__nmap_rc</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">unsafe_opts</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s">&#39;-oG&#39;</span><span class="p">,</span> <span class="s">&#39;-oN&#39;</span><span class="p">,</span> <span class="s">&#39;-iL&#39;</span><span class="p">,</span> <span class="s">&#39;-oA&#39;</span><span class="p">,</span> <span class="s">&#39;-oS&#39;</span><span class="p">,</span> <span class="s">&#39;-oX&#39;</span><span class="p">,</span>
+                           <span class="s">&#39;--iflist&#39;</span><span class="p">,</span> <span class="s">&#39;--resume&#39;</span><span class="p">,</span> <span class="s">&#39;--stylesheet&#39;</span><span class="p">,</span>
+                           <span class="s">&#39;--datadir&#39;</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__nmap_binary_name</span> <span class="o">=</span> <span class="s">&quot;nmap&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__nmap_fixed_options</span> <span class="o">=</span> <span class="s">&quot;-oX - -vvv --stats-every 2s&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__nmap_binary</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_whereis</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__nmap_binary_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nmap_binary</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">EnvironmentError</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s">&quot;nmap is not installed or could &quot;</span>
+                                      <span class="s">&quot;not be found in system path&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sudo_run</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__nmap_targets</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__nmap_targets</span> <span class="o">=</span> <span class="n">targets</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;Supplied target list should be either a &quot;</span>
+                            <span class="s">&quot;string of a list&quot;</span><span class="p">)</span>
+
+        <span class="n">optlist</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">safe_mode</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">optlist</span><span class="o">.</span><span class="n">isdisjoint</span><span class="p">(</span><span class="n">unsafe_opts</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;unsafe options activated while safe_mode &quot;</span>
+                            <span class="s">&quot;is set True&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__nmap_dynamic_options</span> <span class="o">=</span> <span class="n">options</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__nmap_command_line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_command_line</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">event_callback</span> <span class="ow">and</span> <span class="nb">callable</span><span class="p">(</span><span class="n">event_callback</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__nmap_event_callback</span> <span class="o">=</span> <span class="n">event_callback</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__nmap_event_callback</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DONE</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">READY</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">RUNNING</span><span class="p">,</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">CANCELLED</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">FAILED</span><span class="p">)</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+        <span class="c"># API usable in callback function</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">READY</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__starttime</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__endtime</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__version</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__progress</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__etc</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__elapsed</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__summary</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__stdout</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__stderr</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+
+<div class="viewcode-block" id="NmapProcess._run_init"><a class="viewcode-back" href="../../process.html#libnmap.process.NmapProcess._run_init">[docs]</a>    <span class="k">def</span> <span class="nf">_run_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Protected method ran at every call to run(). This ensures that no</span>
+<span class="sd">        no parameters are polluted.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__nmap_proc</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__nmap_rc</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__nmap_command_line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_command_line</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">READY</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__progress</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__etc</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__starttime</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__endtime</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__elapsed</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__summary</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__version</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__io_queue</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ioerr_queue</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__stdout</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__stderr</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+</div>
+    <span class="k">def</span> <span class="nf">_whereis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">program</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Protected method enabling the object to find the full path of a binary</span>
+<span class="sd">        from its PATH environment variable.</span>
+
+<span class="sd">        :param program: name of a binary for which the full path needs to</span>
+<span class="sd">        be discovered.</span>
+
+<span class="sd">        :return: the full path to the binary.</span>
+
+<span class="sd">        :todo: add a default path list in case PATH is empty.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;PATH&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;:&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">program</span><span class="p">))</span> <span class="ow">and</span> <span class="ow">not</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">program</span><span class="p">))):</span>
+                <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">program</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+<div class="viewcode-block" id="NmapProcess.get_command_line"><a class="viewcode-back" href="../../process.html#libnmap.process.NmapProcess.get_command_line">[docs]</a>    <span class="k">def</span> <span class="nf">get_command_line</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Public method returning the reconstructed command line ran via the lib</span>
+
+<span class="sd">        :return: the full nmap command line to run</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">&quot;</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sudo_run</span><span class="p">,</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">__nmap_binary</span><span class="p">,</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">__nmap_fixed_options</span><span class="p">,</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">__nmap_dynamic_options</span><span class="p">,</span>
+                                             <span class="s">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__nmap_targets</span><span class="p">)))</span>
+</div>
+<div class="viewcode-block" id="NmapProcess.sudo_run"><a class="viewcode-back" href="../../process.html#libnmap.process.NmapProcess.sudo_run">[docs]</a>    <span class="k">def</span> <span class="nf">sudo_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_as</span><span class="o">=</span><span class="s">&#39;root&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Public method enabling the library&#39;s user to run the scan with</span>
+<span class="sd">        priviledges via sudo. The sudo configuration should be set manually</span>
+<span class="sd">        on the local system otherwise sudo will prompt for a password.</span>
+<span class="sd">        This method alters the command line by prefixing the sudo command to</span>
+<span class="sd">        nmap and will then call self.run()</span>
+
+<span class="sd">        :param run_as: user name to which the lib needs to sudo to run the scan</span>
+
+<span class="sd">        :return: return code from nmap execution</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sudo_user</span> <span class="o">=</span> <span class="n">run_as</span><span class="o">.</span><span class="n">split</span><span class="p">()</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">pwd</span><span class="o">.</span><span class="n">getpwnam</span><span class="p">(</span><span class="n">sudo_user</span><span class="p">)</span><span class="o">.</span><span class="n">pw_uid</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span>
+
+        <span class="n">sudo_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_whereis</span><span class="p">(</span><span class="s">&quot;sudo&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sudo_path</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">EnvironmentError</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s">&quot;sudo is not installed or &quot;</span>
+                                      <span class="s">&quot;could not be found in system path: &quot;</span>
+                                      <span class="s">&quot;cannot run nmap with sudo&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sudo_run</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> -u </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sudo_path</span><span class="p">,</span> <span class="n">sudo_user</span><span class="p">)</span>
+        <span class="n">rc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sudo_run</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">rc</span>
+</div>
+<div class="viewcode-block" id="NmapProcess.run"><a class="viewcode-back" href="../../process.html#libnmap.process.NmapProcess.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Public method which is usually called right after the constructor</span>
+<span class="sd">        of NmapProcess. This method starts the nmap executable&#39;s subprocess.</span>
+<span class="sd">        It will also bind to threads that will read from subprocess&#39; stdout</span>
+<span class="sd">        and stderr and push the lines read in a python queue for futher</span>
+<span class="sd">        processing.</span>
+
+<span class="sd">        return: return code from nmap execution from self.__wait()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">stream_reader</span><span class="p">(</span><span class="n">thread_stdout</span><span class="p">,</span> <span class="n">io_queue</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            local function that will read lines from a file descriptor</span>
+<span class="sd">            and put the data in a python queue for futher processing.</span>
+
+<span class="sd">            :param thread_stdout: file descriptor to read lines from.</span>
+<span class="sd">            :param io_queue: queue in which read lines will be pushed.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">for</span> <span class="n">streamline</span> <span class="ow">in</span> <span class="nb">iter</span><span class="p">(</span><span class="n">thread_stdout</span><span class="o">.</span><span class="n">readline</span><span class="p">,</span> <span class="n">b</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">streamline</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                        <span class="n">io_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">streamline</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">Queue</span><span class="o">.</span><span class="n">Full</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;Queue ran out of buffer: &quot;</span>
+                                    <span class="s">&quot;increase q.get(timeout) value&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_run_init</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">_tmp_cmdline</span> <span class="o">=</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__nmap_command_line</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__nmap_proc</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">_tmp_cmdline</span><span class="p">,</span>
+                                                <span class="n">stdin</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                                                <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                                                <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
+            <span class="n">tout</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">stream_reader</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;stdout-reader&#39;</span><span class="p">,</span>
+                          <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__nmap_proc</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__io_queue</span><span class="p">))</span>
+            <span class="n">terr</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">stream_reader</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;stderr-reader&#39;</span><span class="p">,</span>
+                          <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__nmap_proc</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ioerr_queue</span><span class="p">))</span>
+            <span class="n">tout</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="n">terr</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">RUNNING</span>
+        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">FAILED</span>
+            <span class="k">raise</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__wait</span><span class="p">()</span>
+</div>
+    <span class="k">def</span> <span class="nf">__wait</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Private method, called by run() which will loop and</span>
+<span class="sd">        process the data from the python queues. Those queues are fed by</span>
+<span class="sd">        the stream_readers of run, reading lines from subprocess.stdout/err.</span>
+<span class="sd">        Each time data is pushed in the nmap&#39;s stdout queue:</span>
+<span class="sd">        1. __process_event is called with the acquired data as input</span>
+<span class="sd">        2. if a event callback was provided, the function passed in the</span>
+<span class="sd">           constructor is called.</span>
+
+<span class="sd">        :return: return code from nmap execution</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">thread_stream</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nmap_proc</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__io_queue</span><span class="o">.</span><span class="n">empty</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">thread_stream</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__io_queue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">Empty</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">e</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__process_event</span><span class="p">(</span><span class="n">thread_stream</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nmap_event_callback</span> <span class="ow">and</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__nmap_event_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thread_stream</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__stdout</span> <span class="o">+=</span> <span class="n">thread_stream</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__nmap_rc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nmap_proc</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rc</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">CANCELLED</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">rc</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DONE</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__progress</span> <span class="o">=</span> <span class="mi">100</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">FAILED</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__stderr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ioerr_queue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rc</span>
+
+<div class="viewcode-block" id="NmapProcess.is_running"><a class="viewcode-back" href="../../process.html#libnmap.process.NmapProcess.is_running">[docs]</a>    <span class="k">def</span> <span class="nf">is_running</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if nmap is still running.</span>
+
+<span class="sd">        :return: True if nmap is still running</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">RUNNING</span>
+</div>
+<div class="viewcode-block" id="NmapProcess.has_terminated"><a class="viewcode-back" href="../../process.html#libnmap.process.NmapProcess.has_terminated">[docs]</a>    <span class="k">def</span> <span class="nf">has_terminated</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if nmap has terminated. Could have failed or succeeded</span>
+
+<span class="sd">        :return: True if nmap process is not running anymore.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">DONE</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">FAILED</span>
+                <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">CANCELLED</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="NmapProcess.has_failed"><a class="viewcode-back" href="../../process.html#libnmap.process.NmapProcess.has_failed">[docs]</a>    <span class="k">def</span> <span class="nf">has_failed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if nmap has failed.</span>
+
+<span class="sd">        :return: True if nmap process errored.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">FAILED</span>
+</div>
+<div class="viewcode-block" id="NmapProcess.is_successful"><a class="viewcode-back" href="../../process.html#libnmap.process.NmapProcess.is_successful">[docs]</a>    <span class="k">def</span> <span class="nf">is_successful</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if nmap terminated successfully.</span>
+
+<span class="sd">        :return: True if nmap terminated successfully.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">DONE</span>
+</div>
+    <span class="k">def</span> <span class="nf">__process_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eventdata</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Private method called while nmap process is running. It enables the</span>
+<span class="sd">        library to handle specific data/events produced by nmap process.</span>
+<span class="sd">        So far, the following events are supported:</span>
+<span class="sd">        1. task progress: updates estimated time to completion and percentage</span>
+<span class="sd">           done while scan is running. Could be used in combination with a</span>
+<span class="sd">           callback function which could then handle this data while scan is</span>
+<span class="sd">           running.</span>
+<span class="sd">        2. nmap run: header of the scan. Usually displayed when nmap is started</span>
+<span class="sd">        3. finished: when nmap scan ends.</span>
+
+<span class="sd">        :return: True is event is known.</span>
+
+<span class="sd">        :todo: handle parsing directly via NmapParser.parse()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rval</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">edomdoc</span> <span class="o">=</span> <span class="n">pulldom</span><span class="o">.</span><span class="n">parseString</span><span class="p">(</span><span class="n">eventdata</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">e</span><span class="p">,</span> <span class="n">xmlnode</span> <span class="ow">in</span> <span class="n">edomdoc</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">e</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">e</span> <span class="o">==</span> <span class="n">pulldom</span><span class="o">.</span><span class="n">START_ELEMENT</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">xmlnode</span><span class="o">.</span><span class="n">nodeName</span> <span class="o">==</span> <span class="s">&#39;taskprogress&#39;</span> <span class="ow">and</span>
+                            <span class="n">xmlnode</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+                        <span class="n">percent_done</span> <span class="o">=</span> <span class="n">xmlnode</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="s">&#39;percent&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                        <span class="n">etc_done</span> <span class="o">=</span> <span class="n">xmlnode</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="s">&#39;etc&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">__progress</span> <span class="o">=</span> <span class="n">percent_done</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">__etc</span> <span class="o">=</span> <span class="n">etc_done</span>
+                        <span class="n">rval</span> <span class="o">=</span> <span class="bp">True</span>
+                    <span class="k">elif</span> <span class="p">(</span><span class="n">xmlnode</span><span class="o">.</span><span class="n">nodeName</span> <span class="o">==</span> <span class="s">&#39;nmaprun&#39;</span> <span class="ow">and</span>
+                            <span class="n">xmlnode</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">__starttime</span> <span class="o">=</span> <span class="n">xmlnode</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="s">&#39;start&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">__version</span> <span class="o">=</span> <span class="n">xmlnode</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="s">&#39;version&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                        <span class="n">rval</span> <span class="o">=</span> <span class="bp">True</span>
+                    <span class="k">elif</span> <span class="p">(</span><span class="n">xmlnode</span><span class="o">.</span><span class="n">nodeName</span> <span class="o">==</span> <span class="s">&#39;finished&#39;</span> <span class="ow">and</span>
+                            <span class="n">xmlnode</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">__endtime</span> <span class="o">=</span> <span class="n">xmlnode</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="s">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">__elapsed</span> <span class="o">=</span> <span class="n">xmlnode</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="s">&#39;elapsed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">__summary</span> <span class="o">=</span> <span class="n">xmlnode</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="s">&#39;summary&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                        <span class="n">rval</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">return</span> <span class="n">rval</span>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="NmapProcess.state"><a class="viewcode-back" href="../../process.html#libnmap.process.NmapProcess.state">[docs]</a>    <span class="k">def</span> <span class="nf">state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Accessor for nmap execution state. Possible states are:</span>
+<span class="sd">        - self.READY</span>
+<span class="sd">        - self.RUNNING</span>
+<span class="sd">        - self.FAILED</span>
+<span class="sd">        - self.CANCELLED</span>
+<span class="sd">        - self.DONE</span>
+
+<span class="sd">        :return: integer (from above documented enum)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__state</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="NmapProcess.starttime"><a class="viewcode-back" href="../../process.html#libnmap.process.NmapProcess.starttime">[docs]</a>    <span class="k">def</span> <span class="nf">starttime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Accessor for time when scan started</span>
+
+<span class="sd">        :return: string. Unix timestamp</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__starttime</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="NmapProcess.endtime"><a class="viewcode-back" href="../../process.html#libnmap.process.NmapProcess.endtime">[docs]</a>    <span class="k">def</span> <span class="nf">endtime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Accessor for time when scan ended</span>
+
+<span class="sd">        :return: string. Unix timestamp</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__endtime</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="NmapProcess.elapsed"><a class="viewcode-back" href="../../process.html#libnmap.process.NmapProcess.elapsed">[docs]</a>    <span class="k">def</span> <span class="nf">elapsed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Accessor returning for how long the scan ran (in seconds)</span>
+
+<span class="sd">        :return: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__elapsed</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="NmapProcess.summary"><a class="viewcode-back" href="../../process.html#libnmap.process.NmapProcess.summary">[docs]</a>    <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Accessor returning a short summary of the scan&#39;s results</span>
+
+<span class="sd">        :return: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__summary</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="NmapProcess.etc"><a class="viewcode-back" href="../../process.html#libnmap.process.NmapProcess.etc">[docs]</a>    <span class="k">def</span> <span class="nf">etc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Accessor for estimated time to completion</span>
+
+<span class="sd">        :return:  estimated time to completion</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__etc</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="NmapProcess.version"><a class="viewcode-back" href="../../process.html#libnmap.process.NmapProcess.version">[docs]</a>    <span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Accessor for nmap binary version number</span>
+
+<span class="sd">        :return: version number of nmap binary</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__version</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="NmapProcess.progress"><a class="viewcode-back" href="../../process.html#libnmap.process.NmapProcess.progress">[docs]</a>    <span class="k">def</span> <span class="nf">progress</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Accessor for progress status in percentage</span>
+
+<span class="sd">        :return: percentage of job processed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__progress</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="NmapProcess.rc"><a class="viewcode-back" href="../../process.html#libnmap.process.NmapProcess.rc">[docs]</a>    <span class="k">def</span> <span class="nf">rc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Accessor for nmap execution&#39;s return code</span>
+
+<span class="sd">        :return: nmap execution&#39;s return code</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nmap_rc</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="NmapProcess.stdout"><a class="viewcode-back" href="../../process.html#libnmap.process.NmapProcess.stdout">[docs]</a>    <span class="k">def</span> <span class="nf">stdout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Accessor for nmap standart output</span>
+
+<span class="sd">        :return: output from nmap scan in XML</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stdout</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="NmapProcess.stderr"><a class="viewcode-back" href="../../process.html#libnmap.process.NmapProcess.stderr">[docs]</a>    <span class="k">def</span> <span class="nf">stderr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Accessor for nmap standart error</span>
+
+<span class="sd">        :return: output from nmap when errors occured.</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stderr</span>
+
+</div></div>
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">argv</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">mycallback</span><span class="p">(</span><span class="n">nmapscan</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">nmapscan</span><span class="o">.</span><span class="n">is_running</span><span class="p">():</span>
+            <span class="k">print</span> <span class="s">&quot;Progress: </span><span class="si">%s</span><span class="s"> </span><span class="si">%%</span><span class="s"> - ETC: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">nmapscan</span><span class="o">.</span><span class="n">progress</span><span class="p">,</span>
+                                                 <span class="n">nmapscan</span><span class="o">.</span><span class="n">etc</span><span class="p">)</span>
+
+    <span class="n">nm</span> <span class="o">=</span> <span class="n">NmapProcess</span><span class="p">(</span><span class="s">&quot;scanme.nmap.org&quot;</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="s">&quot;-sV&quot;</span><span class="p">,</span>
+                     <span class="n">event_callback</span><span class="o">=</span><span class="n">mycallback</span><span class="p">)</span>
+    <span class="n">rc</span> <span class="o">=</span> <span class="n">nm</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">rc</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;Scan started at {0} nmap version: {1}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nm</span><span class="o">.</span><span class="n">starttime</span><span class="p">,</span>
+                                                             <span class="n">nm</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+        <span class="k">print</span> <span class="s">&quot;state: {0} (rc: {1})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nm</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="n">nm</span><span class="o">.</span><span class="n">rc</span><span class="p">)</span>
+        <span class="k">print</span> <span class="s">&quot;results size: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">nm</span><span class="o">.</span><span class="n">stdout</span><span class="p">))</span>
+        <span class="k">print</span> <span class="s">&quot;Scan ended {0}: {1}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nm</span><span class="o">.</span><span class="n">endtime</span><span class="p">,</span> <span class="n">nm</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;state: {0} (rc: {1})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nm</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="n">nm</span><span class="o">.</span><span class="n">rc</span><span class="p">)</span>
+        <span class="k">print</span> <span class="s">&quot;Error: {stderr}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stderr</span><span class="o">=</span><span class="n">nm</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="k">print</span> <span class="s">&quot;Result: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nm</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">libnmap 0.2 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Ronald Bister.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>
