@@ -21,6 +21,6 @@ install:
 #   - "pip install -r requirements.txt --use-mirrors"
 #     # command to run tests
 before_script:
-  - "pep8 . --exclude test"
+  - "pep8 . --exclude test,docs"
   - "pyflakes ."
 script: nosetests

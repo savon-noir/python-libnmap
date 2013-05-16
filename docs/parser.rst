@@ -45,4 +45,4 @@ Code API
 
 .. automodule:: libnmap.parser
 .. autoclass:: NmapParser
-    :members: parse, parse_fromstring, parse_fromfile, parse_fromdict, _parse_xml, _parse_xml_report, _parse_xml_host, _parse_xml_ports, _parse_xml_port
+    :members:
