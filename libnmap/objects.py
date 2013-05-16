@@ -6,7 +6,7 @@ class NmapHost(object):
     """
         NmapHost is a class representing a host object of NmapReport
 
-        :todo: add tcpsequence
+        :todo: add ipsequence parsing (accessor implemented)
     """
     def __init__(self, starttime='', endtime='', address=None, status=None,
                  hostnames=None, services=None, extras=None):
@@ -37,7 +37,7 @@ class NmapHost(object):
                 - hostnames
                 - address
                 - if an associated services has changed
-            :return boolean:
+            :return: boolean
         """
         rval = False
         if(self.__class__ == other.__class__ and self.id == other.id):
@@ -50,7 +50,7 @@ class NmapHost(object):
                 - hostnames
                 - address
                 - if an associated services has changed
-            :return: boolean:
+            :return: boolean
         """
         rval = True
         if(self.__class__ == other.__class__ and self.id == other.id):
@@ -79,33 +79,67 @@ class NmapHost(object):
     def changed(self, other):
         """
             return the number of attribute who have changed
-            :param  other: NmapReport
-            :return int:
+            :param other: NmapHost object to compare
+            :return int
         """
         return len(self.diff(other).changed())
 
     @property
     def starttime(self):
+        """
+            Accessor for the unix timestamp of when the scan was started
+
+            :return: string
+        """
         return self._starttime
 
     @property
     def endtime(self):
+        """
+            Accessor for the unix timestamp of when the scan ended
+
+            :return: string
+        """
         return self._endtime
 
     @property
     def address(self):
+        """
+            Accessor for the IP address of the scanned host
+
+            :return: IP address as a string
+        """
         return self._address['addr']
 
     @address.setter
     def address(self, addrdict):
+        """
+            Setter for the address dictionnary.
+
+            :param addrdict: valid dict is {'addr': '1.1.1.1',
+                                            'addrtype': 'ipv4'}
+        """
         self._address = addrdict
 
     @property
     def status(self):
+        """
+            Accessor for the host's status (up, down, unknown...)
+
+            :return: string
+        """
         return self._status['state']
 
     @status.setter
     def status(self, statusdict):
+        """
+            Setter for the status dictionnary.
+
+            :param statusdict: valid dict is {"state": "open",
+                                              "reason": "syn-ack",
+                                              "reason_ttl": "0"}
+                                'state' is the only mandatory key.
+        """
         self._status = statusdict
 
     @property
@@ -146,42 +180,61 @@ class NmapHost(object):
             raise Exception("Duplicate services found in NmapHost object")
         return plist.pop() if len(plist) else None
 
-    def get_service_byid(self, id):
-        """
-            :param id: integer
-            :return NmapService or None
-        """
-        service = [s for s in self.services if s.id() == id]
-        if len(service) > 1:
-            raise Exception("Duplicate services found in NmapHost object")
-        return service.pop() if len(service) == 1 else None
-
     def os_class_probabilities(self):
+        """
+            Returns an array of possible OS class detected during
+            the OS fingerprinting
+
+            :return: dict describing the OS class detected and the accuracy
+            of the detected classes.
+            Example: [{'accuracy': '96', 'osfamily': 'embedded',
+                       'type': 'WAP', 'vendor': 'Netgear'}, {...}]
+        """
         rval = []
         try:
-            rval = self._extras['osclass']
+            rval = self._extras['os']['osclass']
         except (KeyError, TypeError):
             pass
         return rval
 
     def os_match_probabilities(self):
+        """
+            Returns an array of possible OS match detected during
+            the OS fingerprinting
+
+            :return: dict describing the OS version detected and the accuracy
+            of the result.
+        """
+
         rval = []
         try:
-            rval = self._extras['osmatch']
+            rval = self._extras['os']['osmatch']
         except (KeyError, TypeError):
             pass
         return rval
 
     @property
     def os_fingerprint(self):
+        """
+            Returns the fingerprint of the scanned system.
+
+            :return: string
+        """
         rval = ''
         try:
-            rval = self._extras['osfingerprint']
+            rval = self._extras['os']['osfingerprint']
         except (KeyError, TypeError):
             pass
         return rval
 
     def os_ports_used(self):
+        """
+            Returns an array of the ports used for OS fingerprinting
+
+            :return: array of ports used: [{'portid': '22',
+                                            'proto': 'tcp',
+                                            'state': 'open'},]
+        """
         rval = []
         try:
             rval = self._extras['ports_used']
@@ -191,6 +244,12 @@ class NmapHost(object):
 
     @property
     def tcpsequence(self):
+        """
+            Returns the difficulty to determine remotely predict
+            the tcp sequencing.
+
+            return: string
+        """
         rval = ''
         try:
             rval = self._extras['tcpsequence']['difficulty']
@@ -200,15 +259,23 @@ class NmapHost(object):
 
     @property
     def ipsequence(self):
+        """
+            TODO. Not parsed yet.
+        """
         rval = ''
         try:
-            rval = self._extras['ipidsequance']['class']
+            rval = self._extras['ipidsequence']['class']
         except (KeyError, TypeError):
             pass
         return rval
 
     @property
     def uptime(self):
+        """
+            uptime of the remote host (if nmap was able to determine it)
+
+            :return: string (in seconds)
+        """
         rval = 0
         try:
             rval = int(self._extras['uptime']['seconds'])
@@ -218,6 +285,11 @@ class NmapHost(object):
 
     @property
     def lastboot(self):
+        """
+            Since when the host was booted.
+
+            :return: string
+        """
         rval = ''
         try:
             rval = self._extras['uptime']['lastboot']
@@ -227,6 +299,11 @@ class NmapHost(object):
 
     @property
     def distance(self):
+        """
+            Number of hops to host
+
+            :return: int
+        """
         rval = 0
         try:
             rval = int(self._extras['distance']['value'])
@@ -236,6 +313,11 @@ class NmapHost(object):
 
     @property
     def id(self):
+        """
+            id of the host. Used for diff()ing NmapObjects
+
+            :return: string
+        """
         return self.address
 
     def get_dict(self):
