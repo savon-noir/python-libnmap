@@ -186,9 +186,9 @@ class NmapHost(object):
             the OS fingerprinting
 
             :return: dict describing the OS class detected and the accuracy
-            of the detected classes.
-            Example: [{'accuracy': '96', 'osfamily': 'embedded',
-                       'type': 'WAP', 'vendor': 'Netgear'}, {...}]
+            of the detected classes. 
+            Example [{'accuracy': '96', 'osfamily': 'embedded',
+                      'type': 'WAP', 'vendor': 'Netgear'}, {...}]
         """
         rval = []
         try:

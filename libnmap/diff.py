@@ -3,11 +3,11 @@
 
 class DictDiffer(object):
     """
-    Calculate the difference between two dictionaries as:
-    (1) items added
-    (2) items removed
-    (3) keys same in both but changed values
-    (4) keys same in both and unchanged values
+        Calculate the difference between two dictionaries as:
+        (1) items added
+        (2) items removed
+        (3) keys same in both but changed values
+        (4) keys same in both and unchanged values
     """
     def __init__(self, current_dict, past_dict):
         self.current_dict = current_dict

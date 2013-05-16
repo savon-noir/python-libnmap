@@ -22,7 +22,6 @@ class NmapParser(object):
             :type data_type: string ("XML"|"JSON"|"YAML")
 
             :return: NmapObject (NmapHost, NmapService or NmapReport)
-                    or a list of NmapObject
         """
 
         nmapobj = None
@@ -38,8 +37,8 @@ class NmapParser(object):
     def _parse_xml(cls, nmap_data=None):
         """
             Protected class method used to process a specific data type.
-            In this case: XML. This method is called by cls.parse class method
-            and receives nmap scan results data (in XML).
+            In this case: XML. This method is called by cls.parse class
+            method and receives nmap scan results data (in XML).
 
             :param nmap_data: any portion of nmap scan result can be given
             as argument. nmap_data should always be a string representing
@@ -292,7 +291,7 @@ class NmapParser(object):
             a targeted host. This protected method cannot be called directly
             with a string. A <ports/> tag can be directly passed to parse()
             and the below method will be called and return a list of nmap
-            scanned services
+            scanned services.
 
             :param scanports_data: <ports> XML tag from a nmap scan
             :type scanports_data: xml.ElementTree.Element or a string
@@ -318,8 +317,8 @@ class NmapParser(object):
             Protected method parsing a scanned service from a targeted host.
             This protected method cannot be called directly.
             A <port/> tag can be directly passed to parse() and the below
-            method will be called and return a NmapService object representing
-            the state of the service.
+            method will be called and return a NmapService object
+            representing the state of the service.
 
             :param scanport_data: <port> XML tag from a nmap scan
             :type scanport_data: xml.ElementTree.Element or a string
