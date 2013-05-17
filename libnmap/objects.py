@@ -569,7 +569,7 @@ class NmapReport(object):
         return id
 
     def diff(self, other):
-        if self.__is_consistent() and other.__is_consistent():
+        if self.is_consistent() and other.is_consistent():
             r = NmapDiff(self, other)
         else:
             r = set()
@@ -638,7 +638,7 @@ class NmapReport(object):
         self._hosts = raw_data['_hosts']
         self._runstats = raw_data['_runstats']
 
-    def __is_consistent(self):
+    def is_consistent(self):
         r = False
         rd = self.get_raw_data()
         _consistent_keys = ['_nmaprun', '_scaninfo', '_hosts', '_runstats']
