@@ -101,8 +101,9 @@ class TestNmapParser(unittest.TestCase):
             s = fd.read()
             fd.close()
             nr = NmapParser.parse(s)
-            for attr in ('endtime', 'summary', 'elapsed'):
-                self.assertEqual(getattr(nr, attr), testfile[attr])
+            self.assertEqual(getattr(nr, 'endtime'), int(testfile['endtime']))
+            self.assertEqual(getattr(nr, 'summary'), testfile['summary'])
+            self.assertEqual(getattr(nr, 'elapsed'), float(testfile['elapsed']))
 
     def test_banner(self):
         for testfile in self.flist_banner:

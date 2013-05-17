@@ -435,29 +435,29 @@
         <span class="k">if</span> <span class="n">service_extras</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_service_extras</span> <span class="o">=</span> <span class="n">service_extras</span>
 
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Compares two NmapService objects to see if they are the same or</span>
-<span class="sd">        if one of them changed.</span>
-
-<span class="sd">        :param other: NmapService</span>
-
-<span class="sd">        :return: boolean</span>
-<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Compares two NmapService objects to see if they are the same or</span>
+<span class="sd">            if one of them changed.</span>
+
+<span class="sd">            :param other: NmapService</span>
+
+<span class="sd">            :return: boolean</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">rval</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">__class__</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">id</span><span class="p">):</span>
             <span class="n">rval</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">changed</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">rval</span>
 
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Compares two NmapService objects to see if they are different</span>
-<span class="sd">        if one of them changed.</span>
-
-<span class="sd">        :param other: NmapService</span>
-
-<span class="sd">        :return: boolean</span>
-<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Compares two NmapService objects to see if they are different</span>
+<span class="sd">            if one of them changed.</span>
+
+<span class="sd">            :param other: NmapService</span>
+
+<span class="sd">            :return: boolean</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">rval</span> <span class="o">=</span> <span class="bp">True</span>
         <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">__class__</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">id</span><span class="p">):</span>
             <span class="n">rval</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">changed</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
@@ -475,70 +475,68 @@
         <span class="k">return</span> <span class="p">(</span><span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span> <span class="o">^</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">protocol</span><span class="p">)</span> <span class="o">^</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span> <span class="o">^</span>
                 <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">)</span> <span class="o">^</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">banner</span><span class="p">))</span>
 
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Checks if a NmapService is different from another.</span>
+<div class="viewcode-block" id="NmapService.changed"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapService.changed">[docs]</a>    <span class="k">def</span> <span class="nf">changed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Checks if a NmapService is different from another.</span>
 
-<span class="sd">        :param other: NmapService</span>
+<span class="sd">            :param other: NmapService</span>
 
-<span class="sd">        :return: boolean</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">changed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="sd">            :return: boolean</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="o">.</span><span class="n">changed</span><span class="p">())</span>
-
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Accessor for port.</span>
-
-<span class="sd">        :return: integer or -1</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+</div>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">port</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="NmapService.port"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapService.port">[docs]</a>    <span class="k">def</span> <span class="nf">port</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Accessor for port.</span>
+
+<span class="sd">            :return: integer or -1</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_portid</span>
-
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Accessor for protocol</span>
-
-<span class="sd">        :return: string</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+</div>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">protocol</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="NmapService.protocol"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapService.protocol">[docs]</a>    <span class="k">def</span> <span class="nf">protocol</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Accessor for protocol</span>
+
+<span class="sd">            :return: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_protocol</span>
-
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Accessor for service&#39;s state (open, filtered, closed,...)</span>
-
-<span class="sd">        :return: string</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+</div>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="NmapService.state"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapService.state">[docs]</a>    <span class="k">def</span> <span class="nf">state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Accessor for service&#39;s state (open, filtered, closed,...)</span>
+
+<span class="sd">            :return: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="p">[</span><span class="s">&#39;state&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s">&#39;state&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="k">else</span> <span class="bp">None</span>
-
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Accessor for service dictionnary.</span>
-
-<span class="sd">        :return: dict</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+</div>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">service</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="NmapService.service"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapService.service">[docs]</a>    <span class="k">def</span> <span class="nf">service</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Accessor for service dictionnary.</span>
+
+<span class="sd">            :return: dict or None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_service</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s">&#39;name&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_service</span> <span class="k">else</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="NmapService.open"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapService.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Tells if the port was open or not</span>
 
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Tells if the port was open or not</span>
-
-<span class="sd">        :return: boolean</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">True</span>
-                <span class="k">if</span> <span class="s">&#39;state&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="p">[</span><span class="s">&#39;state&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;open&#39;</span>
-                <span class="k">else</span> <span class="bp">False</span><span class="p">)</span>
-
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Accessor for the service&#39;s banner. Only available if the nmap option</span>
-<span class="sd">        -sV or similar was used.</span>
-
-<span class="sd">        :return: string</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">            :return: boolean</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s">&#39;state&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="p">[</span><span class="s">&#39;state&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;open&#39;</span>
+</div>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">banner</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="NmapService.banner"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapService.banner">[docs]</a>    <span class="k">def</span> <span class="nf">banner</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Accessor for the service&#39;s banner. Only available</span>
+<span class="sd">            if the nmap option -sV or similar was used.</span>
+
+<span class="sd">            :return: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">notrelevant</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;method&#39;</span><span class="p">,</span> <span class="s">&#39;conf&#39;</span><span class="p">]</span>
         <span class="n">b</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
         <span class="k">if</span> <span class="s">&#39;method&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_service</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_service</span><span class="p">[</span><span class="s">&#39;method&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;probed&quot;</span><span class="p">:</span>
@@ -546,15 +544,15 @@
                           <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_service</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
                               <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">notrelevant</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">b</span>
+</div>
+<div class="viewcode-block" id="NmapService.scripts_results"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapService.scripts_results">[docs]</a>    <span class="k">def</span> <span class="nf">scripts_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Gives a python dictionary of the nse scripts results.</span>
+<span class="sd">            The dict key is the name (id) of the nse script and</span>
+<span class="sd">            the value is the output of the script.</span>
 
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Gives a python dictionary of the nse scripts results.</span>
-<span class="sd">        The dict key is the name (id) of the nse script and</span>
-<span class="sd">        the value is the output of the script.</span>
-
-<span class="sd">        :return: dict</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">scripts_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="sd">            :return: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">scripts_dict</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">scripts_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">bdct</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">],</span> <span class="n">bdct</span><span class="p">[</span><span class="s">&#39;output&#39;</span><span class="p">])</span>
@@ -562,47 +560,64 @@
         <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
             <span class="k">pass</span>
         <span class="k">return</span> <span class="n">scripts_dict</span>
-
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Accessor for the id() of the NmapService. This is used for</span>
-<span class="sd">        diff()ing NmapService object via NmapDiff.</span>
-
-<span class="sd">        :return: tuple</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+</div>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="NmapService.id"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapService.id">[docs]</a>    <span class="k">def</span> <span class="nf">id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Accessor for the id() of the NmapService. This is used for</span>
+<span class="sd">            diff()ing NmapService object via NmapDiff.</span>
+
+<span class="sd">            :return: tuple</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">protocol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="NmapService.get_dict"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapService.get_dict">[docs]</a>    <span class="k">def</span> <span class="nf">get_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Return a python dict representation of the NmapService object.</span>
+<span class="sd">            This is used to diff() NmapService objects via NmapDiff.</span>
 
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return a python dict representation of the NmapService object.</span>
-<span class="sd">        This is used to diff() NmapService objects via NmapDiff.</span>
-
-<span class="sd">        :return: dict</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">get_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="sd">            :return: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">({</span><span class="s">&#39;id&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">),</span> <span class="s">&#39;port&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">),</span>
                  <span class="s">&#39;protocol&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">protocol</span><span class="p">,</span> <span class="s">&#39;banner&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">banner</span><span class="p">,</span>
                  <span class="s">&#39;service&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">,</span> <span class="s">&#39;state&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">})</span>
+</div>
+<div class="viewcode-block" id="NmapService.diff"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapService.diff">[docs]</a>    <span class="k">def</span> <span class="nf">diff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Calls NmapDiff to check the difference between self and</span>
+<span class="sd">            another NmapService object.</span>
+<span class="sd">            Will return a NmapDiff object.</span>
+<span class="sd">            This objects return python set() of keys describing the elements</span>
+<span class="sd">            which have changed, were added, removed or kept unchanged.</span>
 
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Calls NmapDiff to check the difference between self and</span>
-<span class="sd">        another NmapService object.</span>
-<span class="sd">        Will return a NmapDiff object.</span>
-<span class="sd">        This objects return python set() of keys describing the elements</span>
-<span class="sd">        which have changed, were added, removed or kept unchanged.</span>
-
-<span class="sd">        :return: NmapDiff object</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">diff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="sd">            :return: NmapDiff object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">NmapDiff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
 
-</div>
-<span class="k">class</span> <span class="nc">NmapReport</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+</div></div>
+<div class="viewcode-block" id="NmapReport"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapReport">[docs]</a><span class="k">class</span> <span class="nc">NmapReport</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :todo:</span>
-<span class="sd">                - remove get_raw_data makes no sens</span>
+<span class="sd">        NmapReport is the usual interface for the end user to</span>
+<span class="sd">        read scans output.</span>
+
+<span class="sd">        A NmapReport as the following structure:</span>
+<span class="sd">        - Scan headers data</span>
+<span class="sd">        - A list of scanned hosts (NmapReport.hosts)</span>
+<span class="sd">        - Scan footer data</span>
+
+<span class="sd">        It is to note that each NmapHost comprised in NmapReport.hosts array</span>
+<span class="sd">        contains also a list of scanned services (NmapService object).</span>
+
+<span class="sd">        This means that if NmapParser.parse*() is the input interface for the</span>
+<span class="sd">        end user of the lib. NmapReport is certainly the output interface for</span>
+<span class="sd">        the end user of the lib.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_data</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Constructor for NmapReport object.</span>
+
+<span class="sd">            This is usually called by the NmapParser module.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_nmaprun</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scaninfo</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_hosts</span> <span class="o">=</span> <span class="p">[]</span>
@@ -610,73 +625,189 @@
         <span class="k">if</span> <span class="n">raw_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__set_raw_data</span><span class="p">(</span><span class="n">raw_data</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">backend</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;this fct get an NmapBackendPlugin representing the backend</span>
+<div class="viewcode-block" id="NmapReport.save"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapReport.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">backend</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            This method gets a NmapBackendPlugin representing the backend.</span>
+
+<span class="sd">            :param backend: libnmap.plugins.PluginBackend object.</span>
+
+<span class="sd">            Object created by BackendPluginFactory and enabling nmap reports</span>
+<span class="sd">            to be saved/stored in any type of backend implemented in plugins.</span>
+
+<span class="sd">            The primary key of the stored object is returned.</span>
+
+<span class="sd">            :return: integer</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="c">#do stuff</span>
-            <span class="nb">id</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="n">_id</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span>
-        <span class="k">return</span> <span class="nb">id</span>
+        <span class="k">return</span> <span class="n">_id</span>
+</div>
+<div class="viewcode-block" id="NmapReport.diff"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapReport.diff">[docs]</a>    <span class="k">def</span> <span class="nf">diff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Calls NmapDiff to check the difference between self and</span>
+<span class="sd">            another NmapReport object.</span>
 
-    <span class="k">def</span> <span class="nf">diff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_consistent</span><span class="p">()</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">__is_consistent</span><span class="p">():</span>
-            <span class="n">r</span> <span class="o">=</span> <span class="n">NmapDiff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+<span class="sd">            Will return a NmapDiff object.</span>
+
+<span class="sd">            :return: NmapDiff object</span>
+<span class="sd">            :todo: remove is_consistent approach, diff() should be generic.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_consistent</span><span class="p">()</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">is_consistent</span><span class="p">():</span>
+            <span class="n">_rdiff</span> <span class="o">=</span> <span class="n">NmapDiff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">r</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">r</span>
-
+            <span class="n">_rdiff</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">_rdiff</span>
+</div>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">started</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nmaprun</span><span class="p">[</span><span class="s">&#39;start&#39;</span><span class="p">]</span>
+<div class="viewcode-block" id="NmapReport.started"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapReport.started">[docs]</a>    <span class="k">def</span> <span class="nf">started</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Accessor returning a unix timestamp of when the scan was started.</span>
 
+<span class="sd">            :return: integer</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rval</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">s_start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nmaprun</span><span class="p">[</span><span class="s">&#39;start&#39;</span><span class="p">]</span>
+            <span class="n">rval</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">s_start</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="k">return</span> <span class="n">rval</span>
+</div>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">commandline</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="NmapReport.commandline"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapReport.commandline">[docs]</a>    <span class="k">def</span> <span class="nf">commandline</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Accessor returning the full nmap command line fired.</span>
+
+<span class="sd">            :return: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nmaprun</span><span class="p">[</span><span class="s">&#39;args&#39;</span><span class="p">]</span>
-
+</div>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="NmapReport.version"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapReport.version">[docs]</a>    <span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Accessor returning the version of the</span>
+<span class="sd">            nmap binary used to perform the scan.</span>
+
+<span class="sd">            :return: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nmaprun</span><span class="p">[</span><span class="s">&#39;version&#39;</span><span class="p">]</span>
-
+</div>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">scan_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="NmapReport.scan_type"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapReport.scan_type">[docs]</a>    <span class="k">def</span> <span class="nf">scan_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Accessor returning a string which identifies what type of scan</span>
+<span class="sd">            was launched (syn, ack, tcp,...).</span>
+
+<span class="sd">            :return: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scaninfo</span><span class="p">[</span><span class="s">&#39;type&#39;</span><span class="p">]</span>
-
+</div>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">hosts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="NmapReport.hosts"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapReport.hosts">[docs]</a>    <span class="k">def</span> <span class="nf">hosts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Accessor returning an array of scanned hosts.</span>
+
+<span class="sd">            Scanned hosts are NmapHost objects.</span>
+
+<span class="sd">            :return: array of NmapHost</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hosts</span>
-
+</div>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">endtime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runstats</span><span class="p">[</span><span class="s">&#39;finished&#39;</span><span class="p">][</span><span class="s">&#39;time&#39;</span><span class="p">]</span>
+<div class="viewcode-block" id="NmapReport.endtime"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapReport.endtime">[docs]</a>    <span class="k">def</span> <span class="nf">endtime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Accessor returning a unix timestamp of when the scan ended.</span>
 
+<span class="sd">            :return: integer</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rval</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">rval</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_runstats</span><span class="p">[</span><span class="s">&#39;finished&#39;</span><span class="p">][</span><span class="s">&#39;time&#39;</span><span class="p">])</span>
+        <span class="k">except</span><span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="k">return</span> <span class="n">rval</span>
+</div>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runstats</span><span class="p">[</span><span class="s">&#39;finished&#39;</span><span class="p">][</span><span class="s">&#39;summary&#39;</span><span class="p">]</span>
+<div class="viewcode-block" id="NmapReport.summary"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapReport.summary">[docs]</a>    <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Accessor returning a string describing and</span>
+<span class="sd">            summarizing the scan.</span>
 
+<span class="sd">            :return: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rval</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">rval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runstats</span><span class="p">[</span><span class="s">&#39;finished&#39;</span><span class="p">][</span><span class="s">&#39;summary&#39;</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+            <span class="k">pass</span>
+
+        <span class="k">return</span> <span class="n">rval</span>
+</div>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">elapsed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runstats</span><span class="p">[</span><span class="s">&#39;finished&#39;</span><span class="p">][</span><span class="s">&#39;elapsed&#39;</span><span class="p">]</span>
+<div class="viewcode-block" id="NmapReport.elapsed"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapReport.elapsed">[docs]</a>    <span class="k">def</span> <span class="nf">elapsed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Accessor returning the number of seconds the scan took</span>
 
+<span class="sd">            :return: float (0 &gt;= or -1)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rval</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">s_elapsed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runstats</span><span class="p">[</span><span class="s">&#39;finished&#39;</span><span class="p">][</span><span class="s">&#39;elapsed&#39;</span><span class="p">]</span>
+            <span class="n">rval</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">s_elapsed</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+            <span class="n">rval</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">return</span> <span class="n">rval</span>
+</div>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">hosts_up</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_runstats</span><span class="p">[</span><span class="s">&#39;hosts&#39;</span><span class="p">][</span><span class="s">&#39;up&#39;</span><span class="p">]</span>
-                <span class="k">if</span> <span class="s">&#39;hosts&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runstats</span>
-                <span class="k">else</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="NmapReport.hosts_up"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapReport.hosts_up">[docs]</a>    <span class="k">def</span> <span class="nf">hosts_up</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Accessor returning the numer of host detected</span>
+<span class="sd">            as &#39;up&#39; during the scan.</span>
 
+<span class="sd">            :return: integer (0 &gt;= or -1)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rval</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">s_up</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runstats</span><span class="p">[</span><span class="s">&#39;hosts&#39;</span><span class="p">][</span><span class="s">&#39;up&#39;</span><span class="p">]</span>
+            <span class="n">rval</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">s_up</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+            <span class="n">rval</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">return</span> <span class="n">rval</span>
+</div>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">hosts_down</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_runstats</span><span class="p">[</span><span class="s">&#39;hosts&#39;</span><span class="p">][</span><span class="s">&#39;down&#39;</span><span class="p">]</span>
-                <span class="k">if</span> <span class="s">&#39;hosts&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runstats</span>
-                <span class="k">else</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="NmapReport.hosts_down"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapReport.hosts_down">[docs]</a>    <span class="k">def</span> <span class="nf">hosts_down</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Accessor returning the numer of host detected</span>
+<span class="sd">            as &#39;down&#39; during the scan.</span>
 
+<span class="sd">            :return: integer (0 &gt;= or -1)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rval</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">s_down</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runstats</span><span class="p">[</span><span class="s">&#39;hosts&#39;</span><span class="p">][</span><span class="s">&#39;down&#39;</span><span class="p">]</span>
+            <span class="n">rval</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">s_down</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+            <span class="n">rval</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">return</span> <span class="n">rval</span>
+</div>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">hosts_total</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_runstats</span><span class="p">[</span><span class="s">&#39;hosts&#39;</span><span class="p">][</span><span class="s">&#39;total&#39;</span><span class="p">]</span>
-                <span class="k">if</span> <span class="s">&#39;hosts&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runstats</span>
-                <span class="k">else</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="NmapReport.hosts_total"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapReport.hosts_total">[docs]</a>    <span class="k">def</span> <span class="nf">hosts_total</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Accessor returning the number of hosts scanned in total.</span>
 
+<span class="sd">            :return: integer (0 &gt;= or -1)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rval</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">s_total</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runstats</span><span class="p">[</span><span class="s">&#39;hosts&#39;</span><span class="p">][</span><span class="s">&#39;total&#39;</span><span class="p">]</span>
+            <span class="n">rval</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">s_total</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+            <span class="n">rval</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">return</span> <span class="n">rval</span>
+</div>
     <span class="k">def</span> <span class="nf">get_raw_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">raw_data</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;_nmaprun&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nmaprun</span><span class="p">,</span>
                     <span class="s">&#39;_scaninfo&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scaninfo</span><span class="p">,</span>
@@ -690,22 +821,37 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_hosts</span> <span class="o">=</span> <span class="n">raw_data</span><span class="p">[</span><span class="s">&#39;_hosts&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_runstats</span> <span class="o">=</span> <span class="n">raw_data</span><span class="p">[</span><span class="s">&#39;_runstats&#39;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">__is_consistent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="n">rd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_raw_data</span><span class="p">()</span>
+<div class="viewcode-block" id="NmapReport.is_consistent"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapReport.is_consistent">[docs]</a>    <span class="k">def</span> <span class="nf">is_consistent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Checks if the report is consistent and can be diffed().</span>
+
+<span class="sd">            This needs to be rewritten and removed: diff() should be generic.</span>
+
+<span class="sd">            :return: boolean</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rval</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">rdata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_raw_data</span><span class="p">()</span>
         <span class="n">_consistent_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;_nmaprun&#39;</span><span class="p">,</span> <span class="s">&#39;_scaninfo&#39;</span><span class="p">,</span> <span class="s">&#39;_hosts&#39;</span><span class="p">,</span> <span class="s">&#39;_runstats&#39;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">_consistent_keys</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">rd</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="ow">and</span>
-                <span class="nb">len</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">rd</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">rd</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">])</span> <span class="o">==</span> <span class="mi">4</span><span class="p">):</span>
-                <span class="n">r</span> <span class="o">=</span> <span class="bp">True</span>
-        <span class="k">return</span> <span class="n">r</span>
+        <span class="k">if</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">_consistent_keys</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">rdata</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="ow">and</span>
+           <span class="nb">len</span><span class="p">([</span><span class="n">dky</span> <span class="k">for</span> <span class="n">dky</span> <span class="ow">in</span> <span class="n">rdata</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">rdata</span><span class="p">[</span><span class="n">dky</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">])</span> <span class="o">==</span> <span class="mi">4</span><span class="p">):</span>
+            <span class="n">rval</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">return</span> <span class="n">rval</span>
+</div>
+<div class="viewcode-block" id="NmapReport.get_dict"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapReport.get_dict">[docs]</a>    <span class="k">def</span> <span class="nf">get_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Return a python dict representation of the NmapReport object.</span>
+<span class="sd">            This is used to diff() NmapReport objects via NmapDiff.</span>
 
-    <span class="k">def</span> <span class="nf">get_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">d</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">id</span><span class="p">)),</span> <span class="nb">hash</span><span class="p">(</span><span class="n">h</span><span class="p">))</span>
-                 <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hosts</span><span class="p">])</span>
-        <span class="n">d</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s">&#39;hosts_up&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">hosts_up</span><span class="p">,</span> <span class="s">&#39;hosts_down&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">hosts_down</span><span class="p">,</span>
-                  <span class="s">&#39;hosts_total&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">hosts_total</span><span class="p">})</span>
-        <span class="k">return</span> <span class="n">d</span>
-
+<span class="sd">            :return: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rdict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">_host</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
+                                  <span class="nb">str</span><span class="p">(</span><span class="n">_host</span><span class="o">.</span><span class="n">id</span><span class="p">)),</span> <span class="nb">hash</span><span class="p">(</span><span class="n">_host</span><span class="p">))</span>
+                     <span class="k">for</span> <span class="n">_host</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hosts</span><span class="p">])</span>
+        <span class="n">rdict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s">&#39;hosts_up&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">hosts_up</span><span class="p">,</span>
+                      <span class="s">&#39;hosts_down&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">hosts_down</span><span class="p">,</span>
+                      <span class="s">&#39;hosts_total&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">hosts_total</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">rdict</span>
+</div>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -713,7 +859,7 @@
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s">&quot;{0} {1} hosts: {2} {3}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nmaprun</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scaninfo</span><span class="p">,</span>
                                                <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hosts</span><span class="p">),</span>
-                                               <span class="bp">self</span><span class="o">.</span><span class="n">_runstats</span><span class="p">)</span>
+                                               <span class="bp">self</span><span class="o">.</span><span class="n">_runstats</span><span class="p">)</span></div>
 </pre></div>
 
           </div>

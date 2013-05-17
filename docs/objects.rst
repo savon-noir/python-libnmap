@@ -9,6 +9,8 @@ Code API
 --------
 
 .. automodule:: libnmap.objects
+.. autoclass:: NmapReport
+    :members:
 .. autoclass:: NmapHost
     :members:
 .. autoclass:: NmapService
