@@ -247,7 +247,7 @@ class NmapParser(object):
         _address = {}
         _host_extras = {}
         extra_tags = ['uptime', 'distance', 'tcpsequence',
-                      'ipidsequance', 'tcptssequence', 'times']
+                      'ipidsequence', 'tcptssequence', 'times']
         for xh in xelement:
             if xh.tag == 'hostnames':
                 for hostname in cls.__parse_hostnames(xh):

@@ -144,10 +144,22 @@ class NmapHost(object):
 
     @property
     def hostnames(self):
+        """
+            Accessor returning the list of hostnames (array of strings).
+
+            :return: array of string
+        """
         return self._hostnames
 
     @property
     def services(self):
+        """
+            Accessor for the array of scanned services for that host.
+
+            An array of NmapService objects is returned.
+
+            :return: array of NmapService
+        """
         return self._services
 
     def get_ports(self):
@@ -259,7 +271,9 @@ class NmapHost(object):
     @property
     def ipsequence(self):
         """
-            TODO. Not parsed yet.
+            Return the class of ip sequence of the remote hosts.
+
+            :return: string
         """
         rval = ''
         try:
@@ -760,6 +774,12 @@ class NmapReport(object):
         return rval
 
     def get_raw_data(self):
+        """
+            Returns a dict representing the NmapReport object.
+
+            :return: dict
+            :todo: deprecate. get rid of this uglyness.
+        """
         raw_data = {'_nmaprun': self._nmaprun,
                     '_scaninfo': self._scaninfo,
                     '_hosts': self._hosts,
@@ -805,6 +825,9 @@ class NmapReport(object):
 
     @property
     def id(self):
+        """
+            Dummy id() defined for reports.
+        """
         return hash(1)
 
     def __repr__(self):

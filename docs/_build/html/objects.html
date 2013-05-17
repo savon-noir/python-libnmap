@@ -145,6 +145,22 @@ This is used to diff() NmapReport objects via NmapDiff.</p>
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="libnmap.objects.NmapReport.get_raw_data">
+<tt class="descname">get_raw_data</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/libnmap/objects.html#NmapReport.get_raw_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapReport.get_raw_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dict representing the NmapReport object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">dict</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Todo :</th><td class="field-body">deprecate. get rid of this uglyness.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="libnmap.objects.NmapReport.hosts">
 <tt class="descname">hosts</tt><a class="reference internal" href="_modules/libnmap/objects.html#NmapReport.hosts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapReport.hosts" title="Permalink to this definition">¶</a></dt>
@@ -202,6 +218,12 @@ as &#8216;up&#8217; during the scan.</p>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libnmap.objects.NmapReport.id">
+<tt class="descname">id</tt><a class="reference internal" href="_modules/libnmap/objects.html#NmapReport.id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapReport.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dummy id() defined for reports.</p>
 </dd></dl>
 
 <dl class="method">
@@ -444,6 +466,20 @@ This is needed by NmapDiff to allow comparaison
 </dd></dl>
 
 <dl class="attribute">
+<dt id="libnmap.objects.NmapHost.hostnames">
+<tt class="descname">hostnames</tt><a class="reference internal" href="_modules/libnmap/objects.html#NmapHost.hostnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapHost.hostnames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor returning the list of hostnames (array of strings).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">array of string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="libnmap.objects.NmapHost.id">
 <tt class="descname">id</tt><a class="reference internal" href="_modules/libnmap/objects.html#NmapHost.id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapHost.id" title="Permalink to this definition">¶</a></dt>
 <dd><p>id of the host. Used for diff()ing NmapObjects</p>
@@ -460,7 +496,15 @@ This is needed by NmapDiff to allow comparaison
 <dl class="attribute">
 <dt id="libnmap.objects.NmapHost.ipsequence">
 <tt class="descname">ipsequence</tt><a class="reference internal" href="_modules/libnmap/objects.html#NmapHost.ipsequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapHost.ipsequence" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO. Not parsed yet.</p>
+<dd><p>Return the class of ip sequence of the remote hosts.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
@@ -536,6 +580,21 @@ the OS fingerprinting</p>
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">array of ports used: [{&#8216;portid&#8217;: &#8216;22&#8217;,
 &#8216;proto&#8217;: &#8216;tcp&#8217;,
 &#8216;state&#8217;: &#8216;open&#8217;},]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libnmap.objects.NmapHost.services">
+<tt class="descname">services</tt><a class="reference internal" href="_modules/libnmap/objects.html#NmapHost.services"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapHost.services" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor for the array of scanned services for that host.</p>
+<p>An array of NmapService objects is returned.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">array of NmapService</td>
 </tr>
 </tbody>
 </table>

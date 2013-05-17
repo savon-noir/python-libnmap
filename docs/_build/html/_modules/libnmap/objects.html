@@ -192,13 +192,25 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">=</span> <span class="n">statusdict</span>
 </div>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">hostnames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="NmapHost.hostnames"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapHost.hostnames">[docs]</a>    <span class="k">def</span> <span class="nf">hostnames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Accessor returning the list of hostnames (array of strings).</span>
+
+<span class="sd">            :return: array of string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hostnames</span>
-
+</div>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">services</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_services</span>
+<div class="viewcode-block" id="NmapHost.services"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapHost.services">[docs]</a>    <span class="k">def</span> <span class="nf">services</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Accessor for the array of scanned services for that host.</span>
 
+<span class="sd">            An array of NmapService objects is returned.</span>
+
+<span class="sd">            :return: array of NmapService</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_services</span>
+</div>
 <div class="viewcode-block" id="NmapHost.get_ports"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapHost.get_ports">[docs]</a>    <span class="k">def</span> <span class="nf">get_ports</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Retrieve a list of the port used by each service of the NmapHost</span>
@@ -308,7 +320,9 @@
     <span class="nd">@property</span>
 <div class="viewcode-block" id="NmapHost.ipsequence"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapHost.ipsequence">[docs]</a>    <span class="k">def</span> <span class="nf">ipsequence</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            TODO. Not parsed yet.</span>
+<span class="sd">            Return the class of ip sequence of the remote hosts.</span>
+
+<span class="sd">            :return: string</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">rval</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
         <span class="k">try</span><span class="p">:</span>
@@ -808,13 +822,19 @@
             <span class="n">rval</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
         <span class="k">return</span> <span class="n">rval</span>
 </div>
-    <span class="k">def</span> <span class="nf">get_raw_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="NmapReport.get_raw_data"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapReport.get_raw_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_raw_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Returns a dict representing the NmapReport object.</span>
+
+<span class="sd">            :return: dict</span>
+<span class="sd">            :todo: deprecate. get rid of this uglyness.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">raw_data</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;_nmaprun&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nmaprun</span><span class="p">,</span>
                     <span class="s">&#39;_scaninfo&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scaninfo</span><span class="p">,</span>
                     <span class="s">&#39;_hosts&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hosts</span><span class="p">,</span>
                     <span class="s">&#39;_runstats&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runstats</span><span class="p">}</span>
         <span class="k">return</span> <span class="n">raw_data</span>
-
+</div>
     <span class="k">def</span> <span class="nf">__set_raw_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_data</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_nmaprun</span> <span class="o">=</span> <span class="n">raw_data</span><span class="p">[</span><span class="s">&#39;_nmaprun&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scaninfo</span> <span class="o">=</span> <span class="n">raw_data</span><span class="p">[</span><span class="s">&#39;_scaninfo&#39;</span><span class="p">]</span>
@@ -853,9 +873,12 @@
         <span class="k">return</span> <span class="n">rdict</span>
 </div>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="NmapReport.id"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapReport.id">[docs]</a>    <span class="k">def</span> <span class="nf">id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Dummy id() defined for reports.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-
+</div>
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s">&quot;{0} {1} hosts: {2} {3}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nmaprun</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scaninfo</span><span class="p">,</span>
                                                <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hosts</span><span class="p">),</span>
