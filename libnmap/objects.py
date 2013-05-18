@@ -874,6 +874,4 @@ class NmapReport(object):
         return hash(1)
 
     def __repr__(self):
-        return "{0} {1} hosts: {2} {3}".format(self._nmaprun, self._scaninfo,
-                                               len(self._hosts),
-                                               self._runstats)
+        return "{0}: {1}".format(self.__class__.__name__, self.summary)
