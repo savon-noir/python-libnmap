@@ -55,7 +55,52 @@ Of course, the above code is quite ugly and heavy but the idea behind diff was t
 let the user of the lib defines its own algorithms to extract the data.
 
 A less manual and more clever approach would be to recursively retrieve the changed attributes and values of nested objects.
-It is left as "exercize" until we put it in this documentation.
+Below, you will find a small code example only covering changed attributes. To implement a full diff, just duplicate that code
+for added and removed keys::
+
+    #!/usr/bin/env python
+    
+    from libnmap.parser import NmapParser
+    
+    
+    def nested_obj(objname):
+        rval = None
+        splitted = objname.split("::")
+        if len(splitted) == 2:
+            rval = splitted
+        return rval
+    
+    
+    def print_diff(obj1, obj2):
+        ndiff = obj1.diff(obj2)
+    
+        changed_keys = ndiff.changed()
+    
+        for ckey in changed_keys:
+            nested = nested_obj(ckey)
+            if nested is not None:
+                if nested[0] == 'NmapHost':
+                    subobj1 = obj1.get_host_byid(nested[1])
+                    subobj2 = obj2.get_host_byid(nested[1])
+                elif nested[0] == 'NmapService':
+                    subobj1 = obj1.get_service_byid(nested[1])
+                    subobj2 = obj2.get_service_byid(nested[1])
+                print_diff(subobj1, subobj2)
+            else:
+                print "~ {0} {1}: {2} => {3}".format(obj1, ckey,
+                                                 getattr(obj1, ckey),
+                                                 getattr(obj2, ckey))
+    
+    
+    def main():
+        rep1 = NmapParser.parse_fromfile('libnmap/test/files/1_hosts.xml')
+        rep2 = NmapParser.parse_fromfile('libnmap/test/files/1_hosts_diff.xml')
+    
+        print_diff(rep1, rep2)
+    
+    
+    if __name__ == "__main__":
+        main()
 
 Code API
 --------

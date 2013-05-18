@@ -102,7 +102,53 @@ diff(tcp.3306, tcp.3306) [state:open] [state:filtered]
 <p>Of course, the above code is quite ugly and heavy but the idea behind diff was to be as generic as possible in order to
 let the user of the lib defines its own algorithms to extract the data.</p>
 <p>A less manual and more clever approach would be to recursively retrieve the changed attributes and values of nested objects.
-It is left as &#8220;exercize&#8221; until we put it in this documentation.</p>
+Below, you will find a small code example only covering changed attributes. To implement a full diff, just duplicate that code
+for added and removed keys:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
+
+<span class="kn">from</span> <span class="nn">libnmap.parser</span> <span class="kn">import</span> <span class="n">NmapParser</span>
+
+
+<span class="k">def</span> <span class="nf">nested_obj</span><span class="p">(</span><span class="n">objname</span><span class="p">):</span>
+    <span class="n">rval</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">splitted</span> <span class="o">=</span> <span class="n">objname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;::&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">splitted</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">rval</span> <span class="o">=</span> <span class="n">splitted</span>
+    <span class="k">return</span> <span class="n">rval</span>
+
+
+<span class="k">def</span> <span class="nf">print_diff</span><span class="p">(</span><span class="n">obj1</span><span class="p">,</span> <span class="n">obj2</span><span class="p">):</span>
+    <span class="n">ndiff</span> <span class="o">=</span> <span class="n">obj1</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">obj2</span><span class="p">)</span>
+
+    <span class="n">changed_keys</span> <span class="o">=</span> <span class="n">ndiff</span><span class="o">.</span><span class="n">changed</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">ckey</span> <span class="ow">in</span> <span class="n">changed_keys</span><span class="p">:</span>
+        <span class="n">nested</span> <span class="o">=</span> <span class="n">nested_obj</span><span class="p">(</span><span class="n">ckey</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">nested</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">nested</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;NmapHost&#39;</span><span class="p">:</span>
+                <span class="n">subobj1</span> <span class="o">=</span> <span class="n">obj1</span><span class="o">.</span><span class="n">get_host_byid</span><span class="p">(</span><span class="n">nested</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">subobj2</span> <span class="o">=</span> <span class="n">obj2</span><span class="o">.</span><span class="n">get_host_byid</span><span class="p">(</span><span class="n">nested</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">nested</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;NmapService&#39;</span><span class="p">:</span>
+                <span class="n">subobj1</span> <span class="o">=</span> <span class="n">obj1</span><span class="o">.</span><span class="n">get_service_byid</span><span class="p">(</span><span class="n">nested</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">subobj2</span> <span class="o">=</span> <span class="n">obj2</span><span class="o">.</span><span class="n">get_service_byid</span><span class="p">(</span><span class="n">nested</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">print_diff</span><span class="p">(</span><span class="n">subobj1</span><span class="p">,</span> <span class="n">subobj2</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;~ {0} {1}: {2} =&gt; {3}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">obj1</span><span class="p">,</span> <span class="n">ckey</span><span class="p">,</span>
+                                             <span class="nb">getattr</span><span class="p">(</span><span class="n">obj1</span><span class="p">,</span> <span class="n">ckey</span><span class="p">),</span>
+                                             <span class="nb">getattr</span><span class="p">(</span><span class="n">obj2</span><span class="p">,</span> <span class="n">ckey</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">rep1</span> <span class="o">=</span> <span class="n">NmapParser</span><span class="o">.</span><span class="n">parse_fromfile</span><span class="p">(</span><span class="s">&#39;libnmap/test/files/1_hosts.xml&#39;</span><span class="p">)</span>
+    <span class="n">rep2</span> <span class="o">=</span> <span class="n">NmapParser</span><span class="o">.</span><span class="n">parse_fromfile</span><span class="p">(</span><span class="s">&#39;libnmap/test/files/1_hosts_diff.xml&#39;</span><span class="p">)</span>
+
+    <span class="n">print_diff</span><span class="p">(</span><span class="n">rep1</span><span class="p">,</span> <span class="n">rep2</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="module-libnmap.diff">
 <span id="code-api"></span><h2>Code API<a class="headerlink" href="#module-libnmap.diff" title="Permalink to this headline">¶</a></h2>
