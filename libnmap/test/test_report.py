@@ -214,13 +214,13 @@ class TestNmapParser(unittest.TestCase):
         self.assertEqual(h2.diff(h3).removed(), set([]))
         self.assertEqual(h2.diff(h3).unchanged(),
                          set(['status',
-                              "NmapService.('tcp', 22)",
-                              "NmapService.('tcp', 111)",
-                              "NmapService.('tcp', 631)",
+                              "('tcp', 22)",
+                              "('tcp', 111)",
+                              "('tcp', 631)",
                               'hostnames',
-                              "NmapService.('tcp', 3306)",
+                              "('tcp', 3306)",
                               'address',
-                              "NmapService.('tcp', 25)"]))
+                              "('tcp', 25)"]))
 
 if __name__ == '__main__':
     test_suite = ['test_report_constructor', 'test_get_ports',

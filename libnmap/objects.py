@@ -196,6 +196,18 @@ class NmapHost(object):
             raise Exception("Duplicate services found in NmapHost object")
         return plist.pop() if len(plist) else None
 
+    def get_service_byid(self, service_id):
+        """
+            Returns a NmapService by providing its id.
+
+            The id of a nmap service is a python tupl made of (protocol, port)
+        """
+        rval = None
+        for _tmpservice in self._services:
+            if _tmpservice.id == service_id:
+                rval = _tmpservice
+        return rval
+
     def os_class_probabilities(self):
         """
             Returns an array of possible OS class detected during
@@ -345,8 +357,8 @@ class NmapHost(object):
 
             :return dict
         """
-        d = dict([("%s.%s" % (s.__class__.__name__,
-                   str(s.id)), hash(s)) for s in self.services])
+        d = dict([("%s" % (str(s.id)), hash(s)) for s in self.services])
+
         d.update({'address': self.address, 'status': self.status,
                   'hostnames': " ".join(self._hostnames)})
         return d
@@ -693,6 +705,22 @@ class NmapReport(object):
         """
         return self._hosts
 
+    def get_host_byid(self, host_id):
+        """
+           Gets a NmapHost object directly from the host array
+           by looking it up by id.
+
+           :param ip_addr: ip address of the host to lookup
+           :type ip_addr: string
+
+           :return: NmapHost
+        """
+        rval = None
+        for _rhost in self._hosts:
+            if _rhost.address == host_id:
+                rval = _rhost
+        return rval
+
     @property
     def endtime(self):
         """
@@ -827,8 +855,7 @@ class NmapReport(object):
 
             :return: dict
         """
-        rdict = dict([("%s.%s" % (_host.__class__.__name__,
-                                  str(_host.id)), hash(_host))
+        rdict = dict([("%s" % (str(_host.id)), hash(_host))
                      for _host in self.hosts])
         rdict.update({'hosts_up': self.hosts_up,
                       'hosts_down': self.hosts_down,
