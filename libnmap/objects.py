@@ -357,7 +357,9 @@ class NmapHost(object):
 
             :return dict
         """
-        d = dict([("%s" % (str(s.id)), hash(s)) for s in self.services])
+        d = dict([("%s::%s" % (s.__class__.__name__, str(s.id)),
+                   hash(s))
+                 for s in self.services])
 
         d.update({'address': self.address, 'status': self.status,
                   'hostnames': " ".join(self._hostnames)})
@@ -554,7 +556,7 @@ class NmapService(object):
 
             :return: tuple
         """
-        return (self.protocol, self.port)
+        return "{0}.{1}".format(self.protocol, self.port)
 
     def get_dict(self):
         """
@@ -855,7 +857,9 @@ class NmapReport(object):
 
             :return: dict
         """
-        rdict = dict([("%s" % (str(_host.id)), hash(_host))
+        rdict = dict([("%s::%s" % (_host.__class__.__name__,
+                                   str(_host.id)),
+                      hash(_host))
                      for _host in self.hosts])
         rdict.update({'hosts_up': self.hosts_up,
                       'hosts_down': self.hosts_down,
