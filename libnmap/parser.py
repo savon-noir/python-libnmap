@@ -20,7 +20,6 @@ class NmapParser(object):
             :type nmap_data: string
 
             :param data_type: specifies the type of data to be parsed.
-
             :type data_type: string ("XML"|"JSON"|"YAML").
 
             As of today, only XML parsing is supported.
@@ -52,6 +51,7 @@ class NmapParser(object):
             This method checks which portion of a nmap scan is given
             as argument.
             It could be:
+
                 1. a full nmap scan report;
                 2. a scanned host: <host> tag in a nmap scan report
                 3. a scanned service: <port> tag

@@ -295,6 +295,7 @@ class NmapProcess:
         Private method called while nmap process is running. It enables the
         library to handle specific data/events produced by nmap process.
         So far, the following events are supported:
+
         1. task progress: updates estimated time to completion and percentage
            done while scan is running. Could be used in combination with a
            callback function which could then handle this data while scan is
@@ -337,6 +338,7 @@ class NmapProcess:
     def state(self):
         """
         Accessor for nmap execution state. Possible states are:
+
         - self.READY
         - self.RUNNING
         - self.FAILED

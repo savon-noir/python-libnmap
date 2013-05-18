@@ -344,6 +344,7 @@
 <span class="sd">        Private method called while nmap process is running. It enables the</span>
 <span class="sd">        library to handle specific data/events produced by nmap process.</span>
 <span class="sd">        So far, the following events are supported:</span>
+
 <span class="sd">        1. task progress: updates estimated time to completion and percentage</span>
 <span class="sd">           done while scan is running. Could be used in combination with a</span>
 <span class="sd">           callback function which could then handle this data while scan is</span>
@@ -386,6 +387,7 @@
 <div class="viewcode-block" id="NmapProcess.state"><a class="viewcode-back" href="../../process.html#libnmap.process.NmapProcess.state">[docs]</a>    <span class="k">def</span> <span class="nf">state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Accessor for nmap execution state. Possible states are:</span>
+
 <span class="sd">        - self.READY</span>
 <span class="sd">        - self.RUNNING</span>
 <span class="sd">        - self.FAILED</span>

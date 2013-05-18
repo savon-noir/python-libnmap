@@ -34,9 +34,11 @@ class NmapHost(object):
     def __eq__(self, other):
         """
             Compare eq NmapHost based on :
+
                 - hostnames
                 - address
                 - if an associated services has changed
+
             :return: boolean
         """
         rval = False
@@ -46,10 +48,12 @@ class NmapHost(object):
 
     def __ne__(self, other):
         """
-            Compare ne NmapHost based on :
+            Compare ne NmapHost based on:
+
                 - hostnames
                 - address
                 - if an associated services has changed
+
             :return: boolean
         """
         rval = True
@@ -335,8 +339,10 @@ class NmapHost(object):
 
     def get_dict(self):
         """
-            Return a dict representation of the object
+            Return a dict representation of the object.
+
             This is needed by NmapDiff to allow comparaison
+
             :return dict
         """
         d = dict([("%s.%s" % (s.__class__.__name__,
@@ -513,6 +519,7 @@ class NmapService(object):
     def scripts_results(self):
         """
             Gives a python dictionary of the nse scripts results.
+
             The dict key is the name (id) of the nse script and
             the value is the output of the script.
 
@@ -529,8 +536,9 @@ class NmapService(object):
     @property
     def id(self):
         """
-            Accessor for the id() of the NmapService. This is used for
-            diff()ing NmapService object via NmapDiff.
+            Accessor for the id() of the NmapService.
+
+            This is used for diff()ing NmapService object via NmapDiff.
 
             :return: tuple
         """
@@ -539,6 +547,7 @@ class NmapService(object):
     def get_dict(self):
         """
             Return a python dict representation of the NmapService object.
+
             This is used to diff() NmapService objects via NmapDiff.
 
             :return: dict
@@ -551,7 +560,9 @@ class NmapService(object):
         """
             Calls NmapDiff to check the difference between self and
             another NmapService object.
+
             Will return a NmapDiff object.
+
             This objects return python set() of keys describing the elements
             which have changed, were added, removed or kept unchanged.
 
@@ -566,6 +577,7 @@ class NmapReport(object):
         read scans output.
 
         A NmapReport as the following structure:
+
         - Scan headers data
         - A list of scanned hosts (NmapReport.hosts)
         - Scan footer data

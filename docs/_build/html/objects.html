@@ -24,6 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="libnmap 0.2 documentation" href="index.html" />
+    <link rel="next" title="libnmap.diff" href="diff.html" />
     <link rel="prev" title="libnmap.parser" href="parser.html" /> 
   </head>
   <body>
@@ -36,6 +37,9 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
+        <li class="right" >
+          <a href="diff.html" title="libnmap.diff"
+             accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="parser.html" title="libnmap.parser"
              accesskey="P">previous</a> |</li>
@@ -52,7 +56,47 @@
 <h1>libnmap.objects<a class="headerlink" href="#libnmap-objects" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="what">
 <h2>What<a class="headerlink" href="#what" title="Permalink to this headline">¶</a></h2>
-<p>please doc me here.</p>
+<p>this module contains the definition and API of all &#8220;NmapObjects&#8221; which enables user to manipulate nmap data:</p>
+<ol class="arabic simple">
+<li>NmapReport</li>
+<li>NmapHost</li>
+<li>NmapService</li>
+</ol>
+<p>The following structure applies by default:</p>
+<dl class="docutils">
+<dt>NmapReport contains:</dt>
+<dd><ul class="first last simple">
+<li>Scan &#8220;header&#8221; data (start time, nmap command, nmap version, ...)</li>
+<li>List of NmapHosts (0 to X scanned hosts could be nested in a nmap report)</li>
+<li>Scan &#8220;footer&#8221; data (end time, summary, ...)</li>
+</ul>
+</dd>
+<dt>NmapHost contains:</dt>
+<dd><ul class="first last simple">
+<li>Host &#8220;header&#8221; data (state, hostnames, ip, ...)</li>
+<li>List of NmapService (0 to X scanned services could be nested in a scanned host)</li>
+<li>Host &#8220;footer&#8221; data (os version, fingerprint, uptime, ...)</li>
+</ul>
+</dd>
+<dt>NmapService contains:</dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt>scan results for this service:</dt>
+<dd><ul class="first last simple">
+<li>service state, service name</li>
+<li>optional: service banner</li>
+<li>optionla: NSE scripts data</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<p>Each of the above-mentioned objects have a diff() method which enables the user of the lib the compare two different objects
+of the same type.
+If you read the code you&#8217;ll see the dirty trick with id() which ensures that proper objects are being compared. The logic of diff will certainly change overtime but the API (i/o) will be kept as is.</p>
+<p>For more info on diff, please check the module&#8217;s <cite>documentation &lt;diff&gt;_</cite>.</p>
 </div>
 <div class="section" id="module-libnmap.objects">
 <span id="code-api"></span><h2>Code API<a class="headerlink" href="#module-libnmap.objects" title="Permalink to this headline">¶</a></h2>
@@ -61,10 +105,12 @@
 <em class="property">class </em><tt class="descclassname">libnmap.objects.</tt><tt class="descname">NmapReport</tt><big>(</big><em>raw_data=None</em><big>)</big><a class="reference internal" href="_modules/libnmap/objects.html#NmapReport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapReport" title="Permalink to this definition">¶</a></dt>
 <dd><p>NmapReport is the usual interface for the end user to
 read scans output.</p>
-<p>A NmapReport as the following structure:
-- Scan headers data
-- A list of scanned hosts (NmapReport.hosts)
-- Scan footer data</p>
+<p>A NmapReport as the following structure:</p>
+<ul class="simple">
+<li>Scan headers data</li>
+<li>A list of scanned hosts (NmapReport.hosts)</li>
+<li>Scan footer data</li>
+</ul>
 <p>It is to note that each NmapHost comprised in NmapReport.hosts array
 contains also a list of scanned services (NmapService object).</p>
 <p>This means that if NmapParser.parse*() is the input interface for the
@@ -412,9 +458,9 @@ which have changed, were added, removed or kept unchanged.</p>
 <dl class="method">
 <dt id="libnmap.objects.NmapHost.get_dict">
 <tt class="descname">get_dict</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/libnmap/objects.html#NmapHost.get_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapHost.get_dict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a dict representation of the object
-This is needed by NmapDiff to allow comparaison
-:return dict</p>
+<dd><p>Return a dict representation of the object.</p>
+<p>This is needed by NmapDiff to allow comparaison</p>
+<p>:return dict</p>
 </dd></dl>
 
 <dl class="method">
@@ -694,9 +740,9 @@ if the nmap option -sV or similar was used.</p>
 <dt id="libnmap.objects.NmapService.diff">
 <tt class="descname">diff</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="_modules/libnmap/objects.html#NmapService.diff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapService.diff" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calls NmapDiff to check the difference between self and
-another NmapService object.
-Will return a NmapDiff object.
-This objects return python set() of keys describing the elements
+another NmapService object.</p>
+<p>Will return a NmapDiff object.</p>
+<p>This objects return python set() of keys describing the elements
 which have changed, were added, removed or kept unchanged.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -711,8 +757,8 @@ which have changed, were added, removed or kept unchanged.</p>
 <dl class="method">
 <dt id="libnmap.objects.NmapService.get_dict">
 <tt class="descname">get_dict</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/libnmap/objects.html#NmapService.get_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapService.get_dict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a python dict representation of the NmapService object.
-This is used to diff() NmapService objects via NmapDiff.</p>
+<dd><p>Return a python dict representation of the NmapService object.</p>
+<p>This is used to diff() NmapService objects via NmapDiff.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -726,8 +772,8 @@ This is used to diff() NmapService objects via NmapDiff.</p>
 <dl class="attribute">
 <dt id="libnmap.objects.NmapService.id">
 <tt class="descname">id</tt><a class="reference internal" href="_modules/libnmap/objects.html#NmapService.id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapService.id" title="Permalink to this definition">¶</a></dt>
-<dd><p>Accessor for the id() of the NmapService. This is used for
-diff()ing NmapService object via NmapDiff.</p>
+<dd><p>Accessor for the id() of the NmapService.</p>
+<p>This is used for diff()ing NmapService object via NmapDiff.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -783,8 +829,8 @@ diff()ing NmapService object via NmapDiff.</p>
 <dl class="method">
 <dt id="libnmap.objects.NmapService.scripts_results">
 <tt class="descname">scripts_results</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/libnmap/objects.html#NmapService.scripts_results"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapService.scripts_results" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gives a python dictionary of the nse scripts results.
-The dict key is the name (id) of the nse script and
+<dd><p>Gives a python dictionary of the nse scripts results.</p>
+<p>The dict key is the name (id) of the nse script and
 the value is the output of the script.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -847,6 +893,9 @@ the value is the output of the script.</p>
   <h4>Previous topic</h4>
   <p class="topless"><a href="parser.html"
                         title="previous chapter">libnmap.parser</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="diff.html"
+                        title="next chapter">libnmap.diff</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/objects.txt"
@@ -878,6 +927,9 @@ the value is the output of the script.</p>
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
+        <li class="right" >
+          <a href="diff.html" title="libnmap.diff"
+             >next</a> |</li>
         <li class="right" >
           <a href="parser.html" title="libnmap.parser"
              >previous</a> |</li>

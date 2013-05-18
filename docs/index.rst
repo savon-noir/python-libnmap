@@ -34,6 +34,7 @@ The different modules are documented below:
    process
    parser
    objects
+   diff
 
 Indices and tables
 ==================
