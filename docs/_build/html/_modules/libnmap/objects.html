@@ -245,6 +245,18 @@
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;Duplicate services found in NmapHost object&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">plist</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">plist</span><span class="p">)</span> <span class="k">else</span> <span class="bp">None</span>
 </div>
+<div class="viewcode-block" id="NmapHost.get_service_byid"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapHost.get_service_byid">[docs]</a>    <span class="k">def</span> <span class="nf">get_service_byid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Returns a NmapService by providing its id.</span>
+
+<span class="sd">            The id of a nmap service is a python tupl made of (protocol, port)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rval</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">for</span> <span class="n">_tmpservice</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_services</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">_tmpservice</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">service_id</span><span class="p">:</span>
+                <span class="n">rval</span> <span class="o">=</span> <span class="n">_tmpservice</span>
+        <span class="k">return</span> <span class="n">rval</span>
+</div>
 <div class="viewcode-block" id="NmapHost.os_class_probabilities"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapHost.os_class_probabilities">[docs]</a>    <span class="k">def</span> <span class="nf">os_class_probabilities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Returns an array of possible OS class detected during</span>
@@ -394,8 +406,10 @@
 
 <span class="sd">            :return dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">d</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
-                   <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">id</span><span class="p">)),</span> <span class="nb">hash</span><span class="p">(</span><span class="n">s</span><span class="p">))</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">services</span><span class="p">])</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">::</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">id</span><span class="p">)),</span>
+                   <span class="nb">hash</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+                 <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">services</span><span class="p">])</span>
+
         <span class="n">d</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s">&#39;address&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">,</span> <span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
                   <span class="s">&#39;hostnames&#39;</span><span class="p">:</span> <span class="s">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hostnames</span><span class="p">)})</span>
         <span class="k">return</span> <span class="n">d</span>
@@ -591,7 +605,7 @@
 
 <span class="sd">            :return: tuple</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">protocol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s">&quot;{0}.{1}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">protocol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="NmapService.get_dict"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapService.get_dict">[docs]</a>    <span class="k">def</span> <span class="nf">get_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -742,6 +756,22 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hosts</span>
 </div>
+<div class="viewcode-block" id="NmapReport.get_host_byid"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapReport.get_host_byid">[docs]</a>    <span class="k">def</span> <span class="nf">get_host_byid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">           Gets a NmapHost object directly from the host array</span>
+<span class="sd">           by looking it up by id.</span>
+
+<span class="sd">           :param ip_addr: ip address of the host to lookup</span>
+<span class="sd">           :type ip_addr: string</span>
+
+<span class="sd">           :return: NmapHost</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rval</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">for</span> <span class="n">_rhost</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hosts</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">_rhost</span><span class="o">.</span><span class="n">address</span> <span class="o">==</span> <span class="n">host_id</span><span class="p">:</span>
+                <span class="n">rval</span> <span class="o">=</span> <span class="n">_rhost</span>
+        <span class="k">return</span> <span class="n">rval</span>
+</div>
     <span class="nd">@property</span>
 <div class="viewcode-block" id="NmapReport.endtime"><a class="viewcode-back" href="../../objects.html#libnmap.objects.NmapReport.endtime">[docs]</a>    <span class="k">def</span> <span class="nf">endtime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -876,8 +906,9 @@
 
 <span class="sd">            :return: dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">rdict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">_host</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
-                                  <span class="nb">str</span><span class="p">(</span><span class="n">_host</span><span class="o">.</span><span class="n">id</span><span class="p">)),</span> <span class="nb">hash</span><span class="p">(</span><span class="n">_host</span><span class="p">))</span>
+        <span class="n">rdict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">::</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">_host</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
+                                   <span class="nb">str</span><span class="p">(</span><span class="n">_host</span><span class="o">.</span><span class="n">id</span><span class="p">)),</span>
+                      <span class="nb">hash</span><span class="p">(</span><span class="n">_host</span><span class="p">))</span>
                      <span class="k">for</span> <span class="n">_host</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hosts</span><span class="p">])</span>
         <span class="n">rdict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s">&#39;hosts_up&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">hosts_up</span><span class="p">,</span>
                       <span class="s">&#39;hosts_down&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">hosts_down</span><span class="p">,</span>
@@ -933,7 +964,7 @@
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2013, Ronald Bister.
+        &copy; Copyright CC-BY 2013, Ronald Bister.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>

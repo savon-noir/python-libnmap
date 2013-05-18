@@ -65,6 +65,44 @@
 <p>Those methods return a python set() of keys which have been changed/added/removed/unchanged from one
 object to another.
 The keys of each objects could be found in the implementation of the get_dict() methods of the compared objects.</p>
+<p>The example below is a heavy version of going through all nested objects to see waht has changed after a diff:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
+
+<span class="kn">from</span> <span class="nn">libnmap.parser</span> <span class="kn">import</span> <span class="n">NmapParser</span>
+
+<span class="n">rep1</span> <span class="o">=</span> <span class="n">NmapParser</span><span class="o">.</span><span class="n">parse_fromfile</span><span class="p">(</span><span class="s">&#39;libnmap/test/files/1_hosts.xml&#39;</span><span class="p">)</span>
+<span class="n">rep2</span> <span class="o">=</span> <span class="n">NmapParser</span><span class="o">.</span><span class="n">parse_fromfile</span><span class="p">(</span><span class="s">&#39;libnmap/test/files/1_hosts_diff.xml&#39;</span><span class="p">)</span>
+
+<span class="n">rep1_items_changed</span> <span class="o">=</span> <span class="n">rep1</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">rep2</span><span class="p">)</span><span class="o">.</span><span class="n">changed</span><span class="p">()</span>
+<span class="n">changed_host_id</span> <span class="o">=</span> <span class="n">rep1_items_changed</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;::&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">changed_host1</span> <span class="o">=</span> <span class="n">rep1</span><span class="o">.</span><span class="n">get_host_byid</span><span class="p">(</span><span class="n">changed_host_id</span><span class="p">)</span>
+<span class="n">changed_host2</span> <span class="o">=</span> <span class="n">rep2</span><span class="o">.</span><span class="n">get_host_byid</span><span class="p">(</span><span class="n">changed_host_id</span><span class="p">)</span>
+<span class="n">host1_items_changed</span> <span class="o">=</span> <span class="n">changed_host1</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">changed_host2</span><span class="p">)</span><span class="o">.</span><span class="n">changed</span><span class="p">()</span>
+
+<span class="n">changed_service_id</span> <span class="o">=</span> <span class="n">host1_items_changed</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;::&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">changed_service1</span> <span class="o">=</span> <span class="n">changed_host1</span><span class="o">.</span><span class="n">get_service_byid</span><span class="p">(</span><span class="n">changed_service_id</span><span class="p">)</span>
+<span class="n">changed_service2</span> <span class="o">=</span> <span class="n">changed_host2</span><span class="o">.</span><span class="n">get_service_byid</span><span class="p">(</span><span class="n">changed_service_id</span><span class="p">)</span>
+<span class="n">service1_items_changed</span> <span class="o">=</span> <span class="n">changed_service1</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">changed_service2</span><span class="p">)</span><span class="o">.</span><span class="n">changed</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">diff_attr</span> <span class="ow">in</span> <span class="n">service1_items_changed</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&quot;diff({0}, {1}) [{2}:{3}] [{4}:{5}]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">changed_service1</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                                                     <span class="n">changed_service2</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                                                     <span class="n">diff_attr</span><span class="p">,</span>
+                                                     <span class="nb">getattr</span><span class="p">(</span><span class="n">changed_service1</span><span class="p">,</span> <span class="n">diff_attr</span><span class="p">),</span>
+                                                     <span class="n">diff_attr</span><span class="p">,</span>
+                                                     <span class="nb">getattr</span><span class="p">(</span><span class="n">changed_service2</span><span class="p">,</span> <span class="n">diff_attr</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>This outputs the following line:</p>
+<div class="highlight-python"><pre>(pydev)$ python /tmp/z.py
+diff(tcp.3306, tcp.3306) [state:open] [state:filtered]
+(pydev)$</pre>
+</div>
+<p>Of course, the above code is quite ugly and heavy but the idea behind diff was to be as generic as possible in order to
+let the user of the lib defines its own algorithms to extract the data.</p>
+<p>A less manual and more clever approach would be to recursively retrieve the changed attributes and values of nested objects.
+It is left as &#8220;exercize&#8221; until we put it in this documentation.</p>
 </div>
 <div class="section" id="module-libnmap.diff">
 <span id="code-api"></span><h2>Code API<a class="headerlink" href="#module-libnmap.diff" title="Permalink to this headline">¶</a></h2>
@@ -152,7 +190,7 @@ compare (i.e: libnmap.objects.NmapHost, NmapService,...).</p>
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2013, Ronald Bister.
+        &copy; Copyright CC-BY 2013, Ronald Bister.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>

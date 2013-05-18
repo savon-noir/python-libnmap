@@ -192,6 +192,23 @@ This is used to diff() NmapReport objects via NmapDiff.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="libnmap.objects.NmapReport.get_host_byid">
+<tt class="descname">get_host_byid</tt><big>(</big><em>host_id</em><big>)</big><a class="reference internal" href="_modules/libnmap/objects.html#NmapReport.get_host_byid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapReport.get_host_byid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a NmapHost object directly from the host array
+by looking it up by id.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ip_addr</strong> (<em>string</em>) &#8211; ip address of the host to lookup</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">NmapHost</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="libnmap.objects.NmapReport.get_raw_data">
 <tt class="descname">get_raw_data</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/libnmap/objects.html#NmapReport.get_raw_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapReport.get_raw_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a dict representing the NmapReport object.</p>
@@ -509,6 +526,13 @@ which have changed, were added, removed or kept unchanged.</p>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libnmap.objects.NmapHost.get_service_byid">
+<tt class="descname">get_service_byid</tt><big>(</big><em>service_id</em><big>)</big><a class="reference internal" href="_modules/libnmap/objects.html#NmapHost.get_service_byid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.objects.NmapHost.get_service_byid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a NmapService by providing its id.</p>
+<p>The id of a nmap service is a python tupl made of (protocol, port)</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -937,7 +961,7 @@ the value is the output of the script.</p>
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2013, Ronald Bister.
+        &copy; Copyright CC-BY 2013, Ronald Bister.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>
