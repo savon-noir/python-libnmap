@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='libnmap',
-    version='0.1.4',
+    version='0.2.1',
     author='Ronald Bister',
     author_email='mini.pelle@gmail.com',
     packages=['libnmap', 'libnmap.plugins', 'libnmap.test'],

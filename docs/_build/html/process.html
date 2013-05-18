@@ -1,0 +1,426 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>libnmap.process &mdash; libnmap 0.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="libnmap 0.2 documentation" href="index.html" />
+    <link rel="next" title="libnmap.parser" href="parser.html" />
+    <link rel="prev" title="Welcome to libnmap’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="parser.html" title="libnmap.parser"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to libnmap’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">libnmap 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="libnmap-process">
+<h1>libnmap.process<a class="headerlink" href="#libnmap-process" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what">
+<h2>What<a class="headerlink" href="#what" title="Permalink to this headline">¶</a></h2>
+<p>This modules enables you to launch nmap scans with simples python commands:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">libnmap.process</span> <span class="kn">import</span> <span class="n">NmapProcess</span>
+
+<span class="n">nm</span> <span class="o">=</span> <span class="n">NmapProcess</span><span class="p">(</span><span class="s">&quot;scanme.nmap.org&quot;</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="s">&quot;-sV&quot;</span><span class="p">)</span>
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nm</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="n">nm</span><span class="o">.</span><span class="n">rc</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">print</span> <span class="n">nm</span><span class="o">.</span><span class="n">stdout</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">print</span> <span class="n">nm</span><span class="o">.</span><span class="n">stderr</span>
+</pre></div>
+</div>
+<p>This module is also able to trigger a callback function provided by the user. This callback will be triggered each time nmap returns data to the lib.
+It is to note that the lib forces nmap to return its status (progress and etc) every two seconds. The event callback could then play around with those values while running.</p>
+<p>The full <a class="reference external" href="https://github.com/savon-noir/python-nmap-lib">source code</a> is available on GitHub. Please, do not hesitate to fork it and issue pull requests.</p>
+</div>
+<div class="section" id="module-libnmap.process">
+<span id="code-api"></span><h2>Code API<a class="headerlink" href="#module-libnmap.process" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="libnmap.process.NmapProcess">
+<em class="property">class </em><tt class="descclassname">libnmap.process.</tt><tt class="descname">NmapProcess</tt><big>(</big><em>targets='127.0.0.1'</em>, <em>options='-sT'</em>, <em>event_callback=None</em>, <em>safe_mode=True</em><big>)</big><a class="reference internal" href="_modules/libnmap/process.html#NmapProcess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.process.NmapProcess" title="Permalink to this definition">¶</a></dt>
+<dd><p>NmapProcess is a class which wraps around the nmap executable.
+Consequently, in order to run an NmapProcess, nmap should be installed
+on the host running the script. By default NmapProcess will produce
+the output of the nmap scan in the nmap XML format. This could be then
+parsed out via the NmapParser class from libnmap.parser module.</p>
+<dl class="attribute">
+<dt id="libnmap.process.NmapProcess.elapsed">
+<tt class="descname">elapsed</tt><a class="reference internal" href="_modules/libnmap/process.html#NmapProcess.elapsed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.process.NmapProcess.elapsed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor returning for how long the scan ran (in seconds)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libnmap.process.NmapProcess.endtime">
+<tt class="descname">endtime</tt><a class="reference internal" href="_modules/libnmap/process.html#NmapProcess.endtime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.process.NmapProcess.endtime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor for time when scan ended</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">string. Unix timestamp</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libnmap.process.NmapProcess.etc">
+<tt class="descname">etc</tt><a class="reference internal" href="_modules/libnmap/process.html#NmapProcess.etc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.process.NmapProcess.etc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor for estimated time to completion</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">estimated time to completion</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libnmap.process.NmapProcess.get_command_line">
+<tt class="descname">get_command_line</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/libnmap/process.html#NmapProcess.get_command_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.process.NmapProcess.get_command_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Public method returning the reconstructed command line ran via the lib</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the full nmap command line to run</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libnmap.process.NmapProcess.has_failed">
+<tt class="descname">has_failed</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/libnmap/process.html#NmapProcess.has_failed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.process.NmapProcess.has_failed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if nmap has failed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if nmap process errored.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libnmap.process.NmapProcess.has_terminated">
+<tt class="descname">has_terminated</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/libnmap/process.html#NmapProcess.has_terminated"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.process.NmapProcess.has_terminated" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if nmap has terminated. Could have failed or succeeded</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if nmap process is not running anymore.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libnmap.process.NmapProcess.is_running">
+<tt class="descname">is_running</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/libnmap/process.html#NmapProcess.is_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.process.NmapProcess.is_running" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if nmap is still running.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if nmap is still running</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libnmap.process.NmapProcess.is_successful">
+<tt class="descname">is_successful</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/libnmap/process.html#NmapProcess.is_successful"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.process.NmapProcess.is_successful" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if nmap terminated successfully.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if nmap terminated successfully.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libnmap.process.NmapProcess.progress">
+<tt class="descname">progress</tt><a class="reference internal" href="_modules/libnmap/process.html#NmapProcess.progress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.process.NmapProcess.progress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor for progress status in percentage</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">percentage of job processed.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libnmap.process.NmapProcess.rc">
+<tt class="descname">rc</tt><a class="reference internal" href="_modules/libnmap/process.html#NmapProcess.rc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.process.NmapProcess.rc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor for nmap execution&#8217;s return code</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">nmap execution&#8217;s return code</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libnmap.process.NmapProcess.run">
+<tt class="descname">run</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/libnmap/process.html#NmapProcess.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.process.NmapProcess.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Public method which is usually called right after the constructor
+of NmapProcess. This method starts the nmap executable&#8217;s subprocess.
+It will also bind to threads that will read from subprocess&#8217; stdout
+and stderr and push the lines read in a python queue for futher
+processing.</p>
+<p>return: return code from nmap execution from self.__wait()</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libnmap.process.NmapProcess.starttime">
+<tt class="descname">starttime</tt><a class="reference internal" href="_modules/libnmap/process.html#NmapProcess.starttime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.process.NmapProcess.starttime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor for time when scan started</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">string. Unix timestamp</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libnmap.process.NmapProcess.state">
+<tt class="descname">state</tt><a class="reference internal" href="_modules/libnmap/process.html#NmapProcess.state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.process.NmapProcess.state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor for nmap execution state. Possible states are:</p>
+<ul class="simple">
+<li>self.READY</li>
+<li>self.RUNNING</li>
+<li>self.FAILED</li>
+<li>self.CANCELLED</li>
+<li>self.DONE</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">integer (from above documented enum)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libnmap.process.NmapProcess.stderr">
+<tt class="descname">stderr</tt><a class="reference internal" href="_modules/libnmap/process.html#NmapProcess.stderr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.process.NmapProcess.stderr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor for nmap standart error</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">output from nmap when errors occured.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libnmap.process.NmapProcess.stdout">
+<tt class="descname">stdout</tt><a class="reference internal" href="_modules/libnmap/process.html#NmapProcess.stdout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.process.NmapProcess.stdout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor for nmap standart output</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">output from nmap scan in XML</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libnmap.process.NmapProcess.sudo_run">
+<tt class="descname">sudo_run</tt><big>(</big><em>run_as='root'</em><big>)</big><a class="reference internal" href="_modules/libnmap/process.html#NmapProcess.sudo_run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.process.NmapProcess.sudo_run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Public method enabling the library&#8217;s user to run the scan with
+priviledges via sudo. The sudo configuration should be set manually
+on the local system otherwise sudo will prompt for a password.
+This method alters the command line by prefixing the sudo command to
+nmap and will then call self.run()</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>run_as</strong> &#8211; user name to which the lib needs to sudo to run the scan</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">return code from nmap execution</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libnmap.process.NmapProcess.summary">
+<tt class="descname">summary</tt><a class="reference internal" href="_modules/libnmap/process.html#NmapProcess.summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.process.NmapProcess.summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor returning a short summary of the scan&#8217;s results</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libnmap.process.NmapProcess.version">
+<tt class="descname">version</tt><a class="reference internal" href="_modules/libnmap/process.html#NmapProcess.version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.process.NmapProcess.version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor for nmap binary version number</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">version number of nmap binary</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">libnmap.process</a><ul>
+<li><a class="reference internal" href="#what">What</a></li>
+<li><a class="reference internal" href="#module-libnmap.process">Code API</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to libnmap&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="parser.html"
+                        title="next chapter">libnmap.parser</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/process.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="parser.html" title="libnmap.parser"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to libnmap’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">libnmap 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Ronald Bister.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

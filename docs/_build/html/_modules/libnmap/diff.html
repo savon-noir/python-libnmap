@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>libnmap.diff &mdash; libnmap 0.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="libnmap 0.2 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">libnmap 0.2 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for libnmap.diff</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+
+
+<span class="k">class</span> <span class="nc">DictDiffer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the difference between two dictionaries as:</span>
+<span class="sd">        (1) items added</span>
+<span class="sd">        (2) items removed</span>
+<span class="sd">        (3) keys same in both but changed values</span>
+<span class="sd">        (4) keys same in both and unchanged values</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_dict</span><span class="p">,</span> <span class="n">past_dict</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_dict</span> <span class="o">=</span> <span class="n">current_dict</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">past_dict</span> <span class="o">=</span> <span class="n">past_dict</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_current</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">current_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_past</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">past_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">intersect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_current</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">set_past</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">added</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_current</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">intersect</span>
+
+    <span class="k">def</span> <span class="nf">removed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_past</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">intersect</span>
+
+    <span class="k">def</span> <span class="nf">changed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">o</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">intersect</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">past_dict</span><span class="p">[</span><span class="n">o</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_dict</span><span class="p">[</span><span class="n">o</span><span class="p">]))</span>
+
+    <span class="k">def</span> <span class="nf">unchanged</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">o</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">intersect</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">past_dict</span><span class="p">[</span><span class="n">o</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_dict</span><span class="p">[</span><span class="n">o</span><span class="p">]))</span>
+
+
+<div class="viewcode-block" id="NmapDiff"><a class="viewcode-back" href="../../diff.html#libnmap.diff.NmapDiff">[docs]</a><span class="k">class</span> <span class="nc">NmapDiff</span><span class="p">(</span><span class="n">DictDiffer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        NmapDiff compares two objects of same type to enable the user to check:</span>
+
+<span class="sd">        - what has changed</span>
+<span class="sd">        - what has been added</span>
+<span class="sd">        - what has been removed</span>
+<span class="sd">        - what was kept unchanged</span>
+
+<span class="sd">        NmapDiff inherit from DictDiffer which makes the actual comparaison.</span>
+<span class="sd">        The different methods from DictDiffer used by NmapDiff are the</span>
+<span class="sd">        following:</span>
+
+<span class="sd">        - NmapDiff.changed()</span>
+<span class="sd">        - NmapDiff.added()</span>
+<span class="sd">        - NmapDiff.removed()</span>
+<span class="sd">        - NmapDiff.unchanged()</span>
+
+<span class="sd">        Each of the returns a python set() of key which have changed in the</span>
+<span class="sd">        compared objects. To check the different keys that could be returned,</span>
+<span class="sd">        refer to the get_dict() method of the objects you which to</span>
+<span class="sd">        compare (i.e: libnmap.objects.NmapHost, NmapService,...).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nmap_obj1</span><span class="p">,</span> <span class="n">nmap_obj2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Constructor of NmapDiff:</span>
+
+<span class="sd">            - Checks if the two objects are of the same class</span>
+<span class="sd">            - Checks if the objects are &quot;comparable&quot; via a call to id() (dirty)</span>
+<span class="sd">            - Inherits from DictDiffer and</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">nmap_obj1</span><span class="o">.</span><span class="n">__class__</span> <span class="o">!=</span> <span class="n">nmap_obj2</span><span class="o">.</span><span class="n">__class__</span> <span class="ow">or</span>
+           <span class="n">nmap_obj1</span><span class="o">.</span><span class="n">id</span> <span class="o">!=</span> <span class="n">nmap_obj2</span><span class="o">.</span><span class="n">id</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">NmapDiffException</span><span class="p">(</span><span class="s">&quot;Comparing objects with non-matching id&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">object1</span> <span class="o">=</span> <span class="n">nmap_obj1</span><span class="o">.</span><span class="n">get_dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">object2</span> <span class="o">=</span> <span class="n">nmap_obj2</span><span class="o">.</span><span class="n">get_dict</span><span class="p">()</span>
+
+        <span class="n">DictDiffer</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">object1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">object2</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s">&quot;added: [{0}] -- changed: [{1}] -- &quot;</span>
+                <span class="s">&quot;unchanged: [{2}] -- removed [{3}]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">added</span><span class="p">(),</span>
+                                                           <span class="bp">self</span><span class="o">.</span><span class="n">changed</span><span class="p">(),</span>
+                                                           <span class="bp">self</span><span class="o">.</span><span class="n">unchanged</span><span class="p">(),</span>
+                                                           <span class="bp">self</span><span class="o">.</span><span class="n">removed</span><span class="p">()))</span>
+
+</div>
+<span class="k">class</span> <span class="nc">NmapDiffException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">libnmap 0.2 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Ronald Bister.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

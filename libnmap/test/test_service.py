@@ -169,7 +169,7 @@ class TestNmapService(unittest.TestCase):
                          set(['banner']))
 
     def test_eq_service(self):
-        self.assertNotEqual(self.s1, self.s2)
+        self.assertNotEqual(NmapDiffException, self.s1, self.s2)
         self.assertNotEqual(self.s1, self.s3)
         self.assertNotEqual(self.s1, self.s4)
 

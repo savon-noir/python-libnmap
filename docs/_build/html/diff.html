@@ -1,0 +1,159 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>libnmap.diff &mdash; libnmap 0.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="libnmap 0.2 documentation" href="index.html" />
+    <link rel="prev" title="libnmap.objects" href="objects.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="objects.html" title="libnmap.objects"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">libnmap 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="libnmap-diff">
+<h1>libnmap.diff<a class="headerlink" href="#libnmap-diff" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what">
+<h2>What<a class="headerlink" href="#what" title="Permalink to this headline">¶</a></h2>
+<p>This modules enables the user to diff two NmapObjects: NmapService, NmapHost, NmapReport.</p>
+<p>The constructor returns a NmapDiff object which he can then use to call its inherited methods:</p>
+<blockquote>
+<div><ul class="simple">
+<li>added()</li>
+<li>removed()</li>
+<li>changed()</li>
+<li>unchanged()</li>
+</ul>
+</div></blockquote>
+<p>Those methods return a python set() of keys which have been changed/added/removed/unchanged from one
+object to another.
+The keys of each objects could be found in the implementation of the get_dict() methods of the compared objects.</p>
+</div>
+<div class="section" id="module-libnmap.diff">
+<span id="code-api"></span><h2>Code API<a class="headerlink" href="#module-libnmap.diff" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="libnmap.diff.NmapDiff">
+<em class="property">class </em><tt class="descclassname">libnmap.diff.</tt><tt class="descname">NmapDiff</tt><big>(</big><em>nmap_obj1</em>, <em>nmap_obj2</em><big>)</big><a class="reference internal" href="_modules/libnmap/diff.html#NmapDiff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libnmap.diff.NmapDiff" title="Permalink to this definition">¶</a></dt>
+<dd><p>NmapDiff compares two objects of same type to enable the user to check:</p>
+<ul class="simple">
+<li>what has changed</li>
+<li>what has been added</li>
+<li>what has been removed</li>
+<li>what was kept unchanged</li>
+</ul>
+<p>NmapDiff inherit from DictDiffer which makes the actual comparaison.
+The different methods from DictDiffer used by NmapDiff are the
+following:</p>
+<ul class="simple">
+<li>NmapDiff.changed()</li>
+<li>NmapDiff.added()</li>
+<li>NmapDiff.removed()</li>
+<li>NmapDiff.unchanged()</li>
+</ul>
+<p>Each of the returns a python set() of key which have changed in the
+compared objects. To check the different keys that could be returned,
+refer to the get_dict() method of the objects you which to
+compare (i.e: libnmap.objects.NmapHost, NmapService,...).</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">libnmap.diff</a><ul>
+<li><a class="reference internal" href="#what">What</a></li>
+<li><a class="reference internal" href="#module-libnmap.diff">Code API</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="objects.html"
+                        title="previous chapter">libnmap.objects</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/diff.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="objects.html" title="libnmap.objects"
+             >previous</a> |</li>
+        <li><a href="index.html">libnmap 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Ronald Bister.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

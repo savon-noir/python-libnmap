@@ -21,13 +21,6 @@ install:
 #   - "pip install -r requirements.txt --use-mirrors"
 #     # command to run tests
 before_script:
-  - "pep8 . --exclude test"
+  - "pep8 . --exclude test,docs"
   - "pyflakes ."
-script:
-  - cd libnmap
-  - python test/host_test.py
-  - python test/parser_test.py
-  - python test/report_test.py
-  - python test/report_diff_test.py
-  - python test/service_test.py
-  - python test/test_backend_plugin_factory.py
+script: nosetests
