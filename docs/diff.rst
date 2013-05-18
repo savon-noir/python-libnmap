@@ -102,6 +102,13 @@ for added and removed keys::
     if __name__ == "__main__":
         main()
 
+This code will output the following::
+
+    (pydev)$ python /tmp/za.py
+    ~ NmapService: [open 3306/tcp mysql ()] state: open => filtered
+    (pydev)$
+
+
 Code API
 --------
 
