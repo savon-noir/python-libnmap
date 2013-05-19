@@ -874,4 +874,8 @@ class NmapReport(object):
         return hash(1)
 
     def __repr__(self):
-        return "{0}: {1}".format(self.__class__.__name__, self.summary)
+        return "{0}: started at {1} hosts up {2}/{3}".format(
+               self.__class__.__name__,
+               self.started,
+               self.hosts_up,
+               self.hosts_total)
