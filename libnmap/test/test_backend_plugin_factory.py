@@ -8,7 +8,7 @@ from libnmap.plugins.backendpluginFactory import BackendPluginFactory
 
 #define all plugin that need test
 from libnmap.plugins.mongodb import NmapMongoPlugin
-from libnmap.plugins.sqlite import NmapSqlitePlugin
+from libnmap.plugins.sql import NmapSqlPlugin
 
 
 class TestNmapBackendPlugin(unittest.TestCase):
