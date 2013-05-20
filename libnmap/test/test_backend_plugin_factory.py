@@ -75,7 +75,7 @@ class TestNmapBackendPlugin(unittest.TestCase):
         mongodb = factory.create(plugin_name="mongodb")
         self.assertEqual(isinstance(mongodb, NmapBackendPlugin), True)
         self.assertEqual(isinstance(mongodb, NmapMongoPlugin), True)
-        self.assertEqual(isinstance(mongodb, NmapSqlitePlugin), False)
+        self.assertEqual(isinstance(mongodb, NmapSqlPlugin), False)
 
     def mongo_test_insert(self):
         """"best way to insert is to call save() of nmapreport"""
