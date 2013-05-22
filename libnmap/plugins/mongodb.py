@@ -8,7 +8,7 @@ from libnmap.parser import NmapParser
 from libnmap.plugins.backendplugin import NmapBackendPlugin
 
 
-class NmapMongoPlugin(NmapBackendPlugin):
+class NmapMongodbPlugin(NmapBackendPlugin):
     def __init__(self, dbname=None, store=None, **kwargs):
         NmapBackendPlugin.__init__(self)
         if dbname is not None:

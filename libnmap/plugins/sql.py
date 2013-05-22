@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from sqlalchemy import create_engine
 from sqlalchemy.schema import Column
-from sqlalchemy.types import Integer, String, DateTime
+from sqlalchemy.types import Integer, DateTime, LargeBinary
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -53,7 +53,7 @@ class NmapSqlPlugin(NmapBackendPlugin):
 
         id = Column('report_id', Integer, primary_key=True)
         inserted = Column('inserted', DateTime(), default='now')
-        report_json = Column('report_json', String)
+        report_json = Column('report_json', LargeBinary)
 
         def __init__(self, obj_NmapReport):
             self.inserted = datetime.fromtimestamp(obj_NmapReport.endtime)
