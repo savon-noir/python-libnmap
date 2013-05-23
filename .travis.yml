@@ -23,4 +23,5 @@ install:
 before_script:
   - "pep8 . --exclude test,docs"
   - "pyflakes ."
+  - mysql -e 'create database poulet;'
 script: nosetests
