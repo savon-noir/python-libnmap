@@ -59,7 +59,7 @@ class TestNmapBackendPlugin(unittest.TestCase):
                          'url': 'sqlite:////tmp/reportdb.sql',
                          'echo': False},
                      {'plugin_name': 'sql',
-                         'url': 'mysql+mysqldb://patin@localhost/poulet',
+                         'url': 'mysql+mysqldb://root@localhost/poulet',
                          'echo': True},
                      ]
 
