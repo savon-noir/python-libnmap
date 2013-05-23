@@ -16,7 +16,7 @@ services: mongodb
 install:
   - "pip install pep8 --use-mirrors"
   - "pip install pyflakes --use-mirrors"
-  - "pip install pymongo sqlalchemy --use-mirrors"
+  - "pip install pymongo sqlalchemy MySQL-python --use-mirrors"
   - "python setup.py install"
 #   - "pip install -r requirements.txt --use-mirrors"
 #     # command to run tests
