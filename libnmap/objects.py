@@ -861,7 +861,11 @@ class NmapReport(object):
                                    str(_host.id)),
                       hash(_host))
                      for _host in self.hosts])
-        rdict.update({'hosts_up': self.hosts_up,
+        rdict.update({'commandline': self.commandline,
+                      'version': self.version,
+                      'scan_type': self.scan_type,
+                      'elapsed': self.elapsed,
+                      'hosts_up': self.hosts_up,
                       'hosts_down': self.hosts_down,
                       'hosts_total': self.hosts_total})
         return rdict
