@@ -861,7 +861,11 @@ class NmapReport(object):
                                    str(_host.id)),
                       hash(_host))
                      for _host in self.hosts])
-        rdict.update({'hosts_up': self.hosts_up,
+        rdict.update({'commandline': self.commandline,
+                      'version': self.version,
+                      'scan_type': self.scan_type,
+                      'elapsed': self.elapsed,
+                      'hosts_up': self.hosts_up,
                       'hosts_down': self.hosts_down,
                       'hosts_total': self.hosts_total})
         return rdict
@@ -874,6 +878,8 @@ class NmapReport(object):
         return hash(1)
 
     def __repr__(self):
-        return "{0} {1} hosts: {2} {3}".format(self._nmaprun, self._scaninfo,
-                                               len(self._hosts),
-                                               self._runstats)
+        return "{0}: started at {1} hosts up {2}/{3}".format(
+               self.__class__.__name__,
+               self.started,
+               self.hosts_up,
+               self.hosts_total)

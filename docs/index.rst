@@ -1,8 +1,8 @@
 Welcome to libnmap's documentation!
 ===================================
 
-What
-----
+About libnmap
+-------------
 
 libnmap is a python toolkit for manipulating nmap. It currently offers the following modules:
 
@@ -20,15 +20,15 @@ libnmap is a python toolkit for manipulating nmap. It currently offers the follo
   - csv: todo
 
 
-Contents
---------
+libnmap's modules
+-----------------
 
 The full `source code <https://github.com/savon-noir/python-nmap-lib>`_ is available on GitHub. Please, do not hesitate to fork it and issue pull requests.
 
 The different modules are documented below:
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :glob:
 
    process
