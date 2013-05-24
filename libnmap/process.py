@@ -1,15 +1,14 @@
 #!/usr/bin/env python
 import os
-import sys
 import pwd
 import shlex
 import subprocess
 from threading import Thread
-from Queue import Queue, Empty
+from Queue import Queue, Empty, Full
 from xml.dom import pulldom
 
 
-class NmapProcess:
+class NmapProcess(Thread):
     """
     NmapProcess is a class which wraps around the nmap executable.
     Consequently, in order to run an NmapProcess, nmap should be installed
@@ -41,6 +40,7 @@ class NmapProcess:
         :return: NmapProcess object
 
         """
+        Thread.__init__(self)
         self.__nmap_proc = None
         self.__nmap_rc = 0
 
@@ -68,16 +68,18 @@ class NmapProcess:
         if safe_mode and not optlist.isdisjoint(unsafe_opts):
             raise Exception("unsafe options activated while safe_mode "
                             "is set True")
-
         self.__nmap_dynamic_options = options
-
         self.__nmap_command_line = self.get_command_line()
+
         if event_callback and callable(event_callback):
             self.__nmap_event_callback = event_callback
         else:
             self.__nmap_event_callback = None
         (self.DONE, self.READY, self.RUNNING,
          self.CANCELLED, self.FAILED) = range(5)
+
+        self.__io_queue = Queue()
+        self.__ioerr_queue = Queue()
 
         # API usable in callback function
         self.__state = self.READY
@@ -195,7 +197,7 @@ class NmapProcess:
                 try:
                     if streamline is not None:
                         io_queue.put(streamline)
-                except Queue.Full:
+                except Full:
                     raise Exception("Queue ran out of buffer: "
                                     "increase q.get(timeout) value")
 
@@ -206,12 +208,10 @@ class NmapProcess:
                                                 stdin=subprocess.PIPE,
                                                 stdout=subprocess.PIPE,
                                                 stderr=subprocess.PIPE)
-            tout = Thread(target=stream_reader, name='stdout-reader',
-                          args=(self.__nmap_proc.stdout, self.__io_queue))
-            terr = Thread(target=stream_reader, name='stderr-reader',
-                          args=(self.__nmap_proc.stderr, self.__ioerr_queue))
-            tout.start()
-            terr.start()
+            Thread(target=stream_reader, name='stdout-reader',
+                   args=(self.__nmap_proc.stdout, self.__io_queue)).start()
+            Thread(target=stream_reader, name='stderr-reader',
+                   args=(self.__nmap_proc.stderr, self.__ioerr_queue)).start()
             self.__state = self.RUNNING
         except OSError:
             self.__state = self.FAILED
@@ -240,8 +240,8 @@ class NmapProcess:
             except KeyboardInterrupt:
                 break
             else:
-                e = self.__process_event(thread_stream)
-                if self.__nmap_event_callback and e:
+                evnt = self.__process_event(thread_stream)
+                if self.__nmap_event_callback and evnt:
                     self.__nmap_event_callback(self, thread_stream)
                 self.__stdout += thread_stream
 
@@ -256,6 +256,10 @@ class NmapProcess:
             self.__stderr = self.__ioerr_queue.get(timeout=2)
 
         return self.rc
+
+    def run_background(self):
+        self.daemon = True
+        super(NmapProcess, self).start()
 
     def is_running(self):
         """
@@ -310,8 +314,8 @@ class NmapProcess:
         rval = False
         try:
             edomdoc = pulldom.parseString(eventdata)
-            for e, xmlnode in edomdoc:
-                if e is not None and e == pulldom.START_ELEMENT:
+            for xlmnt, xmlnode in edomdoc:
+                if xlmnt is not None and xlmnt == pulldom.START_ELEMENT:
                     if (xmlnode.nodeName == 'taskprogress' and
                             xmlnode.attributes.keys()):
                         percent_done = xmlnode.attributes['percent'].value
@@ -443,8 +447,8 @@ class NmapProcess:
         return self.__stderr
 
 
-def main(argv):
-    def mycallback(nmapscan=None, data=""):
+def main():
+    def mycallback(nmapscan=None):
         if nmapscan.is_running():
             print "Progress: %s %% - ETC: %s" % (nmapscan.progress,
                                                  nmapscan.etc)
@@ -465,4 +469,4 @@ def main(argv):
         print "Result: {0}".format(nm.stdout)
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    main()

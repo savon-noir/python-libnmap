@@ -1,8 +1,9 @@
 libnmap.diff
 ==============
 
-What
-----
+Using libnmap.diff module
+-------------------------
+
 This modules enables the user to diff two NmapObjects: NmapService, NmapHost, NmapReport.
 
 The constructor returns a NmapDiff object which he can then use to call its inherited methods:
@@ -55,62 +56,30 @@ Of course, the above code is quite ugly and heavy but the idea behind diff was t
 let the user of the lib defines its own algorithms to extract the data.
 
 A less manual and more clever approach would be to recursively retrieve the changed attributes and values of nested objects.
-Below, you will find a small code example only covering changed attributes. To implement a full diff, just duplicate that code
-for added and removed keys::
+Below, you will find a small code example doing it
 
-    #!/usr/bin/env python
-    
-    from libnmap.parser import NmapParser
-    
-    
-    def nested_obj(objname):
-        rval = None
-        splitted = objname.split("::")
-        if len(splitted) == 2:
-            rval = splitted
-        return rval
-    
-    
-    def print_diff(obj1, obj2):
-        ndiff = obj1.diff(obj2)
-    
-        changed_keys = ndiff.changed()
-    
-        for ckey in changed_keys:
-            nested = nested_obj(ckey)
-            if nested is not None:
-                if nested[0] == 'NmapHost':
-                    subobj1 = obj1.get_host_byid(nested[1])
-                    subobj2 = obj2.get_host_byid(nested[1])
-                elif nested[0] == 'NmapService':
-                    subobj1 = obj1.get_service_byid(nested[1])
-                    subobj2 = obj2.get_service_byid(nested[1])
-                print_diff(subobj1, subobj2)
-            else:
-                print "~ {0} {1}: {2} => {3}".format(obj1, ckey,
-                                                 getattr(obj1, ckey),
-                                                 getattr(obj2, ckey))
-    
-    
-    def main():
-        rep1 = NmapParser.parse_fromfile('libnmap/test/files/1_hosts.xml')
-        rep2 = NmapParser.parse_fromfile('libnmap/test/files/1_hosts_diff.xml')
-    
-        print_diff(rep1, rep2)
-    
-    
-    if __name__ == "__main__":
-        main()
+.. literalinclude:: ../examples/diff_sample2.py
 
 This code will output the following::
 
-    (pydev)$ python /tmp/za.py
-    ~ NmapService: [open 3306/tcp mysql ()] state: open => filtered
-    (pydev)$
+    ~ NmapReport: started at 1361737906 hosts up 2/2 hosts_total: 1 => 2
+    ~ NmapReport: started at 1361737906 hosts up 2/2 commandline: nmap -sT -vv -oX 1_hosts.xml localhost => nmap -sS -vv -oX 2_hosts.xml localhost scanme.nmap.org
+    ~ NmapReport: started at 1361737906 hosts up 2/2 hosts_up: 1 => 2
+    ~ NmapService: [closed 25/tcp smtp ()] state: open => closed
+    + NmapService: [open 23/tcp telnet ()]
+    - NmapService: [open 111/tcp rpcbind ()]
+    ~ NmapReport: started at 1361737906 hosts up 2/2 scan_type: connect => syn
+    ~ NmapReport: started at 1361737906 hosts up 2/2 elapsed: 0.14 => 134.36
+    + NmapHost: [74.207.244.221 (scanme.nmap.org scanme.nmap.org) - up]
 
+Note that, in the above example, lines prefixed with:
 
-Code API
---------
+    1. '~' means values changed
+    2. '+ means values were added
+    3. '-' means values were removed
+
+NmapDiff methods
+----------------
 
 .. automodule:: libnmap.diff
 .. autoclass:: NmapDiff

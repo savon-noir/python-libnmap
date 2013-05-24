@@ -1,9 +1,10 @@
 libnmap.objects
 ===============
 
-What
-----
-this module contains the definition and API of all "NmapObjects" which enables user to manipulate nmap data:
+Using libnmap.objects module
+----------------------------
+
+This module contains the definition and API of all "NmapObjects" which enables user to manipulate nmap data:
 
 1. NmapReport
 2. NmapHost
@@ -33,13 +34,19 @@ If you read the code you'll see the dirty trick with id() which ensures that pro
 
 For more info on diff, please check the module's `documentation <diff>_`.
 
-Code API
---------
+NmapReport methods
+------------------
 
 .. automodule:: libnmap.objects
 .. autoclass:: NmapReport
     :members:
+
+NmapHost methods
+----------------
 .. autoclass:: NmapHost
     :members:
+
+NmapService methods
+-------------------
 .. autoclass:: NmapService
     :members:
