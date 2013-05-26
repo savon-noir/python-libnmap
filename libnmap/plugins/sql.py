@@ -149,6 +149,7 @@ class NmapSqlPlugin(NmapBackendPlugin):
             raise ValueError
         nb_line = 0
         sess = self.Session()
-        nb_line = sess.query(NmapSqlPlugin.Reports).filter_by(id=report_id).delete()
+        nb_line = sess.query(NmapSqlPlugin.Reports).\
+            filter_by(id=report_id).delete()
         sess.commit()
         return nb_line
