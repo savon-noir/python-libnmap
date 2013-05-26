@@ -19,17 +19,23 @@ class NmapMongodbPlugin(NmapBackendPlugin):
         self.collection = self.dbclient[self.dbname][self.store]
 
     def insert(self, report):
-        # create a json object from an NmapReport instance
+        """
+            create a json object from an NmapReport instance
+            :param NmapReport: obj to insert
+            :return: str id
+        """
         j = json.dumps(report, cls=ReportEncoder)
         try:
             id = self.collection.insert(json.loads(j))
         except:
             print "MONGODB cannot insert"
             raise
-        return id
+        return str(id)
 
     def get(self, str_report_id=None):
-        """get return a NmapReport object
+        """ select a NmapReport by Id
+            :param str: id
+            :return: NmapReport object
         """
         rid = str_report_id
         nmapreport = None
@@ -38,11 +44,11 @@ class NmapMongodbPlugin(NmapBackendPlugin):
 
         if isinstance(rid, ObjectId):
             #get a specific report by mongo's id
-            r = self.collection.find({'_id': rid})
-            if r is not None:
+            resultSet = self.collection.find({'_id': rid})
+            if resultSet.count() == 1:
                 #search by id means only one in the iterator
-                record = r[0]
-                #remove mongo's id
+                record = resultSet[0]
+                #remove mongo's id to recreate the NmapReport Obj
                 del record['_id']
                 nmapreport = NmapParser.parse_fromdict(record)
         return nmapreport
@@ -60,7 +66,12 @@ class NmapMongodbPlugin(NmapBackendPlugin):
         return nmapreportList
 
     def delete(self, report_id=None):
+        """
+            delete an obj from the backend
+            :param str: id
+            :return: dict document with result or None
+        """
         if report_id is not None and isinstance(report_id, str):
-            self.collection.remove({'_id': ObjectId(report_id)})
+            return self.collection.remove({'_id': ObjectId(report_id)})
         else:
-            self.collection.remove({'_id': report_id})
+            return self.collection.remove({'_id': report_id})

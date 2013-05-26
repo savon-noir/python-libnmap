@@ -95,7 +95,6 @@ class TestNmapBackendPlugin(unittest.TestCase):
         id_list = []
         result_list = []
         for url in self.urls:
-            print url
             backend = BackendPluginFactory.create(**url)
             for nrp in self.reportList:
                 id_list.append(nrp.save(backend))
@@ -105,8 +104,6 @@ class TestNmapBackendPlugin(unittest.TestCase):
             #print self.reportList[0]
             self.assertEqual(len(result_list), len(self.reportList))
             self.assertEqual((result_list), (self.reportList))
-            #for index in range(len(result_list)):
-            #    self.assertEqual(result_list[index], self.reportList[index])
             id_list = []
             result_list = []
 
@@ -118,11 +115,17 @@ class TestNmapBackendPlugin(unittest.TestCase):
             inset all report and save the returned id in a list
             for each id remove the item and test if not present
         """
-        pass
-#        for nrp in self.reportList:
-#            for url in self.urls:
-#                backend = BackendPluginFactory.create(**url)
-#                returncode = nrp.save(backend)
+        id_list = []
+        result_list = []
+        for url in self.urls:
+            backend = BackendPluginFactory.create(**url)
+            for nrp in self.reportList:
+                id_list.append(nrp.save(backend))
+            for rep_id in id_list:
+                result_list.append(backend.delete(rep_id))
+                self.assertEqual(backend.get(rep_id),None)
+            id_list = []
+            result_list = []
 
 
 if __name__ == '__main__':

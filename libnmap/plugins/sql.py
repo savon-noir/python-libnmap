@@ -140,8 +140,15 @@ class NmapSqlPlugin(NmapBackendPlugin):
         return nmapreportList
 
     def delete(self, report_id=None):
+        """
+            Remove a report from the backend
+            :param id: str
+            :return: The number of rows deleted
+        """
         if report_id is None:
             raise ValueError
+        nb_line = 0
         sess = self.Session()
-        sess.query(NmapSqlPlugin.Reports).filter_by(id=report_id).delete()
+        nb_line = sess.query(NmapSqlPlugin.Reports).filter_by(id=report_id).delete()
         sess.commit()
+        return nb_line
