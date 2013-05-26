@@ -1,8 +1,9 @@
 libnmap.parser
 ==============
 
-What
-----
+Using libnmap.parser module
+---------------------------
+
 This modules enables you to parse nmap scans' output. For now on, only XML parsing is supported. NmapParser is a factory which will return a NmapReport, NmapHost or NmapService object.
 All these objects' API are documented.
 The NmapParser should never be instanciated and only the following methods should be called:
@@ -40,8 +41,8 @@ Basic usage from a processed scan::
 
 For more details on using the results from NmapParser, refer to the API of class: NmapReport, NmapHost, NmapService.
 
-Code API
---------
+NmapParser methods
+------------------
 
 .. automodule:: libnmap.parser
 .. autoclass:: NmapParser
