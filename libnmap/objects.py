@@ -873,6 +873,42 @@ class NmapReport(object):
         """
         return hash(1)
 
+    def __eq__(self, other):
+        """
+            Compare eq NmapReport based on :
+
+                - create a diff obj and check the result
+                report are equal if added&changed&removed are empty
+
+            :return: boolean
+        """
+        rval = False
+        if(self.__class__ == other.__class__ and self.id == other.id):
+            diffobj = self.diff(other)
+            rval = (len(diffobj.changed()) == 0 and
+                    len(diffobj.added()) == 0 and
+                    len(diffobj.removed()) == 0
+                    )
+        return rval
+
+    def __ne__(self, other):
+        """
+            Compare ne NmapReport based on:
+
+                - create a diff obj and check the result
+                report are ne if added|changed|removed are not empty
+
+            :return: boolean
+        """
+        rval = True
+        if(self.__class__ == other.__class__ and self.id == other.id):
+            diffobj = self.diff(other)
+            rval = (len(diffobj.changed()) != 0 or
+                    len(diffobj.added()) != 0 or
+                    len(diffobj.removed()) != 0
+                    )
+        return rval
+
     def __repr__(self):
         return "{0} {1} hosts: {2} {3}".format(self._nmaprun, self._scaninfo,
                                                len(self._hosts),
