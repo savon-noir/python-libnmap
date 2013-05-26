@@ -25,5 +25,9 @@ class BackendPluginFactory(object):
         pluginclasses = inspect.getmembers(pluginobj, inspect.isclass)
         for classname, classobj in pluginclasses:
             if inspect.getmodule(classobj).__name__.find(plugin_path) == 0:
-                backendplugin = classobj(**kwargs)
+                try:
+                    backendplugin = classobj(**kwargs)
+                except Exception as error:
+                    print "Cannot create Backend:", error
+
         return backendplugin

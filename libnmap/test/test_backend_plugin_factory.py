@@ -123,20 +123,17 @@ class TestNmapBackendPlugin(unittest.TestCase):
                 id_list.append(nrp.save(backend))
             for rep_id in id_list:
                 result_list.append(backend.delete(rep_id))
-                self.assertEqual(backend.get(rep_id),None)
+                self.assertEqual(backend.get(rep_id), None)
             id_list = []
             result_list = []
 
 
 if __name__ == '__main__':
-    template_test_suite = ['test_factory',
-                           'test_insert',
-                           'test_update',
-                           'test_delete',
-                           'test_get',
-                           'test_getall',
-                           'test_find']
-
-    test_suite = ['mongo_test_factory', 'mongo_test_insert']
+    test_suite = ['test_backend_factory',
+                  'test_backend_insert',
+                  'test_backend_get',
+                  'test_backend_getall',
+                  'test_backend_delete'
+                  ]
     suite = unittest.TestSuite(map(TestNmapBackendPlugin, test_suite))
     test_result = unittest.TextTestRunner(verbosity=5).run(suite)

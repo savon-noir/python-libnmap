@@ -111,7 +111,9 @@ class NmapSqlPlugin(NmapBackendPlugin):
         report = NmapSqlPlugin.Reports(nmap_report)
         sess.add(report)
         sess.commit()
-        return report.id if report else None
+        reportid = report.id
+        sess.close()
+        return reportid if reportid else None
 
     def get(self, report_id=None):
         """
@@ -124,6 +126,7 @@ class NmapSqlPlugin(NmapBackendPlugin):
         sess = self.Session()
         our_report = (
             sess.query(NmapSqlPlugin.Reports).filter_by(id=report_id).first())
+        sess.close()
         return our_report.decode() if our_report else None
 
     def getall(self):
@@ -137,6 +140,7 @@ class NmapSqlPlugin(NmapBackendPlugin):
                 sess.query(NmapSqlPlugin.Reports).
                 order_by(NmapSqlPlugin.Reports.inserted)):
             nmapreportList.append((report.id, report.decode()))
+        sess.close()
         return nmapreportList
 
     def delete(self, report_id=None):
@@ -151,5 +155,8 @@ class NmapSqlPlugin(NmapBackendPlugin):
         sess = self.Session()
         nb_line = sess.query(NmapSqlPlugin.Reports).\
             filter_by(id=report_id).delete()
+        print nb_line
         sess.commit()
+        sess.close()
+        print sess
         return nb_line
