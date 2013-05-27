@@ -627,7 +627,7 @@ class NmapReport(object):
 
             The primary key of the stored object is returned.
 
-            :return: integer
+            :return: str
         """
         if backend is not None:
             #do stuff

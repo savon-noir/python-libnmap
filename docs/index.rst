@@ -14,8 +14,9 @@ libnmap is a python toolkit for manipulating nmap. It currently offers the follo
 - plugins: enables you to support datastores for your scan results directly in the "NmapReport" object from report module
 
   - mongodb: only plugin implemented so far, ultra basic, for POC purpose only
+  - sqlalchemy: Allow to store/retreive NmapReport to sqlite/mysql/... all engine supported by sqlalchemy
+  - rabbitMQ : todo
   - couchdb: todo
-  - sqlalchemy: todo
   - elastic search: todo
   - csv: todo
 
