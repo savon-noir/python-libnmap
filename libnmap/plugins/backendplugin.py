@@ -14,7 +14,8 @@ class NmapBackendPlugin(object):
         """
             insert NmapReport in the backend
             :param NmapReport:
-            :return: str the ident of the object in the backend for future usage
+            :return: str the ident of the object in the backend for 
+            future usage
             or None
         """
         raise NotImplementedError
