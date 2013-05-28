@@ -5,7 +5,7 @@ from bson.objectid import ObjectId
 from boto.s3.connection import S3Connection, OrdinaryCallingFormat
 from boto.s3.key import Key
 from boto.s3.bucketlistresultset import bucket_lister
-
+from boto.exception import S3ResponseError
 from libnmap.reportjson import ReportEncoder
 from libnmap.parser import NmapParser
 from libnmap.plugins.backendplugin import NmapBackendPlugin
@@ -71,10 +71,13 @@ class NmapS3Plugin(NmapBackendPlugin):
         """
         nmapreport = None
         if str_report_id is not None and isinstance(str_report_id, str):
-            myKey = Key(self.bucket)
-            myKey.key = str_report_id
-            nmapReportJson = json.loads(myKey.get_contents_as_string())
-            nmapreport = NmapParser.parse_fromdict(nmapReportJson)
+            try:
+                myKey = Key(self.bucket)
+                myKey.key = str_report_id
+                nmapReportJson = json.loads(myKey.get_contents_as_string())
+                nmapreport = NmapParser.parse_fromdict(nmapReportJson)
+            except S3ResponseError:
+                print "Not Found"
         return nmapreport
 
     def getall(self, dict_filter=None):
@@ -99,5 +102,5 @@ class NmapS3Plugin(NmapBackendPlugin):
         """
         rcode = None
         if report_id is not None and isinstance(report_id, str):
-            rcode = self.bucket.delete(report_id)
+            rcode = self.bucket.delete_key(report_id)
         return rcode

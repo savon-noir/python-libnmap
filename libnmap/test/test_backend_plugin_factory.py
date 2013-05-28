@@ -61,7 +61,11 @@ class TestNmapBackendPlugin(unittest.TestCase):
                      {'plugin_name': 'sql',
                          'url': 'mysql+mysqldb://root@localhost/poulet',
                          'echo': True},
-                     ]
+                     {'plugin_name': 's3',
+                         'EC2_ACCESS_KEY': 'UU72FLVJCAYRATLXI70YH',
+                         'EC2_SECRET_KEY': 'wFg7gP5YFHjVlxakw1g1uCC8UR2xVW5ax9ErZCut',
+                         'bucket': 'nmapreport'},
+                  ]
 
     def test_backend_factory(self):
         """ test_factory BackendPluginFactory.create(**url)
