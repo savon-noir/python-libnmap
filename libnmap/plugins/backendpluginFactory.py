@@ -2,6 +2,7 @@
 import sys
 import inspect
 
+
 class BackendPluginFactory(object):
     """
         This is a backend plugin factory a backend instance MUST be
@@ -27,5 +28,5 @@ class BackendPluginFactory(object):
                 try:
                     backendplugin = classobj(**kwargs)
                 except Exception as error:
-                    print "Cannot create Backend: %s" %  (error)
+                    print "Cannot create Backend: %s" % (error)
         return backendplugin
