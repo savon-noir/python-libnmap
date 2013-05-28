@@ -2,7 +2,6 @@
 import sys
 import inspect
 
-
 class BackendPluginFactory(object):
     """
         This is a backend plugin factory a backend instance MUST be
@@ -10,7 +9,7 @@ class BackendPluginFactory(object):
         ie : mybackend = BackendPluginFactory.create()
     """
     @classmethod
-    def create(self, plugin_name="mongodb", **kwargs):
+    def create(cls, plugin_name="mongodb", **kwargs):
         """Import the needed lib and return an object NmapBackendPlugin
            representing the backend of your desire.
            NmapBackendPlugin is an abstract class, to know what argument
@@ -28,6 +27,5 @@ class BackendPluginFactory(object):
                 try:
                     backendplugin = classobj(**kwargs)
                 except Exception as error:
-                    print "Cannot create Backend:", error
-
+                    print "Cannot create Backend: %s" %  (error)
         return backendplugin
