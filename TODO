@@ -1,8 +1,7 @@
+- review and improve threading for NmapProcess
 - complete unit tests
-- complete Sphinx DocStrings
 - Add new plugins to support import/export from mysql, couchdb, csv
 - support iterators for NmapReport::hosts
 - add unittest for udp scans, ping sweeping
 - add support for 'resume' capability (see nmap --resume)
 - add support for "not shown ports" (extra ports) in NmapHost (via NmapParser)
-- add API support in NmapReport for returning nmap_run data
