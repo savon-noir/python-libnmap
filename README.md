@@ -2,7 +2,7 @@
 
 ## Code status
 
-[![Build Status](https://travis-ci.org/savon-noir/python-nmap-lib.png)](https://travis-ci.org/savon-noir/python-nmap-lib)
+[![Build Status](https://travis-ci.org/savon-noir/python-libnmap.png?branch=master)](https://travis-ci.org/savon-noir/python-libnmap)
 
 ## Use cases
 
