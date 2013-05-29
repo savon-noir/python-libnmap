@@ -35,9 +35,9 @@ class NmapBackendPlugin(object):
         """
         raise NotImplementedError
 
-    def getall(self):
+    def getall(self, filter):
         """
-            :return: collection of NmapReport
+            :return: collection of tuple (id,NmapReport)
             :param filter: Nice to have implement a filter capability
         """
         raise NotImplementedError
