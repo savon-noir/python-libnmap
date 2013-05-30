@@ -267,8 +267,14 @@ class NmapParser(object):
             #else:
             #    print "struct host unknown attr: %s value: %s" %
             #           (h.tag, h.get(h.tag))
-        nhost = NmapHost(_host_header['starttime'],
-                         _host_header['endtime'],
+        _stime = ''
+        _etime = ''
+        if 'starttime' in _host_header:
+            _stime = _host_header['starttime']
+        if 'endime' in _host_header:
+            _etime = _host_header['endtime']
+        nhost = NmapHost(_stime,
+                         _etime,
                          _address,
                          _status,
                          _hostnames,
