@@ -13,7 +13,8 @@ from libnmap.plugins.backendplugin import NmapBackendPlugin
 
 class NmapS3Plugin(NmapBackendPlugin):
     """
-        This plugin save the reports on S3 and compatible
+        This plugin save the reports on S3 and compatible.
+
         This is now a beta version who use eucalyptus walrus
     """
     def __init__(self, **kwargs):
@@ -46,11 +47,12 @@ class NmapS3Plugin(NmapBackendPlugin):
     def insert(self, report):
         """
             create a json string from an NmapReport instance
-            and push it to S3 bucket
+            and push it to S3 bucket.
+
             :param NmapReport: obj to insert
             :rtype: string
             :return: str id
-            TODO Add tagging option
+            :todo: Add tagging option
         """
         try:
             oid = ObjectId()
@@ -64,7 +66,9 @@ class NmapS3Plugin(NmapBackendPlugin):
         return str(oid)
 
     def get(self, str_report_id=None):
-        """ select a NmapReport by Id
+        """
+            select a NmapReport by Id.
+
             :param str: id
             :rtype: NmapReport
             :return: NmapReport object
@@ -84,7 +88,7 @@ class NmapS3Plugin(NmapBackendPlugin):
         """
             :rtype: List of tuple
             :return: list of key/report
-           TODO : add a filter capability
+            :todo: add a filter capability
         """
         nmapreportList = []
         for key in bucket_lister(self.bucket):
@@ -97,6 +101,7 @@ class NmapS3Plugin(NmapBackendPlugin):
     def delete(self, report_id=None):
         """
             delete an obj from the backend
+
             :param str: id
             :return: dict document with result or None
         """
