@@ -2,7 +2,7 @@
 
 ## Code status
 
-[![Build Status](https://travis-ci.org/savon-noir/python-nmap-lib.png)](https://travis-ci.org/savon-noir/python-nmap-lib)
+[![Build Status](https://travis-ci.org/savon-noir/python-libnmap.png?branch=master)](https://travis-ci.org/savon-noir/python-libnmap)
 
 ## Use cases
 
@@ -33,8 +33,8 @@ The lib currently offers the following modules:
 
 ## Documentation
 
-All the documentation is available on `read the docs <https://libnmap.readthedocs.org>`_ . This documentation contains small code samples that you directly reuse. 
+All the documentation is available on [read the docs](<https://libnmap.readthedocs.org>). This documentation contains small code samples that you directly reuse. 
 
 ## Examples
 
-Some codes samples are available in the examples directory or in the documentation.
+Some codes samples are available in the examples directory or in the [documentation](<https://libnmap.readthedocs.org>).
