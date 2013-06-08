@@ -1,4 +1,4 @@
-v0.2.2, 10/06/2013 -- Prepare packaging for pypi
+v0.2.3, 10/06/2013 -- Prepare packaging for pypi
 v0.2.1, 17/05/2013 -- Code Docstring and added support for additional data
                     - added support for scripts in NmapService
                     - added support for hosts extra data in NmapHost (uptime, distance,...)
