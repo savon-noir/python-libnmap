@@ -13,7 +13,7 @@ setup(
     license='LICENSE.txt',
     description=('A Python NMAP library enabling you to launch nmap scans',
                  'parse and compare (diff) scan results'),
-    long_description=long_description
+    long_description=long_description,
     classifiers=["Development Status :: 5 - Production/Stable",
                  "Environment :: Console",
                  "Programming Language :: Python :: 2.6",
