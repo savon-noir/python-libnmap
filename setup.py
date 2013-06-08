@@ -18,6 +18,5 @@ setup(
                  "Environment :: Console",
                  "Programming Language :: Python :: 2.6",
                  "Programming Language :: Python :: 2.7",
-                 "Topic :: System :: Networking",
-                 "Topic :: Software Development :: Libraries :: Python Modules"],
+                 "Topic :: System :: Networking"]
 )
