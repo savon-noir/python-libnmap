@@ -1,5 +1,8 @@
 - review and improve threading for NmapProcess
 - complete unit tests
+- XML interface to support both ElementTree and lxml APIs
+- support for python3
+- support for windows
 - Add new plugins to support import/export from mysql, couchdb, csv
 - support iterators for NmapReport::hosts
 - add unittest for udp scans, ping sweeping
