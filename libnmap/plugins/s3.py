@@ -1,3 +1,14 @@
+"""
+:mod:`libnmap.plugin.s3` -- S3 Backend Plugin
+===================================
+
+.. module:: libnmap.plugin.s3
+:platform: Linux
+:synopsis: a plugin is representation of a S3 backend using boto
+.. moduleauthor:: Ronald Bister
+.. moduleauthor:: Mike Boutillier
+"""
+
 #!/usr/bin/env python
 import json
 import os
@@ -25,9 +36,9 @@ class NmapS3Plugin(NmapBackendPlugin):
         """
         NmapBackendPlugin.__init__(self)
         try:
-            self.awsKey = (os.getenv('EC2_ACCESS_KEY') or
+            self.awskey = (os.getenv('EC2_ACCESS_KEY') or
                            kwargs['EC2_ACCESS_KEY'])
-            self.awsSecret = (os.getenv('EC2_SECRET_KEY') or
+            self.awssecret = (os.getenv('EC2_SECRET_KEY') or
                               kwargs['EC2_SECRET_KEY'])
             calling_format = OrdinaryCallingFormat()
             self.conn = S3Connection(host="walrus.ecc.eucalyptus.com",
@@ -35,8 +46,8 @@ class NmapS3Plugin(NmapBackendPlugin):
                                      port=8773,
                                      calling_format=calling_format,
                                      is_secure=False,
-                                     aws_access_key_id=self.awsKey,
-                                     aws_secret_access_key=self.awsSecret)
+                                     aws_access_key_id=self.awskey,
+                                     aws_secret_access_key=self.awssecret)
             self.bucket = self.conn.lookup(kwargs['bucket'])
             if self.bucket is None:
                 self.bucket = self.conn.create_bucket(kwargs['bucket'])
@@ -54,10 +65,10 @@ class NmapS3Plugin(NmapBackendPlugin):
         """
         try:
             oid = ObjectId()
-            myKey = Key(self.bucket)
-            myKey.key = str(oid)
-            strJsonNmapReport = json.dumps(report, cls=ReportEncoder)
-            myKey.set_contents_from_string(strJsonNmapReport)
+            mykey = Key(self.bucket)
+            mykey.key = str(oid)
+            strjsonnmapreport = json.dumps(report, cls=ReportEncoder)
+            mykey.set_contents_from_string(strjsonnmapreport)
         except:
             print "Bucket cannot insert"
             raise
@@ -72,10 +83,10 @@ class NmapS3Plugin(NmapBackendPlugin):
         nmapreport = None
         if str_report_id is not None and isinstance(str_report_id, str):
             try:
-                myKey = Key(self.bucket)
-                myKey.key = str_report_id
-                nmapReportJson = json.loads(myKey.get_contents_as_string())
-                nmapreport = NmapParser.parse_fromdict(nmapReportJson)
+                mykey = Key(self.bucket)
+                mykey.key = str_report_id
+                nmapreportjson = json.loads(mykey.get_contents_as_string())
+                nmapreport = NmapParser.parse_fromdict(nmapreportjson)
             except S3ResponseError:
                 print "Not Found"
         return nmapreport
@@ -86,13 +97,13 @@ class NmapS3Plugin(NmapBackendPlugin):
             :return: list of key/report
            TODO : add a filter capability
         """
-        nmapreportList = []
+        nmapreportlist = []
         for key in bucket_lister(self.bucket):
             if isinstance(key, Key):
-                nmapReportJson = json.loads(key.get_contents_as_string())
-                nmapreport = NmapParser.parse_fromdict(nmapReportJson)
-                nmapreportList.append((key.key, nmapreport))
-        return nmapreportList
+                nmapreportjson = json.loads(key.get_contents_as_string())
+                nmapreport = NmapParser.parse_fromdict(nmapreportjson)
+                nmapreportlist.append((key.key, nmapreport))
+        return nmapreportlist
 
     def delete(self, report_id=None):
         """
