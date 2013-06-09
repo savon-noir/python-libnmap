@@ -36,6 +36,7 @@ The different modules are documented below:
    parser
    objects
    diff
+   plugins_s3
 
 Indices and tables
 ==================
