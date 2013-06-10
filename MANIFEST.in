@@ -1,2 +1,3 @@
 include TODO
-recursive-include docs *.txt *.md *.rst
+include *.rst *.txt
+recursive-include docs *.rst
