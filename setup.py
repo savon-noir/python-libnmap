@@ -1,11 +1,11 @@
 from distutils.core import setup
 
-with open("README.txt") as rfile:
+with open("README.rst") as rfile:
     long_description = rfile.read()
 
 setup(
     name='python-libnmap',
-    version='0.2.4',
+    version='0.2.5',
     author='Ronald Bister',
     author_email='mini.pelle@gmail.com',
     packages=['libnmap', 'libnmap.plugins', 'libnmap.test'],
