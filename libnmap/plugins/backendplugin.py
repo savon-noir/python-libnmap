@@ -14,7 +14,8 @@ class NmapBackendPlugin(object):
         """
             insert NmapReport in the backend
             :param NmapReport:
-            :return: the ident of the object in the backend for future usage
+            :return: str the ident of the object in the backend for
+            future usage
             or None
         """
         raise NotImplementedError
@@ -34,9 +35,9 @@ class NmapBackendPlugin(object):
         """
         raise NotImplementedError
 
-    def getall(self):
+    def getall(self, filter):
         """
-            :return: collection of NmapReport
+            :return: collection of tuple (id,NmapReport)
             :param filter: Nice to have implement a filter capability
         """
         raise NotImplementedError

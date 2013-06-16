@@ -1,0 +1,10 @@
+sqlite:
+  adapter: sqlite3
+  database: "/tmp/reportdb.sql"
+  timeout: 500
+mysql:
+  adapter: mysql2
+  database: poulet 
+  username:
+  encoding: utf8
+

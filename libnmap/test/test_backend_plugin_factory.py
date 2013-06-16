@@ -6,41 +6,18 @@ from libnmap.parser import NmapParser
 from libnmap.plugins.backendplugin import NmapBackendPlugin
 from libnmap.plugins.backendpluginFactory import BackendPluginFactory
 
-#define all plugin that need test
-from libnmap.plugins.mongodb import NmapMongoPlugin
-from libnmap.plugins.sqlite import NmapSqlitePlugin
-
 
 class TestNmapBackendPlugin(unittest.TestCase):
     """
-    This testing class will create a testsuite for each plugins
+    This testing class will tests each plugins
     The following test need to be done :
        - test the factory
        - test all the method of the class NmapBackendPlugin:
           - Verify implmented/notImplemented
           - Verify the behaviour (ie insert must insert)
-    Sample of code to implement for a new plugin:
-
-     def %plugintest_factory(self):
-        pass
-
-    def %plugintest_insert(self):
-        pass
-
-    def %plugintest_update(self):
-        pass
-
-    def %plugintest_delete(self):
-        pass
-
-    def %plugintest_get(self):
-        pass
-
-    def %plugintest_getall(self):
-        pass
-
-    def %plugintest_find(self):
-        pass
+    To support a new plugin or a new way to instanciate a plugin, add a dict
+    with the necessary parameter in the urls table define in setUp
+    All testcase must loop thru theses urls to validate a plugins
     """
     def setUp(self):
         fdir = os.path.dirname(os.path.realpath(__file__))
@@ -67,53 +44,120 @@ class TestNmapBackendPlugin(unittest.TestCase):
                                                'files/1_hosts_nohostname.xml'),
                             'hosts': 1}]
         self.flist = self.flist_full
-
-    def mongo_test_factory(self):
-        """Invoke factory and test that the object is of the right classes"""
-        #create the backend factory object
-        factory = BackendPluginFactory()
-        mongodb = factory.create(plugin_name="mongodb")
-        self.assertEqual(isinstance(mongodb, NmapBackendPlugin), True)
-        self.assertEqual(isinstance(mongodb, NmapMongoPlugin), True)
-        self.assertEqual(isinstance(mongodb, NmapSqlitePlugin), False)
-
-    def mongo_test_insert(self):
-        """"best way to insert is to call save() of nmapreport"""
+        #build a list of NmapReport
+        self.reportList = []
         for testfile in self.flist:
             fd = open(testfile['file'], 'r')
             s = fd.read()
             fd.close()
+            nrp = NmapParser.parse(s)
+            self.reportList.append(nrp)
 
-            nr = NmapParser.parse(s)
-            #create the backend factory object
-            factory = BackendPluginFactory()
-            mongodb = factory.create(plugin_name="mongodb")
-            self.assertNotEqual(nr.save(mongodb),None)
+        self.urls = [{'plugin_name': "mongodb"},
+                     #{'plugin_name':'sql','url':'sqlite://','echo':'debug'},
+                     {'plugin_name': 'sql',
+                         'url': 'sqlite:////tmp/reportdb.sql',
+                         'echo': False},
+                     {'plugin_name': 'sql',
+                         'url': 'mysql+mysqldb://root@localhost/poulet',
+                         'echo': False},
+                     #Walrus
+                     ###{'plugin_name': 's3',
+                     ###    'aws_access_key_id': 'UU72FLVJCAYRATLXI70YH',
+                     ###    'aws_secret_access_key': 'wFg7gP5YFHjVlxakw1g1uCC8UR2xVW5ax9ErZCut',
+                     ###    'host':"walrus.ecc.eucalyptus.com",
+                     ###    'path':'/services/Walrus',
+                     ###    'port':8773,
+                     ###    'is_secure':False,
+                     ###    'bucket':"uu72flvjcayratlxi70yh_nmapreport33333",
+                     ###},
+                     ####Walrus
+                     {'plugin_name': 's3',
+                         'aws_access_key_id': 'UU72FLVJCAYRATLXI70YH',
+                         'aws_secret_access_key': 'wFg7gP5YFHjVlxakw1g1uCC8UR2xVW5ax9ErZCut',
+                         'host':"walrus.ecc.eucalyptus.com",
+                         'path':'/services/Walrus',
+                         'port':8773,
+                         'is_secure':False,
+                     },
+                     #S3
+                     ###{'plugin_name': 's3',
+                     ###    'aws_access_key_id': 'YOURKEY',
+                     ###    'aws_secret_access_key': 'YOURPASSWKEY',
+                     ###},
+                  ]
 
-    def mongo_test_update(self):
+    def test_backend_factory(self):
+        """ test_factory BackendPluginFactory.create(**url)
+            Invoke factory and test that the object is of the right classes
+        """
+        for url in self.urls:
+            backend = BackendPluginFactory.create(**url)
+            self.assertEqual(isinstance(backend, NmapBackendPlugin), True)
+            className = "Nmap%sPlugin" % url['plugin_name'].title()
+            self.assertEqual(backend.__class__.__name__, className, True)
+
+    def test_backend_insert(self):
+        """ test_insert
+            best way to insert is to call save() of nmapreport :P
+        """
+        for nrp in self.reportList:
+            for url in self.urls:
+                #create the backend factory object
+                backend = BackendPluginFactory.create(**url)
+                #save the report
+                returncode = nrp.save(backend)
+                #test return code
+                self.assertNotEqual(returncode, None)
+
+    def test_backend_get(self):
+        """ test_backend_get
+            inset all report and save the returned id in a list
+            then get each id and create a new list of report
+            compare each report (assume eq)
+        """
+        id_list = []
+        result_list = []
+        for url in self.urls:
+            backend = BackendPluginFactory.create(**url)
+            for nrp in self.reportList:
+                id_list.append(nrp.save(backend))
+            for rep_id in id_list:
+                result_list.append(backend.get(rep_id))
+            #print result_list[0]
+            #print self.reportList[0]
+            self.assertEqual(len(result_list), len(self.reportList))
+            self.assertEqual((result_list), (self.reportList))
+            id_list = []
+            result_list = []
+
+    def test_backend_getall(self):
         pass
 
-    def mongo_test_delete(self):
-        pass
+    def test_backend_delete(self):
+        """ test_backend_delete
+            inset all report and save the returned id in a list
+            for each id remove the item and test if not present
+        """
+        id_list = []
+        result_list = []
+        for url in self.urls:
+            backend = BackendPluginFactory.create(**url)
+            for nrp in self.reportList:
+                id_list.append(nrp.save(backend))
+            for rep_id in id_list:
+                result_list.append(backend.delete(rep_id))
+                self.assertEqual(backend.get(rep_id), None)
+            id_list = []
+            result_list = []
 
-    def mongo_test_get(self):
-        pass
-
-    def mongo_test_getall(self):
-        pass
-
-    def mongo_test_find(self):
-        pass
 
 if __name__ == '__main__':
-    template_test_suite = ['test_factory',
-                           'test_insert',
-                           'test_update',
-                           'test_delete',
-                           'test_get',
-                           'test_getall',
-                           'test_find']
-
-    test_suite = ['mongo_test_factory', 'mongo_test_insert']
+    test_suite = ['test_backend_factory',
+                  'test_backend_insert',
+                  'test_backend_get',
+                  'test_backend_getall',
+                  'test_backend_delete'
+                  ]
     suite = unittest.TestSuite(map(TestNmapBackendPlugin, test_suite))
     test_result = unittest.TextTestRunner(verbosity=5).run(suite)
