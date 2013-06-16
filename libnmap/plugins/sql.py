@@ -155,8 +155,6 @@ class NmapSqlPlugin(NmapBackendPlugin):
         sess = self.Session()
         nb_line = sess.query(NmapSqlPlugin.Reports).\
             filter_by(id=report_id).delete()
-        print nb_line
         sess.commit()
         sess.close()
-        print sess
         return nb_line

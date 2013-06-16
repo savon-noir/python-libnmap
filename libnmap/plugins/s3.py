@@ -11,7 +11,6 @@
 
 #!/usr/bin/env python
 import json
-import os
 from bson.objectid import ObjectId
 from boto.s3.connection import S3Connection, OrdinaryCallingFormat
 from boto.s3.key import Key
@@ -25,33 +24,49 @@ from libnmap.plugins.backendplugin import NmapBackendPlugin
 class NmapS3Plugin(NmapBackendPlugin):
     """
         This plugin save the reports on S3 and compatible.
-
-        This is now a beta version who use eucalyptus walrus
     """
     def __init__(self, **kwargs):
         """
-            - get access key/secret key from env or kwargs
             - create the conn object
-            - create the bucket
+            - create the bucket (if it doesn't exist)
+                - if not given, awsaccessKey_nmapreport
             - may raise exception (ie in case of conflict bucket name)
+            - sample :
+            To connect to walrus:
+            from libnmap.plugins.backendpluginFactory import
+                            BackendPluginFactory
+            walrusBackend =
+              BackendPluginFactory.create(
+                    plugin_name='s3',
+                    host="walrus.ecc.eucalyptus.com",
+                    path="/services/Walrus",port=8773,
+                    is_secure=False,
+                    aws_access_key_id='UU72FLVJCAYRATLXI70YH',
+                    aws_secret_access_key=
+                               'wFg7gP5YFHjVlxakw1g1uCC8UR2xVW5ax9ErZCut')
+           To connect to S3:
+           mybackend_S3 =
+             BackendPluginFactory.create(
+                plugin_name='s3',
+                is_secure=True,
+                aws_access_key_id='MYACCESSKEY',
+                aws_secret_access_key='MYSECRET')
         """
         NmapBackendPlugin.__init__(self)
         try:
-            self.awskey = (os.getenv('EC2_ACCESS_KEY') or
-                           kwargs['EC2_ACCESS_KEY'])
-            self.awssecret = (os.getenv('EC2_SECRET_KEY') or
-                              kwargs['EC2_SECRET_KEY'])
             calling_format = OrdinaryCallingFormat()
-            self.conn = S3Connection(host="walrus.ecc.eucalyptus.com",
-                                     path="/services/Walrus",
-                                     port=8773,
-                                     calling_format=calling_format,
-                                     is_secure=False,
-                                     aws_access_key_id=self.awskey,
-                                     aws_secret_access_key=self.awssecret)
-            self.bucket = self.conn.lookup(kwargs['bucket'])
+            if 'bucket' not in kwargs:
+                self.bucket_name = ''.join(
+                    [kwargs['aws_access_key_id'].lower(),
+                     "_nmapreport"])
+            else:
+                self.bucket_name = kwargs['bucket']
+                del kwargs['bucket']
+            kwargs['calling_format'] = calling_format
+            self.conn = S3Connection(**kwargs)
+            self.bucket = self.conn.lookup(self.bucket_name)
             if self.bucket is None:
-                self.bucket = self.conn.create_bucket(kwargs['bucket'])
+                self.bucket = self.conn.create_bucket(self.bucket_name)
         except:
             raise
 

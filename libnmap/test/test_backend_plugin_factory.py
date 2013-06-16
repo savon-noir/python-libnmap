@@ -60,11 +60,31 @@ class TestNmapBackendPlugin(unittest.TestCase):
                          'echo': False},
                      {'plugin_name': 'sql',
                          'url': 'mysql+mysqldb://root@localhost/poulet',
-                         'echo': True},
+                         'echo': False},
+                     #Walrus
+                     ###{'plugin_name': 's3',
+                     ###    'aws_access_key_id': 'UU72FLVJCAYRATLXI70YH',
+                     ###    'aws_secret_access_key': 'wFg7gP5YFHjVlxakw1g1uCC8UR2xVW5ax9ErZCut',
+                     ###    'host':"walrus.ecc.eucalyptus.com",
+                     ###    'path':'/services/Walrus',
+                     ###    'port':8773,
+                     ###    'is_secure':False,
+                     ###    'bucket':"uu72flvjcayratlxi70yh_nmapreport33333",
+                     ###},
+                     ####Walrus
                      {'plugin_name': 's3',
-                         'EC2_ACCESS_KEY': 'UU72FLVJCAYRATLXI70YH',
-                         'EC2_SECRET_KEY': 'wFg7gP5YFHjVlxakw1g1uCC8UR2xVW5ax9ErZCut',
-                         'bucket': 'nmapreport'},
+                         'aws_access_key_id': 'UU72FLVJCAYRATLXI70YH',
+                         'aws_secret_access_key': 'wFg7gP5YFHjVlxakw1g1uCC8UR2xVW5ax9ErZCut',
+                         'host':"walrus.ecc.eucalyptus.com",
+                         'path':'/services/Walrus',
+                         'port':8773,
+                         'is_secure':False,
+                     },
+                     #S3
+                     ###{'plugin_name': 's3',
+                     ###    'aws_access_key_id': 'YOURKEY',
+                     ###    'aws_secret_access_key': 'YOURPASSWKEY',
+                     ###},
                   ]
 
     def test_backend_factory(self):
