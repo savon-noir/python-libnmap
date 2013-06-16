@@ -239,7 +239,6 @@ class NmapParser(object):
         """
 
         xelement = cls.__format_element(scanhost_data)
-
         _host_header = cls.__format_attributes(xelement)
         _hostnames = []
         _services = []
@@ -271,7 +270,7 @@ class NmapParser(object):
         _etime = ''
         if 'starttime' in _host_header:
             _stime = _host_header['starttime']
-        if 'endime' in _host_header:
+        if 'endtime' in _host_header:
             _etime = _host_header['endtime']
         nhost = NmapHost(_stime,
                          _etime,
