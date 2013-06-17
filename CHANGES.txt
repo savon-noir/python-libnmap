@@ -1,5 +1,10 @@
+v0.3.0, 17/06/2013 -- Added fingerprint class
+                    - added NmapOSFingerprint class to provide better API to
+                      fingerprint data
+                    - added unit tests for basic NmapHost API check
+                    - added unit test for basic NmapOSFingerprint class
 v0.2.9, 17/06/2013 -- Add S3 plugin, allow to store nmapreport object to aws
-S3. and compatible (via boto)
+                    - S3. and compatible (via boto)
 v0.2.8, 11/06/2013 -- Prepare packaging for pypi
 v0.2.1, 17/05/2013 -- Code Docstring and added support for additional data
                     - added support for scripts in NmapService
