@@ -1,3 +1,5 @@
+v0.3.1, 17/06/2013 -- Refactory of objects to isolate each nmap object in a
+                      separate file
 v0.3.0, 17/06/2013 -- Added fingerprint class
                     - added NmapOSFingerprint class to provide better API to
                       fingerprint data
