@@ -101,7 +101,10 @@ class NmapHost(object):
         self._address = address if address is not None else {}
         self._services = services if services is not None else []
         self._extras = extras if extras is not None else {}
-        self.os = self.NmapOSFingerprint(self._extras['os'])
+        self._osfingerprinted = False
+        if 'os' in self._extras:
+            self.os = self.NmapOSFingerprint(self._extras['os'])
+            self._osfingerprinted = True
 
     def __eq__(self, other):
         """
@@ -311,6 +314,15 @@ class NmapHost(object):
         except (KeyError, TypeError):
             pass
         return rval
+
+    @property
+    def os_fingerprinted(self):
+        """
+            Specify if the host has OS fingerprint data available
+
+            :return: Boolean
+        """
+        return self._osfingerprinted
 
     @property
     def os_fingerprint(self):
