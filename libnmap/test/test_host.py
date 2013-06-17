@@ -159,6 +159,20 @@ class TestNmapHost(unittest.TestCase):
         self.assertEqual(h1, h4)
         self.assertNotEqual(h2, h3)
 
+    def test_host_api(self):
+        h = NmapParser.parse(host2)
+        self.assertEqual(h.starttime, "1361738318")
+        self.assertEqual(h.endtime, "13617386177")
+        self.assertEqual(h.address, '127.0.0.1')
+        self.assertEqual(h.status, "up")
+        self.assertEqual(h.hostnames, ['localhost', 'localhost', 'localhost2'])
+
+        h2 = NmapParser.parse(host3)
+        self.assertEqual(len(h2.services), 5)
+        self.assertEqual(len(h2.get_ports()), 5)
+        self.assertEqual(len(h2.get_open_ports()), 3)
+        self.assertEqual(h2.get_service(22, "tcp").state, "open")
+
     def test_diff_host(self):
         h1 = NmapParser.parse(host1)
         h2 = NmapParser.parse(host2)
@@ -201,6 +215,6 @@ class TestNmapHost(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    test_suite = ['test_eq_host', 'test_diff_host']
+    test_suite = ['test_eq_host', 'test_host_api', 'test_diff_host']
     suite = unittest.TestSuite(map(TestNmapHost, test_suite))
     test_result = unittest.TextTestRunner(verbosity=2).run(suite)
