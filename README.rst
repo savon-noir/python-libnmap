@@ -53,9 +53,9 @@ The only additional python modules you'll have to install depends if you wish to
 
 Below the list of optional dependencies:
 
-- sqlalchemy(+the driver ie:MySQL-python)
-- pymongo
-- boto
+- `sqlalchemy`_ (+the driver ie:MySQL-python)
+- `pymongo`_
+- `boto`_
 
 Install
 -------
@@ -86,3 +86,9 @@ Mike @bmx0r Boutillier for S3 and SQL-Alechemy plugins and for the constructive 
 .. _read the docs: https://libnmap.readthedocs.org
 
 .. _documentation: https://libnmap.readthedocs.org
+
+.. _boto: https://github.com/boto/boto
+
+.. _pymongo: https://github.com/mongodb/mongo-python-driver/
+
+.. _sqlalchemy: https://github.com/zzzeek/sqlalchemy
