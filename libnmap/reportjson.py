@@ -7,6 +7,7 @@ from libnmap.parser import NmapParser
 class ReportEncoder(json.JSONEncoder):
     def default(self, obj):
         otype = {'NmapHost': NmapHost,
+                 'NmapOSFingerprint': NmapHost.NmapOSFingerprint,
                  'NmapService': NmapService,
                  'NmapReport': NmapReport}
         if isinstance(obj, tuple(otype.values())):
