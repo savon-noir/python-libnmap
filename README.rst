@@ -31,10 +31,11 @@ The lib currently offers the following modules:
 - **report**: enables you to manipulate a parsed scan result and de/serialize scan results in a json format
 - **diff**: enables you to see what changed between two scans
 - **common**: contains basic nmap objects like NmapHost and NmapService. It is to note that each object can be "diff()ed" with another similar object.
-- **plugins**: enables you to support datastores for your scan results directly in the "NmapReport" object from report module:
+- **plugins**: enables you to support datastores for your scan results directly in the "NmapReport" object. from report module:
 
- - mongodb: only plugin implemented so far, ultra basic, for POC purpose only
- - sqlalchemy: on-going
+ - mongodb: insert/get/getAll/delete
+ - sqlalchemy: insert/get/getAll/delete
+ - aws s3: insert/get/getAll/delete
  - csv: todo (easy to implement)
  - elastic search: todo
 
@@ -52,8 +53,9 @@ The only additional python modules you'll have to install depends if you wish to
 
 Below the list of optional dependencies:
 
-- sqlite3
+- sqlalchemy(+the driver ie:MySQL-python)
 - pymongo
+- boto
 
 Install
 -------
