@@ -8,7 +8,7 @@ setup(
     version='0.2.8',
     author='Ronald Bister',
     author_email='mini.pelle@gmail.com',
-    packages=['libnmap', 'libnmap.plugins', 'libnmap.test'],
+    packages=['libnmap', 'libnmap.plugins', 'libnmap.objects'],
     url='http://pypi.python.org/pypi/python-libnmap/',
     license='Creative Common "Attribution" license (CC-BY) v3',
     description=('Python NMAP library enabling you to start async nmap tasks, '
