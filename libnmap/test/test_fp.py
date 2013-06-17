@@ -2,7 +2,7 @@
 
 import unittest
 import os
-from libnmap.parser import NmapParser, NmapParserException
+from libnmap.parser import NmapParser
 
 
 class TestNmapFP(unittest.TestCase):
