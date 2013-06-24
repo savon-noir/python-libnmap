@@ -64,8 +64,8 @@ class NmapProcess(Thread):
             raise Exception("Supplied target list should be either a "
                             "string of a list")
 
-        optlist = set(options.split())
-        if safe_mode and not optlist.isdisjoint(unsafe_opts):
+        self._nmap_options = set(options.split())
+        if safe_mode and not self._nmap_options.isdisjoint(unsafe_opts):
             raise Exception("unsafe options activated while safe_mode "
                             "is set True")
         self.__nmap_dynamic_options = options
@@ -337,6 +337,24 @@ class NmapProcess(Thread):
         except:
             pass
         return rval
+
+    @property
+    def targets(self):
+        """
+        Provides the list of targets to scan
+
+        :return: list of string
+        """
+        return self.__nmap_targets
+
+    @property
+    def options(self):
+        """
+        Provides the list of options for that scan
+
+        :return: list of string (nmap options)
+        """
+        return self._nmap_options
 
     @property
     def state(self):
