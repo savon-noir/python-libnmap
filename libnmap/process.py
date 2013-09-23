@@ -11,6 +11,7 @@ try:
 except ImportError:
     from queue import Queue, Empty, Full
 
+
 class NmapProcess(Thread):
     """
     NmapProcess is a class which wraps around the nmap executable.
