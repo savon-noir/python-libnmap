@@ -3,10 +3,13 @@ import os
 import pwd
 import shlex
 import subprocess
+import threading
 from threading import Thread
-from Queue import Queue, Empty, Full
 from xml.dom import pulldom
-
+try:
+    from Queue import Queue, Empty, Full
+except ImportError:
+    from queue import Queue, Empty, Full
 
 class NmapProcess(Thread):
     """
@@ -139,7 +142,7 @@ class NmapProcess(Thread):
         :return: the full nmap command line to run
         :rtype: string
         """
-        return ("%s %s %s %s %s".lstrip() % (self.__sudo_run,
+        return ("{0} {1} {2} {3} {4}".format(self.__sudo_run,
                                              self.__nmap_binary,
                                              self.__nmap_fixed_options,
                                              self.__nmap_dynamic_options,
@@ -169,7 +172,7 @@ class NmapProcess(Thread):
                                       "could not be found in system path: "
                                       "cannot run nmap with sudo")
 
-        self.__sudo_run = "%s -u %s" % (sudo_path, sudo_user)
+        self.__sudo_run = "{0} -u {1}".format(sudo_path, sudo_user)
         rc = self.run()
         self.__sudo_run = ""
 
@@ -200,18 +203,21 @@ class NmapProcess(Thread):
                 except Full:
                     raise Exception("Queue ran out of buffer: "
                                     "increase q.get(timeout) value")
+            thread_stdout.close()
 
         self._run_init()
         try:
             _tmp_cmdline = shlex.split(self.__nmap_command_line)
             self.__nmap_proc = subprocess.Popen(args=_tmp_cmdline,
-                                                stdin=subprocess.PIPE,
                                                 stdout=subprocess.PIPE,
-                                                stderr=subprocess.PIPE)
+                                                stderr=subprocess.PIPE,
+                                                bufsize=0)
             Thread(target=stream_reader, name='stdout-reader',
-                   args=(self.__nmap_proc.stdout, self.__io_queue)).start()
+                   args=(self.__nmap_proc.stdout,
+                         self.__io_queue)).start()
             Thread(target=stream_reader, name='stderr-reader',
-                   args=(self.__nmap_proc.stderr, self.__ioerr_queue)).start()
+                   args=(self.__nmap_proc.stderr,
+                         self.__ioerr_queue)).start()
             self.__state = self.RUNNING
         except OSError:
             self.__state = self.FAILED
@@ -232,9 +238,11 @@ class NmapProcess(Thread):
         :return: return code from nmap execution
         """
         thread_stream = ''
-        while self.__nmap_proc.poll() is None or not self.__io_queue.empty():
+        while (self.__nmap_proc.poll() is None or
+               threading.active_count() > 1 or
+               not self.__io_queue.empty()):
             try:
-                thread_stream = self.__io_queue.get(timeout=1)
+                thread_stream = self.__io_queue.get_nowait()
             except Empty:
                 pass
             except KeyboardInterrupt:
@@ -242,8 +250,9 @@ class NmapProcess(Thread):
             else:
                 evnt = self.__process_event(thread_stream)
                 if self.__nmap_event_callback and evnt:
-                    self.__nmap_event_callback(self, thread_stream)
+                    self.__nmap_event_callback(self)
                 self.__stdout += thread_stream
+                self.__io_queue.task_done()
 
         self.__nmap_rc = self.__nmap_proc.poll()
         if self.rc is None:
@@ -253,8 +262,11 @@ class NmapProcess(Thread):
             self.__progress = 100
         else:
             self.__state = self.FAILED
-            self.__stderr = self.__ioerr_queue.get(timeout=2)
-
+            try:
+                self.__stderr = self.__ioerr_queue.get(timeout=1)
+                self.__ioerr_queue.task_done()
+            except Empty:
+                pass
         return self.rc
 
     def run_background(self):
@@ -468,23 +480,24 @@ class NmapProcess(Thread):
 def main():
     def mycallback(nmapscan=None):
         if nmapscan.is_running():
-            print "Progress: %s %% - ETC: %s" % (nmapscan.progress,
-                                                 nmapscan.etc)
+            print("Progress: {0}% - ETC: {1}").format(nmapscan.progress,
+                                                      nmapscan.etc)
 
-    nm = NmapProcess("scanme.nmap.org", options="-sV",
+    #nm = NmapProcess("scanme.nmap.org", options="-sV",
+    nm = NmapProcess("localhost", options="-sV",
                      event_callback=mycallback)
     rc = nm.run()
 
     if rc == 0:
-        print "Scan started at {0} nmap version: {1}".format(nm.starttime,
-                                                             nm.version)
-        print "state: {0} (rc: {1})".format(nm.state, nm.rc)
-        print "results size: {0}".format(len(nm.stdout))
-        print "Scan ended {0}: {1}".format(nm.endtime, nm.summary)
+        print("Scan started at {0} nmap version: {1}").format(nm.starttime,
+                                                              nm.version)
+        print("state: {0} (rc: {1})").format(nm.state, nm.rc)
+        print("results size: {0}").format(len(nm.stdout))
+        print("Scan ended {0}: {1}").format(nm.endtime, nm.summary)
     else:
-        print "state: {0} (rc: {1})".format(nm.state, nm.rc)
-        print "Error: {stderr}".format(stderr=nm.stderr)
-        print "Result: {0}".format(nm.stdout)
+        print("state: {0} (rc: {1})").format(nm.state, nm.rc)
+        print("Error: {stderr}").format(stderr=nm.stderr)
+        print("Result: {0}").format(nm.stdout)
 
 if __name__ == '__main__':
     main()
