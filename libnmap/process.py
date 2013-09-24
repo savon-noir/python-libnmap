@@ -96,6 +96,7 @@ class NmapProcess(Thread):
         self.__summary = ''
         self.__stdout = ''
         self.__stderr = ''
+        self.initial_threads = 0
 
     def _run_init(self):
         """
@@ -213,6 +214,7 @@ class NmapProcess(Thread):
                                                 stdout=subprocess.PIPE,
                                                 stderr=subprocess.PIPE,
                                                 bufsize=0)
+            self.initial_threads = threading.active_count()
             Thread(target=stream_reader, name='stdout-reader',
                    args=(self.__nmap_proc.stdout,
                          self.__io_queue)).start()
@@ -240,7 +242,7 @@ class NmapProcess(Thread):
         """
         thread_stream = ''
         while (self.__nmap_proc.poll() is None or
-               threading.active_count() > 1 or
+               threading.active_count() != self.initial_threads or
                not self.__io_queue.empty()):
             try:
                 thread_stream = self.__io_queue.get_nowait()
@@ -484,7 +486,6 @@ def main():
             print("Progress: {0}% - ETC: {1}").format(nmapscan.progress,
                                                       nmapscan.etc)
 
-    #nm = NmapProcess("scanme.nmap.org", options="-sV",
     nm = NmapProcess("localhost", options="-sV",
                      event_callback=mycallback)
     rc = nm.run()
