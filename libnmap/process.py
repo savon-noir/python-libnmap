@@ -84,6 +84,7 @@ class NmapProcess(Thread):
 
         self.__io_queue = Queue()
         self.__ioerr_queue = Queue()
+        self.__process_killed = threading.Event()
 
         # API usable in callback function
         self.__state = self.READY
@@ -244,6 +245,8 @@ class NmapProcess(Thread):
         while (self.__nmap_proc.poll() is None or
                threading.active_count() != self.initial_threads or
                not self.__io_queue.empty()):
+            if self.__process_killed.isSet():
+                break
             try:
                 thread_stream = self.__io_queue.get_nowait()
             except Empty:
@@ -308,6 +311,14 @@ class NmapProcess(Thread):
         :return: True if nmap terminated successfully.
         """
         return self.state == self.DONE
+
+    def stop(self):
+        """
+        Send KILL -15 to the nmap subprocess and gently ask the threads to
+        stop.
+        """
+        self.__nmap_proc.terminate()
+        self.__process_killed.set()
 
     def __process_event(self, eventdata):
         """
