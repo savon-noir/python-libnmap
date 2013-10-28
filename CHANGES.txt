@@ -1,3 +1,5 @@
+v0.4.0, 28/10/2013 -- Bug corrected in missing data from nmap scan output
+                      Added stop() to terminate nmap scan running in background
 v0.3.1, 17/06/2013 -- Refactory of objects to isolate each nmap object in a
                       separate file
 v0.3.0, 17/06/2013 -- Added fingerprint class

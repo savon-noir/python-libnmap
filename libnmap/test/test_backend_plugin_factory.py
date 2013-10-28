@@ -72,14 +72,14 @@ class TestNmapBackendPlugin(unittest.TestCase):
                      ###    'bucket':"uu72flvjcayratlxi70yh_nmapreport33333",
                      ###},
                      ####Walrus
-                     {'plugin_name': 's3',
-                         'aws_access_key_id': 'UU72FLVJCAYRATLXI70YH',
-                         'aws_secret_access_key': 'wFg7gP5YFHjVlxakw1g1uCC8UR2xVW5ax9ErZCut',
-                         'host':"walrus.ecc.eucalyptus.com",
-                         'path':'/services/Walrus',
-                         'port':8773,
-                         'is_secure':False,
-                     },
+                   #  {'plugin_name': 's3',   # disabled for now
+                   #      'aws_access_key_id': 'UU72FLVJCAYRATLXI70YH',
+                   #      'aws_secret_access_key': 'wFg7gP5YFHjVlxakw1g1uCC8UR2xVW5ax9ErZCut',
+                   #      'host':"walrus.ecc.eucalyptus.com",
+                   #      'path':'/services/Walrus',
+                   #      'port':8773,
+                   #      'is_secure':False,
+                   #  },
                      #S3
                      ###{'plugin_name': 's3',
                      ###    'aws_access_key_id': 'YOURKEY',
@@ -153,12 +153,12 @@ class TestNmapBackendPlugin(unittest.TestCase):
 
 
 if __name__ == '__main__':
-#    test_suite = ['test_backend_factory',
-#                  'test_backend_insert',
-#                  'test_backend_get',
-#                  'test_backend_getall',
-#                  'test_backend_delete'
-#                  ]
+    test_suite = ['test_backend_factory',
+                  'test_backend_insert',
+                  'test_backend_get',
+                  'test_backend_getall',
+                  'test_backend_delete'
+                  ]
     test_suite = []
     suite = unittest.TestSuite(map(TestNmapBackendPlugin, test_suite))
     test_result = unittest.TextTestRunner(verbosity=5).run(suite)
