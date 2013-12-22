@@ -85,6 +85,8 @@ class NmapProcess(Thread):
         self.__io_queue = Queue()
         self.__ioerr_queue = Queue()
         self.__process_killed = threading.Event()
+        self.__thread_stdout = None
+        self.__thread_stderr = None
 
         # API usable in callback function
         self.__state = self.READY
@@ -97,7 +99,6 @@ class NmapProcess(Thread):
         self.__summary = ''
         self.__stdout = ''
         self.__stderr = ''
-        self.initial_threads = 0
 
     def _run_init(self):
         """
@@ -215,19 +216,28 @@ class NmapProcess(Thread):
                                                 stdout=subprocess.PIPE,
                                                 stderr=subprocess.PIPE,
                                                 bufsize=0)
-            self.initial_threads = threading.active_count()
-            Thread(target=stream_reader, name='stdout-reader',
-                   args=(self.__nmap_proc.stdout,
-                         self.__io_queue)).start()
-            Thread(target=stream_reader, name='stderr-reader',
-                   args=(self.__nmap_proc.stderr,
-                         self.__ioerr_queue)).start()
+            self.__thread_stdout = Thread(target=stream_reader,
+                                          name='stdout-reader',
+                                          args=(self.__nmap_proc.stdout,
+                                                self.__io_queue))
+            self.__thread_stderr = Thread(target=stream_reader,
+                                          name='stderr-reader',
+                                          args=(self.__nmap_proc.stderr,
+                                                self.__ioerr_queue))
+
+            self.__thread_stdout.start()
+            self.__thread_stderr.start()
+
             self.__state = self.RUNNING
         except OSError:
             self.__state = self.FAILED
             raise
 
         return self.__wait()
+
+    def active_fd(self):
+        return (self.__thread_stdout.is_alive() or
+                self.__thread_stderr.is_alive())
 
     def __wait(self):
         """
@@ -243,8 +253,9 @@ class NmapProcess(Thread):
         """
         thread_stream = ''
         while (self.__nmap_proc.poll() is None or
-               threading.active_count() != self.initial_threads or
-               not self.__io_queue.empty()):
+               self.active_fd() is True or
+               not self.__io_queue.empty() or
+               not self.__ioerr_queue.empty()):
             if self.__process_killed.isSet():
                 break
             try:
@@ -276,7 +287,6 @@ class NmapProcess(Thread):
         return self.rc
 
     def run_background(self):
-        self.daemon = True
         super(NmapProcess, self).start()
 
     def is_running(self):
