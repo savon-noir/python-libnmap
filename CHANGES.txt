@@ -1,3 +1,10 @@
+v0.4.2, 26/10/2013 -- Bug corrected: issue 8
+                      There is no guarantee that "finished" or "runstats" will be
+                      received by event parser of process.py.
+                      Summary functions are now flagged as deprecated. To use data
+                      from scan summary of numbers of hosts up, the user of the
+                      lib will have to use NmapParser.parse() and the appropriate
+                      accessors.
 v0.4.1, 26/10/2013 -- Bug corrected: issue6
                       Infinite loop while launching several nmap scans in background
 v0.4.0, 28/10/2013 -- Bug corrected in missing data from nmap scan output
