@@ -1,3 +1,5 @@
+v0.4.1, 26/10/2013 -- Bug corrected: issue6
+                      Infinite loop while launching several nmap scans in background
 v0.4.0, 28/10/2013 -- Bug corrected in missing data from nmap scan output
                       Added stop() to terminate nmap scan running in background
 v0.3.1, 17/06/2013 -- Refactory of objects to isolate each nmap object in a
