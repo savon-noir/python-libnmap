@@ -6,6 +6,7 @@ import subprocess
 import threading
 from threading import Thread
 from xml.dom import pulldom
+import warnings
 try:
     from Queue import Queue, Empty, Full
 except ImportError:
@@ -423,6 +424,7 @@ class NmapProcess(Thread):
 
         :return: string. Unix timestamp
         """
+        warnings.warn("data collected from finished events are deprecated. Use NmapParser.parse()", DeprecationWarning)
         return self.__endtime
 
     @property
@@ -432,6 +434,7 @@ class NmapProcess(Thread):
 
         :return: string
         """
+        warnings.warn("data collected from finished events are deprecated. Use NmapParser.parse()", DeprecationWarning)
         return self.__elapsed
 
     @property
@@ -441,6 +444,7 @@ class NmapProcess(Thread):
 
         :return: string
         """
+        warnings.warn("data collected from finished events are deprecated. Use NmapParser.parse()", DeprecationWarning)
         return self.__summary
 
     @property
