@@ -117,7 +117,7 @@ class NmapHost(object):
                 self._mac_addr = addr['addr']
 
         self._main_address = self._ipv4_addr or self._ipv6_addr or ''
-        self._address = address #self._ipv4_addr or self._ipv6_addr or ''
+        self._address = address
 
     def __eq__(self, other):
         """
