@@ -407,7 +407,11 @@ class NmapParser(object):
         rdict['osmatch'] = os_match_probability
         rdict['osclass'] = os_class_probability
         rdict['ports_used'] = os_ports_used
-        rdict['osfingerprint'] = os_fp['fingerprint']
+        if 'fingerprint' in os_fp:
+            rdict['osfingerprint'] = os_fp['fingerprint']
+        else:
+            rdict['osfingerprint'] = ''
+
 
         return rdict
 

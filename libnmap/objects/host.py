@@ -348,7 +348,7 @@ class NmapHost(object):
         """
         rval = []
         try:
-            rval = self._extras['ports_used']
+            rval = self._extras['os']['ports_used']
         except (KeyError, TypeError):
             pass
         return rval
