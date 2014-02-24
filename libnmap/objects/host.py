@@ -51,8 +51,8 @@ class NmapHost(object):
                     if int(osclass_entry['accuracy']) >= min_accuracy:
                         _relevantkeys = ['type', 'vendor', 'osfamily', 'osgen']
                         _ftstr = "|".join([vkey + ": " + osclass_entry[vkey]
-                            for vkey in osclass_entry
-                            if vkey in _relevantkeys])
+                                          for vkey in osclass_entry
+                                          if vkey in _relevantkeys])
                         os_array.append(_ftstr)
                 except (KeyError, TypeError):
                     pass
@@ -116,7 +116,8 @@ class NmapHost(object):
             elif addr['addrtype'] == 'mac':
                 self._mac_addr = addr['addr']
 
-        self._address = self._ipv4_addr or self._ipv6_addr or ''
+        self._main_address = self._ipv4_addr or self._ipv6_addr or ''
+        self._address = address #self._ipv4_addr or self._ipv6_addr or ''
 
     def __eq__(self, other):
         """
@@ -200,7 +201,7 @@ class NmapHost(object):
 
             :return: IP address as a string
         """
-        return self._address
+        return self._main_address
 
     @address.setter
     def address(self, addrdict):
@@ -217,7 +218,8 @@ class NmapHost(object):
         if addrdict['addrtype'] == 'mac':
             self._mac_addr = addrdict['addr']
 
-        self._address = self._ipv4_addr or self._ipv6_addr or ''
+        self._main_address = self._ipv4_addr or self._ipv6_addr or ''
+        self._address = addrdict
 
     @property
     def ipv4(self):
