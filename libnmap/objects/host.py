@@ -51,8 +51,8 @@ class NmapHost(object):
                     if int(osclass_entry['accuracy']) >= min_accuracy:
                         _relevantkeys = ['type', 'vendor', 'osfamily', 'osgen']
                         _ftstr = "|".join([vkey + ": " + osclass_entry[vkey]
-                                           for vkey in osclass_entry
-                                           if vkey in _relevantkeys])
+                            for vkey in osclass_entry
+                            if vkey in _relevantkeys])
                         os_array.append(_ftstr)
                 except (KeyError, TypeError):
                     pass
@@ -71,9 +71,9 @@ class NmapHost(object):
                 _fmtstr += "OS CLASS:\r\n"
                 for _oscline in self.osclass():
                     _fmtstr += "  {0}\r\n".format(_oscline)
-            elif len(self.fingerprint):
+            elif len(self.fingerprint()):
                 _fmtstr += "OS FINGERPRINT:\r\n"
-                _fmtstr += "  {0}".format(self.fingerprint)
+                _fmtstr += "  {0}".format(self.fingerprint())
             return _fmtstr
 
     """
@@ -98,13 +98,25 @@ class NmapHost(object):
         self._endtime = endtime
         self._hostnames = hostnames if hostnames is not None else []
         self._status = status if status is not None else {}
-        self._address = address if address is not None else {}
         self._services = services if services is not None else []
         self._extras = extras if extras is not None else {}
         self._osfingerprinted = False
         if 'os' in self._extras:
             self.os = self.NmapOSFingerprint(self._extras['os'])
             self._osfingerprinted = True
+
+        self._ipv4_addr = None
+        self._ipv6_addr = None
+        self._mac_addr = None
+        for addr in address:
+            if addr['addrtype'] == "ipv4":
+                self._ipv4_addr = addr['addr']
+            elif addr['addrtype'] == 'ipv6':
+                self._ipv6_addr = addr['addr']
+            elif addr['addrtype'] == 'mac':
+                self._mac_addr = addr['addr']
+
+        self._address = self._ipv4_addr or self._ipv6_addr or ''
 
     def __eq__(self, other):
         """
@@ -188,7 +200,7 @@ class NmapHost(object):
 
             :return: IP address as a string
         """
-        return self._address['addr']
+        return self._address
 
     @address.setter
     def address(self, addrdict):
@@ -198,7 +210,41 @@ class NmapHost(object):
             :param addrdict: valid dict is {'addr': '1.1.1.1',
                                             'addrtype': 'ipv4'}
         """
-        self._address = addrdict
+        if addrdict['addrtype'] == 'ipv4':
+            self._ipv4_addr = addrdict['addr']
+        elif addrdict['addrtype'] == 'ipv6':
+            self._ipv6_addr = addrdict['addr']
+        if addrdict['addrtype'] == 'mac':
+            self._mac_addr = addrdict['addr']
+
+        self._address = self._ipv4_addr or self._ipv6_addr or ''
+
+    @property
+    def ipv4(self):
+        """
+            Accessor for the IPv4 address of the scanned host
+
+            :return: IPv4 address as a string
+        """
+        return self._ipv4_addr or ''
+
+    @property
+    def mac(self):
+        """
+            Accessor for the MAC address of the scanned host
+
+            :return: MAC address as a string
+        """
+        return self._mac_addr or ''
+
+    @property
+    def ipv6(self):
+        """
+            Accessor for the IPv6 address of the scanned host
+
+            :return: IPv6 address as a string
+        """
+        return self._ipv6_addr or ''
 
     @property
     def status(self):

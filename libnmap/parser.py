@@ -243,7 +243,7 @@ class NmapParser(object):
         _hostnames = []
         _services = []
         _status = {}
-        _address = {}
+        _addresses = []
         _host_extras = {}
         extra_tags = ['uptime', 'distance', 'tcpsequence',
                       'ipidsequence', 'tcptssequence', 'times']
@@ -257,7 +257,7 @@ class NmapParser(object):
             elif xh.tag == 'status':
                 _status = cls.__format_attributes(xh)
             elif xh.tag == 'address':
-                _address = cls.__format_attributes(xh)
+                _addresses.append(cls.__format_attributes(xh))
             elif xh.tag == 'os':
                 _os_extra = cls.__parse_os_fingerprint(xh)
                 _host_extras.update({'os': _os_extra})
@@ -274,7 +274,7 @@ class NmapParser(object):
             _etime = _host_header['endtime']
         nhost = NmapHost(_stime,
                          _etime,
-                         _address,
+                         _addresses,
                          _status,
                          _hostnames,
                          _services,
@@ -411,7 +411,6 @@ class NmapParser(object):
             rdict['osfingerprint'] = os_fp['fingerprint']
         else:
             rdict['osfingerprint'] = ''
-
 
         return rdict
 
