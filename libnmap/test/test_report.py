@@ -167,7 +167,7 @@ class TestNmapParser(unittest.TestCase):
             host1 = np1.hosts.pop()
             host2 = np2.hosts.pop()
 
-            host1._address['addr'] = 'xxxxxx'
+            host1.address = {'addr': '1.3.3.7', 'addrtype': 'ipv4'}
             self.assertNotEqual(host1, host2)
 
     def test_host_equal(self):
