@@ -67,7 +67,7 @@ class NmapProcess(Thread):
             self.__nmap_targets = targets
         else:
             raise Exception("Supplied target list should be either a "
-                            "string of a list")
+                            "string or a list")
 
         self._nmap_options = set(options.split())
         if safe_mode and not self._nmap_options.isdisjoint(unsafe_opts):
