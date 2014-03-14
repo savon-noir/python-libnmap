@@ -472,6 +472,21 @@ class NmapHost(object):
             pass
         return rval
 
+
+    @property
+    def scripts_results(self):
+        """
+            Scripts results specific to the scanned host
+
+            :return: array of <script> dictionary
+        """
+        rval = {}
+        try:
+            rval = self._extras['hostscript']
+        except (KeyError, TypeError):
+            pass
+        return rval
+
     @property
     def id(self):
         """

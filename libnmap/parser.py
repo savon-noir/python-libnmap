@@ -261,6 +261,9 @@ class NmapParser(object):
             elif xh.tag == 'os':
                 _os_extra = cls.__parse_os_fingerprint(xh)
                 _host_extras.update({'os': _os_extra})
+            elif xh.tag == 'hostscript':
+                _host_scripts = cls.__parse_host_scripts(xh)
+                _host_extras.update({'hostscript': _host_scripts})
             elif xh.tag in extra_tags:
                 _host_extras[xh.tag] = cls.__format_attributes(xh)
             #else:
@@ -356,7 +359,7 @@ class NmapParser(object):
             elif xport.tag == 'service':
                 _service = cls.__format_attributes(xport)
             elif xport.tag == 'script':
-                _script_dict = cls.__format_attributes(xport)
+                _script_dict = cls.__parse_script(xport)
                 _service_extras.append(_script_dict)
 
         if(_portid is None or _protocol is None
@@ -371,6 +374,40 @@ class NmapParser(object):
                             _service,
                             _service_extras)
         return nport
+
+    @classmethod
+    def __parse_script(cls, script_data):
+        """
+            Private method parsing the data from NSE scripts output
+
+            :param script_data: portion of XML describing the results of the
+            script data
+            :type script_data: xml.ElementTree.Element or a string
+
+            :return: python dict holding scripts output
+        """
+        _script_dict = cls.__format_attributes(script_data)
+        return _script_dict 
+
+    @classmethod
+    def __parse_host_scripts(cls, scripts_data):
+        """
+            Private method parsing the data from scripts affecting
+            the target host.
+            Contents of <hostscript> is returned as a list of dict.
+
+            :param scripts_data: portion of XML describing the results of the
+            scripts data
+            :type scripts_data: xml.ElementTree.Element or a string
+
+            :return: python list holding scripts output in a dict
+        """
+        _host_scripts = []
+        for xscript in scripts_data:
+            if xscript.tag == 'script':
+                _script_dict = cls.__parse_script(xscript)
+            _host_scripts.append(_script_dict)
+        return _host_scripts
 
     @classmethod
     def __parse_os_fingerprint(cls, os_data):
