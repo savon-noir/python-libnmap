@@ -387,7 +387,7 @@ class NmapParser(object):
             :return: python dict holding scripts output
         """
         _script_dict = cls.__format_attributes(script_data)
-        return _script_dict 
+        return _script_dict
 
     @classmethod
     def __parse_host_scripts(cls, scripts_data):

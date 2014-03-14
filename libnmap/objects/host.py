@@ -472,7 +472,6 @@ class NmapHost(object):
             pass
         return rval
 
-
     @property
     def scripts_results(self):
         """
