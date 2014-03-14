@@ -352,7 +352,8 @@ class NmapParser(object):
 
         _state = None
         _service = None
-        _service_extras = []
+        _service_scripts = []
+        _service_extras = {}
         for xport in xelement:
             if xport.tag == 'state':
                 _state = cls.__format_attributes(xport)
@@ -360,7 +361,8 @@ class NmapParser(object):
                 _service = cls.__format_attributes(xport)
             elif xport.tag == 'script':
                 _script_dict = cls.__parse_script(xport)
-                _service_extras.append(_script_dict)
+                _service_scripts.append(_script_dict)
+        _service_extras['scripts'] = _service_scripts
 
         if(_portid is None or _protocol is None
                 or _state is None or _service is None):
@@ -387,6 +389,17 @@ class NmapParser(object):
             :return: python dict holding scripts output
         """
         _script_dict = cls.__format_attributes(script_data)
+
+        _elt_dict = {}
+        for script_elem in script_data:
+            if script_elem.tag == 'elem':
+                _elt_dict.update({script_elem.get('key'): script_elem.text})
+            elif script_elem.tag == 'table':
+                tdict = {}
+                for telem in script_elem:
+                    tdict[telem.get('key')] = telem.text
+                _elt_dict[script_elem.get('key')] = tdict
+        _script_dict['elements'] = _elt_dict
         return _script_dict
 
     @classmethod

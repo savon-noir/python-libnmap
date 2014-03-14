@@ -150,9 +150,10 @@ class NmapService(object):
                               if k not in notrelevant])
         return b
 
+    @property
     def scripts_results(self):
         """
-            Gives a python dictionary of the nse scripts results.
+            Gives a python list of the nse scripts results.
 
             The dict key is the name (id) of the nse script and
             the value is the output of the script.
@@ -161,8 +162,7 @@ class NmapService(object):
         """
         scripts_dict = None
         try:
-            scripts_dict = dict([(bdct['id'], bdct['output'])
-                                 for bdct in self._service_extras])
+            scripts_dict = self._service_extras['scripts']
         except (KeyError, TypeError):
             pass
         return scripts_dict
