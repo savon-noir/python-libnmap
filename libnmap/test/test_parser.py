@@ -139,6 +139,10 @@ class TestNmapParser(unittest.TestCase):
             self.assertNotEqual(p.state, "open")
             self.assertEqual(p.state, "filtered")
             self.assertEqual(p.service, "smtp")
+            self.assertEqual(p.reason, "admin-prohibited")
+            self.assertEqual(p.reason_ttl, "253")
+            self.assertEqual(p.reason_ip, "109.133.192.1")
+
 
     def test_port_except(self):
         self.assertRaises(ValueError,

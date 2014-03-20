@@ -36,6 +36,11 @@ class NmapService(object):
         self._protocol = protocol
         self._state = state if state is not None else {}
         self._service = service if service is not None else {}
+
+        self._reason = self._state['reason'] if 'reason' in self._state else ''
+        self._reason_ttl = self._state['reason_ttl'] if 'reason_ttl' in self._state else ''
+        self._reason_ip = self._state['reason_ip'] if 'reason_ip' in self._state else ''
+
         self._service_extras = []
         if service_extras is not None:
             self._service_extras = service_extras
@@ -78,7 +83,7 @@ class NmapService(object):
 
     def __hash__(self):
         return (hash(self.port) ^ hash(self.protocol) ^ hash(self.state) ^
-                hash(self.service) ^ hash(self.banner))
+                hash(self.reason) ^ hash(self.service) ^ hash(self.banner))
 
     def changed(self, other):
         """
@@ -116,6 +121,33 @@ class NmapService(object):
             :return: string
         """
         return self._state['state'] if 'state' in self._state else None
+
+    @property
+    def reason(self):
+        """
+            Accessor for service's state reason (syn-ack, filtered,...)
+
+            :return: string or empty if not applicable
+        """
+        return self._reason
+
+    @property
+    def reason_ip(self):
+        """
+            Accessor for service's state reason ip
+
+            :return: string or empty if not applicable
+        """
+        return self._reason_ip
+
+    @property
+    def reason_ttl(self):
+        """
+            Accessor for service's state reason ttl
+
+            :return: string or empty if not applicable
+        """
+        return self._reason_ttl
 
     @property
     def service(self):
@@ -188,7 +220,9 @@ class NmapService(object):
         """
         return ({'id': str(self.id), 'port': str(self.port),
                  'protocol': self.protocol, 'banner': self.banner,
-                 'service': self.service, 'state': self.state})
+                 'service': self.service, 'state': self.state,
+                 'reason': self.reason
+                })
 
     def diff(self, other):
         """
