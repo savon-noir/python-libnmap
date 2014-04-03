@@ -204,6 +204,7 @@ class NmapParser(object):
                               address=h['__NmapHost__']['_address'],
                               status=h['__NmapHost__']['_status'],
                               hostnames=h['__NmapHost__']['_hostnames'],
+                              extras=h['__NmapHost__']['_extras'],
                               services=slist)
                 hlist.append(nh)
             nreport['_hosts'] = hlist
