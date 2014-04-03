@@ -115,7 +115,7 @@ class NmapParser(object):
                 nmap_scan['_hosts'].append(cls._parse_xml_host(el))
             elif el.tag == 'runstats':
                 nmap_scan['_runstats'] = cls.__parse_runstats(el)
-            #else:
+            # else:
             #    print "struct pparse unknown attr: {0} value: {1}".format(
             #        el.tag,
             #        el.get(el.tag))
@@ -267,7 +267,7 @@ class NmapParser(object):
                 _host_extras.update({'hostscript': _host_scripts})
             elif xh.tag in extra_tags:
                 _host_extras[xh.tag] = cls.__format_attributes(xh)
-            #else:
+            # else:
             #    print "struct host unknown attr: %s value: %s" %
             #           (h.tag, h.get(h.tag))
         _stime = ''
@@ -325,7 +325,7 @@ class NmapParser(object):
             if xservice.tag == 'port':
                 nport = cls._parse_xml_port(xservice)
                 ports.append(nport)
-            #else:
+            # else:
             #    print "struct port unknown attr: %s value: %s" %
             #           (h.tag, h.get(h.tag))
         return ports

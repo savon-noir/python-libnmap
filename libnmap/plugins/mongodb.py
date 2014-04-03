@@ -51,12 +51,12 @@ class NmapMongodbPlugin(NmapBackendPlugin):
             rid = ObjectId(str_report_id)
 
         if isinstance(rid, ObjectId):
-            #get a specific report by mongo's id
+            # get a specific report by mongo's id
             resultset = self.collection.find({'_id': rid})
             if resultset.count() == 1:
-                #search by id means only one in the iterator
+                # search by id means only one in the iterator
                 record = resultset[0]
-                #remove mongo's id to recreate the NmapReport Obj
+                # remove mongo's id to recreate the NmapReport Obj
                 del record['_id']
                 nmapreport = NmapParser.parse_fromdict(record)
         return nmapreport
