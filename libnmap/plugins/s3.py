@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 :mod:`libnmap.plugin.s3` -- S3 Backend Plugin
 ===================================
@@ -8,8 +9,6 @@
 .. moduleauthor:: Ronald Bister
 .. moduleauthor:: Mike Boutillier
 """
-
-#!/usr/bin/env python
 import json
 from bson.objectid import ObjectId
 from boto.s3.connection import S3Connection, OrdinaryCallingFormat

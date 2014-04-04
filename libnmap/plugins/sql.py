@@ -89,7 +89,7 @@ class NmapSqlPlugin(NmapBackendPlugin):
         self.url = None
         self.Session = sessionmaker()
 
-        if not 'url' in kwargs:
+        if 'url' not in kwargs:
             raise ValueError
         self.url = kwargs['url']
         del kwargs['url']

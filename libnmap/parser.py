@@ -115,7 +115,7 @@ class NmapParser(object):
                 nmap_scan['_hosts'].append(cls._parse_xml_host(el))
             elif el.tag == 'runstats':
                 nmap_scan['_runstats'] = cls.__parse_runstats(el)
-            #else:
+            # else:
             #    print "struct pparse unknown attr: {0} value: {1}".format(
             #        el.tag,
             #        el.get(el.tag))
@@ -204,6 +204,7 @@ class NmapParser(object):
                               address=h['__NmapHost__']['_address'],
                               status=h['__NmapHost__']['_status'],
                               hostnames=h['__NmapHost__']['_hostnames'],
+                              extras=h['__NmapHost__']['_extras'],
                               services=slist)
                 hlist.append(nh)
             nreport['_hosts'] = hlist
@@ -268,7 +269,7 @@ class NmapParser(object):
                 _host_extras.update({'hostscript': _host_scripts})
             elif xh.tag in extra_tags:
                 _host_extras[xh.tag] = cls.__format_attributes(xh)
-            #else:
+            # else:
             #    print "struct host unknown attr: %s value: %s" %
             #           (h.tag, h.get(h.tag))
         _stime = ''
@@ -329,7 +330,7 @@ class NmapParser(object):
             elif xservice.tag == 'extraports':
                 extraports = cls.__parse_extraports(xservice)
                 rdict['extraports'] = extraports
-            #else:
+            # else:
             #    print "struct port unknown attr: %s value: %s" %
             #           (h.tag, h.get(h.tag))
         return rdict

@@ -47,7 +47,6 @@ class NmapReport(object):
             :return: str
         """
         if backend is not None:
-            #do stuff
             _id = backend.insert(self)
         else:
             raise RuntimeError
