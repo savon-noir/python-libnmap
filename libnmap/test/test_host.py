@@ -173,6 +173,16 @@ class TestNmapHost(unittest.TestCase):
         self.assertEqual(len(h2.get_open_ports()), 3)
         self.assertEqual(h2.get_service(22, "tcp").state, "open")
 
+    def test_extra_ports(self):
+        h1 = NmapParser.parse(host1)
+        h2 = NmapParser.parse(host2)
+
+        self.assertEqual(h1.extraports_state['state'], {'count': '995', 'state': 'WILLY_WONCKA'})
+        self.assertEqual(h1.extraports_reasons, [{'reason': 'conn-refused', 'count': '995'}])
+
+        self.assertEqual(h2.extraports_state['state'], {'count': '995', 'state': 'closed'})
+        self.assertEqual(h2.extraports_reasons, [{'reason': 'conn-refused', 'count': '995'}])
+
     def test_diff_host(self):
         h1 = NmapParser.parse(host1)
         h2 = NmapParser.parse(host2)

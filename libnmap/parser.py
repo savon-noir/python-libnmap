@@ -252,8 +252,10 @@ class NmapParser(object):
                 for hostname in cls.__parse_hostnames(xh):
                     _hostnames.append(hostname)
             elif xh.tag == 'ports':
-                for port in cls._parse_xml_ports(xh):
+                ports_dict = cls._parse_xml_ports(xh)
+                for port in ports_dict['ports']:
                     _services.append(port)
+                _host_extras['extraports'] = ports_dict['extraports']
             elif xh.tag == 'status':
                 _status = cls.__format_attributes(xh)
             elif xh.tag == 'address':
@@ -319,15 +321,18 @@ class NmapParser(object):
 
         xelement = cls.__format_element(scanports_data)
 
-        ports = []
+        rdict = {'ports': [], 'extraports': None}
         for xservice in xelement:
             if xservice.tag == 'port':
                 nport = cls._parse_xml_port(xservice)
-                ports.append(nport)
+                rdict['ports'].append(nport)
+            elif xservice.tag == 'extraports':
+                extraports = cls.__parse_extraports(xservice)
+                rdict['extraports'] = extraports
             #else:
             #    print "struct port unknown attr: %s value: %s" %
             #           (h.tag, h.get(h.tag))
-        return ports
+        return rdict
 
     @classmethod
     def _parse_xml_port(cls, scanport_data):
@@ -376,6 +381,32 @@ class NmapParser(object):
                             _service,
                             _service_extras)
         return nport
+
+    @classmethod
+    def __parse_extraports(cls, extraports_data):
+        """
+            Private method parsing the data from extra scanned ports.
+            X extraports were in state "closed" server returned "conn-refused"
+            tag: <extraports>
+
+            :param extraports_data: XML data for extraports
+            :type extraports_data: xml.ElementTree.Element or a string
+
+            :return: python dict with following keys: state, count, reason
+        """
+        rdict = {'state': '', 'count': '', 'reasons': []}
+        xelement = cls.__format_element(extraports_data)
+        extraports_dict = cls.__format_attributes(xelement)
+
+        if 'state' in extraports_dict:
+            rdict['state'] = extraports_dict
+        if 'count' in extraports_dict:
+            rdict['count'] = extraports_dict
+        for xelt in xelement:
+            if xelt.tag == 'extrareasons':
+                extrareasons_dict = cls.__format_attributes(xelt)
+                rdict['reasons'].append(extrareasons_dict)
+        return rdict
 
     @classmethod
     def __parse_script(cls, script_data):

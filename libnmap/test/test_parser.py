@@ -125,7 +125,8 @@ class TestNmapParser(unittest.TestCase):
             NmapParser.parse(s)
 
     def test_class_ports_parser(self):
-        plist = NmapParser.parse(self.ports_string)
+        pdict = NmapParser.parse(self.ports_string)
+        plist = pdict['ports']
         self.assertEqual(len(plist), 4)
         self.assertEqual(sorted([p.port for p in plist]),
                          sorted([22, 25, 9929, 80]))
