@@ -514,7 +514,6 @@ class NmapHost(object):
 
             :return: array of dict containing keys 'state' and 'count'
         """
-        _xtrports = self._extras['extraports']
         return self._extras['extraports']['reasons']
 
     def get_dict(self):
