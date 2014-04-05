@@ -40,6 +40,8 @@ class NmapService(object):
         self._reason = ''
         self._reason_ip = ''
         self._reason_ttl = ''
+        self._servicefp = ''
+        self._tunnel = ''
 
         if 'reason' in self._state:
             self._reason = self._state['reason']
@@ -47,6 +49,11 @@ class NmapService(object):
             self._reason_ttl = self._state['reason_ttl']
         if 'reason_ip' in self._state:
             self._reason_ip = self._state['reason_ip']
+
+        if 'servicefp' in self._service:
+            self._servicefp = self._service['servicefp']
+        if 'tunnel' in self._service:
+            self._servicefp = self._service['tunnel']
 
         self._service_extras = []
         if service_extras is not None:
@@ -205,6 +212,27 @@ class NmapService(object):
         except (KeyError, TypeError):
             pass
         return scripts_dict
+
+    @property
+    def servicefp(self):
+        """
+            Accessor for the service's fingerprint
+            if the nmap option -sV or -A is used
+
+            :return: string if available
+        """
+        return self._servicefp
+
+    @property
+    def tunnel(self):
+        """
+            Accessor for the service's tunnel type
+            if applicable and available from scan
+            results
+
+            :return: string if available
+        """
+        return self._tunnel
 
     @property
     def id(self):
