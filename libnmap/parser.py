@@ -1,11 +1,14 @@
 #!/usr/bin/env python
-import xml.etree.ElementTree as ET
+try:
+    import xml.etree.cElementTree as ET
+except ImportError:
+    import xml.etree.ElementTree as ET
 from libnmap.objects import NmapHost, NmapService, NmapReport
 
 
 class NmapParser(object):
     @classmethod
-    def parse(cls, nmap_data=None, data_type='XML'):
+    def parse(cls, nmap_data=None, data_type='XML', incomplete=False):
         """
             Generic class method of NmapParser class.
             The data to be parsed does not need to be a complete nmap
@@ -22,6 +25,11 @@ class NmapParser(object):
             :param data_type: specifies the type of data to be parsed.
             :type data_type: string ("XML"|"JSON"|"YAML").
 
+            :param incomplete: enable you to parse interrupted nmap scans
+            and/or incomplete nmap xml blocks by adding a </nmaprun> at
+            the end of the scan.
+            :type incomplete: boolean
+
             As of today, only XML parsing is supported.
 
             :return: NmapObject (NmapHost, NmapService or NmapReport)
@@ -29,7 +37,7 @@ class NmapParser(object):
 
         nmapobj = None
         if data_type == "XML":
-            nmapobj = cls._parse_xml(nmap_data)
+            nmapobj = cls._parse_xml(nmap_data, incomplete)
         else:
             raise NmapParserException("Unknown data type provided. "
                                       "Please check documentation for "
@@ -37,7 +45,7 @@ class NmapParser(object):
         return nmapobj
 
     @classmethod
-    def _parse_xml(cls, nmap_data=None):
+    def _parse_xml(cls, nmap_data=None, incomplete=False):
         """
             Protected class method used to process a specific data type.
             In this case: XML. This method is called by cls.parse class
@@ -58,6 +66,11 @@ class NmapParser(object):
                 4. a list of hosts: <hosts/> tag (TODO)
                 5. a list of ports: <ports/> tag
 
+            :param incomplete: enable you to parse interrupted nmap scans
+            and/or incomplete nmap xml blocks by adding a </nmaprun> at
+            the end of the scan.
+
+            :type incomplete: boolean
             :return: NmapObject (NmapHost, NmapService or NmapReport)
                     or a list of NmapObject
         """
@@ -69,6 +82,8 @@ class NmapParser(object):
             raise NmapParserException("wrong nmap_data type given as "
                                       "argument: cannot parse data")
 
+        if incomplete:
+            nmap_data += "</nmaprun>"
         try:
             root = ET.fromstring(nmap_data)
         except:
