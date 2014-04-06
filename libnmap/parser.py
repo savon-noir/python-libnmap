@@ -82,8 +82,9 @@ class NmapParser(object):
             raise NmapParserException("wrong nmap_data type given as "
                                       "argument: cannot parse data")
 
-        if incomplete:
+        if incomplete is True:
             nmap_data += "</nmaprun>"
+
         try:
             root = ET.fromstring(nmap_data)
         except:
@@ -137,7 +138,7 @@ class NmapParser(object):
         return NmapReport(nmap_scan)
 
     @classmethod
-    def parse_fromstring(cls, nmap_data, data_type="XML"):
+    def parse_fromstring(cls, nmap_data, data_type="XML", incomplete=False):
         """
             Call generic cls.parse() method and ensure that a string is
             passed on as argument. If not, an exception is raised.
@@ -150,16 +151,23 @@ class NmapParser(object):
 
             :param data_type: Specifies the type of data passed on as argument.
 
+            :param incomplete: enable you to parse interrupted nmap scans
+            and/or incomplete nmap xml blocks by adding a </nmaprun> at
+            the end of the scan.
+            :type incomplete: boolean
+
             :return: NmapObject
         """
 
         if not isinstance(nmap_data, str):
             raise NmapParserException("bad argument type for "
                                       "xarse_fromstring(): should be a string")
-        return cls.parse(nmap_data, data_type)
+        return cls.parse(nmap_data, data_type, incomplete)
 
     @classmethod
-    def parse_fromfile(cls, nmap_report_path, data_type="XML"):
+    def parse_fromfile(cls, nmap_report_path,
+                       data_type="XML",
+                       incomplete=False):
         """
             Call generic cls.parse() method and ensure that a correct file
             path is given as argument. If not, an exception is raised.
@@ -173,13 +181,18 @@ class NmapParser(object):
 
             :param data_type: Specifies the type of serialization in the file.
 
+            :param incomplete: enable you to parse interrupted nmap scans
+            and/or incomplete nmap xml blocks by adding a </nmaprun> at
+            the end of the scan.
+            :type incomplete: boolean
+
             :return: NmapObject
         """
 
         try:
             with open(nmap_report_path, 'r') as fileobj:
                 fdata = fileobj.read()
-                rval = cls.parse(fdata, data_type)
+                rval = cls.parse(fdata, data_type, incomplete)
         except IOError:
             raise
         return rval

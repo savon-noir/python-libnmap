@@ -14,8 +14,8 @@ libnmap is a python library enabling python developpers to manipulate nmap proce
 libnmap is what you were looking for if you need to implement the following:
 
 - automate or schedule nmap scans on a regular basis
-- manipulate nmap scans results to do reporting for instance
-- compare and diff nmap scans to generate graphs for instance
+- manipulate nmap scans results to do reporting
+- compare and diff nmap scans to generate graphs
 - batch process scan reports
 - ...
 
