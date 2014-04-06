@@ -1,12 +1,10 @@
 - review OS fingerprint API and add NmapOSFP class
 - add unit test for os fingerprint class
-- complete unit tests
+- complete unit tests with coverall support
 - review and improve threading for NmapProcess
-- XML interface to support both ElementTree and lxml APIs
 - support for python3
-- support for windows and cywin
+- support for windows
 - Add new plugins to support import/export from mysql, couchdb, csv
-- support iterators for NmapReport::hosts
 - add unittest for udp scans, ping sweeping
 - add support for 'resume' capability (see nmap --resume)
 - add support for "not shown ports" (extra ports) in NmapHost (via NmapParser)

@@ -1,3 +1,12 @@
+v0.4.5, 06/04/2014 -- minor fixes and botox injections
+                    - Added "incomplete" argument in NmapReport.parse()
+                      in order to enable parsing of incomplete or interrupted
+                      nmap scans. Could be useful to use with a background
+                      scan to parse incomplete data blocks from callback
+                      function (thanks @Sibwara for the idea).
+                    - Fixed bug when NmapReport.summary is empty
+                    - added NmapReport.endtimestr
+                    - remplaced ElementTree by cElementTree (performance)
 v0.4.4, 04/04/2014 -- Bugs and features requests
                     - added support for tunnel attribute from <service> tag
                     - added support for servicefp (service fingerprint) in

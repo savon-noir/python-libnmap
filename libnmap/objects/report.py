@@ -154,6 +154,21 @@ class NmapReport(object):
         return rval
 
     @property
+    def endtimestr(self):
+        """
+            Accessor returning a human readable time string
+            of when the scan ended.
+
+            :return: string
+        """
+        rval = ''
+        try:
+            rval = self._runstats['finished']['timestr']
+        except(KeyError, TypeError, ValueError):
+            pass
+        return rval
+
+    @property
     def summary(self):
         """
             Accessor returning a string describing and
@@ -167,6 +182,12 @@ class NmapReport(object):
         except(KeyError, TypeError):
             pass
 
+        if len(rval) == 0:
+            rval = ("Nmap ended at {0} ; {1} IP addresses ({2} hosts up)"
+                    " scanned in {3} seconds".format(self.endtimestr,
+                                                     self.hosts_total,
+                                                     self.hosts_up,
+                                                     self.elapsed))
         return rval
 
     @property
