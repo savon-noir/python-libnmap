@@ -1,3 +1,11 @@
+v0.4.4, 04/04/2014 -- Bugs and features requests
+                    - added support for tunnel attribute from <service> tag
+                    - added support for servicefp (service fingerprint) in
+                      attributes from <port><service> tag
+                    - added support for reasons attributes from <port> tag
+                    - added support for extraports/extrareasons tags
+                    - corrected bug in serialization: missing extra data
+                      (pull request from DougRoyal)
 v0.4.3, 14/03/2014 -- Lots of bug corrections - Warning small changes in API:
                       - fix issue#14: better scripts parsing
                       - API change for NmapService.scripts_results:

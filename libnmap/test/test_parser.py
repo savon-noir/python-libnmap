@@ -125,7 +125,8 @@ class TestNmapParser(unittest.TestCase):
             NmapParser.parse(s)
 
     def test_class_ports_parser(self):
-        plist = NmapParser.parse(self.ports_string)
+        pdict = NmapParser.parse(self.ports_string)
+        plist = pdict['ports']
         self.assertEqual(len(plist), 4)
         self.assertEqual(sorted([p.port for p in plist]),
                          sorted([22, 25, 9929, 80]))
@@ -139,6 +140,10 @@ class TestNmapParser(unittest.TestCase):
             self.assertNotEqual(p.state, "open")
             self.assertEqual(p.state, "filtered")
             self.assertEqual(p.service, "smtp")
+            self.assertEqual(p.reason, "admin-prohibited")
+            self.assertEqual(p.reason_ttl, "253")
+            self.assertEqual(p.reason_ip, "109.133.192.1")
+
 
     def test_port_except(self):
         self.assertRaises(ValueError,

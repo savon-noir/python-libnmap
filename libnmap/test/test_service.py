@@ -118,6 +118,34 @@ port_string_other9 = """
         method="probed" conf="10"/>
 </port>"""
 
+port_string_other10 = """
+<port protocol="tcp" portid="25">
+    <state state="open" reason="syn-ack" reason_ttl="64"/>
+    <service name="smtp" product="Postfix smtpd"
+        hostname=" jambon.localdomain" method="probed" conf="10"/>
+</port>"""
+
+port_string_other11 = """
+<port protocol="tcp" portid="25">
+    <state state="open" reason="syn-ack" reason_ttl="69"/>
+    <service name="smtp" product="Postfix smtpd"
+        hostname=" jambon.localdomain" method="probed" conf="10"/>
+</port>"""
+
+port_string_other12 = """
+<port protocol="tcp" portid="25">
+    <state state="filtered" reason="admin-prohibited"
+        reason_ttl="253" reason_ip="109.133.192.1"/>
+    <service name="smtp" method="table" conf="3"/>
+</port>"""
+
+port_string_other13 = """
+<port protocol="tcp" portid="25">
+    <state state="filtered" reason="patin"
+        reason_ttl="253" reason_ip="109.133.192.1"/>
+    <service name="smtp" method="table" conf="3"/>
+</port>"""
+
 
 class TestNmapService(unittest.TestCase):
     def setUp(self):
@@ -150,7 +178,7 @@ class TestNmapService(unittest.TestCase):
         #nservice4 = NmapParser.parse(port_string_other4)
 
         self.assertEqual(nservice1.diff(nservice2).unchanged(),
-                         set(['banner', 'protocol', 'port', 'service', 'id']))
+                         set(['banner', 'protocol', 'port', 'service', 'id', 'reason']))
 
     def test_port_service_changed(self):
         nservice1 = NmapParser.parse(port_string)
@@ -181,10 +209,17 @@ class TestNmapService(unittest.TestCase):
         self.assertRaises(NmapDiffException, self.s1.diff, self.s3)
         self.assertEqual(self.s1.diff(self.s4).changed(), set(['state']))
         self.assertEqual(self.s1.diff(self.s4).unchanged(),
-                         set(['banner', 'protocol', 'port', 'service', 'id']))
+                         set(['banner', 'protocol', 'port', 'service',
+                              'id', 'reason']))
 
         self.assertEqual(self.s5.diff(self.s6).changed(), set(['banner']))
         self.assertEqual(self.s6.diff(self.s6).changed(), set([]))
+
+    def test_diff_reason(self):
+        nservice12 = NmapParser.parse(port_string_other12)
+        nservice13 = NmapParser.parse(port_string_other13)
+        ddict = nservice12.diff(nservice13)
+        self.assertEqual(ddict.changed(), set(['reason']))
 
 if __name__ == '__main__':
     test_suite = ['test_port_state_changed', 'test_port_state_unchanged',

@@ -495,6 +495,27 @@ class NmapHost(object):
         """
         return self.address
 
+    @property
+    def extraports_state(self):
+        """
+            dictionnary containing state and amount of extra ports scanned
+            for which a common state, usually, closed was discovered.
+
+            :return: dict with keys 'state' and 'count'
+        """
+        _xtrports = self._extras['extraports']
+        return {'state': _xtrports['state'], 'count': _xtrports['count']}
+
+    @property
+    def extraports_reasons(self):
+        """
+            dictionnary containing reasons why extra ports scanned
+            for which a common state, usually, closed was discovered.
+
+            :return: array of dict containing keys 'state' and 'count'
+        """
+        return self._extras['extraports']['reasons']
+
     def get_dict(self):
         """
             Return a dict representation of the object.
