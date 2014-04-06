@@ -183,6 +183,34 @@ class NmapProcess(Thread):
 
         return rc
 
+    def sudo_run_background(self, run_as='root'):
+        """
+        Public method enabling the library's user to run in background a
+        nmap scan with priviledges via sudo.
+        The sudo configuration should be set manually on the local system
+        otherwise sudo will prompt for a password.
+        This method alters the command line by prefixing the sudo command to
+        nmap and will then call self.run()
+
+        :param run_as: user name to which the lib needs to sudo to run the scan
+
+        :return: return code from nmap execution
+        """
+        sudo_user = run_as.split().pop()
+        try:
+            pwd.getpwnam(sudo_user).pw_uid
+        except KeyError:
+            raise
+
+        sudo_path = self._whereis("sudo")
+        if sudo_path is None:
+            raise EnvironmentError(2, "sudo is not installed or "
+                                      "could not be found in system path: "
+                                      "cannot run nmap with sudo")
+
+        self.__sudo_run = "{0} -u {1}".format(sudo_path, sudo_user)
+        super(NmapProcess, self).start()
+
     def run(self):
         """
         Public method which is usually called right after the constructor
@@ -259,6 +287,8 @@ class NmapProcess(Thread):
                not self.__ioerr_queue.empty()):
             if self.__process_killed.isSet():
                 break
+            if not self.__ioerr_queue.empty():
+                self.__stderr += self.__ioerr_queue.get_nowait()
             try:
                 thread_stream = self.__io_queue.get_nowait()
             except Empty:
@@ -281,7 +311,7 @@ class NmapProcess(Thread):
         else:
             self.__state = self.FAILED
             try:
-                self.__stderr = self.__ioerr_queue.get(timeout=1)
+                self.__stderr += self.__ioerr_queue.get(timeout=1)
                 self.__ioerr_queue.task_done()
             except Empty:
                 pass

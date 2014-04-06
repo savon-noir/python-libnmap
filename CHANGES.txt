@@ -1,3 +1,10 @@
+v0.4.6, 06/04/2014 -- minor fix
+                    - corrected missing incomplete parameter on parse_fromfile
+                      and parse_fromstring
+                    - added support to run scan in background with sudo support
+                      added NmapProcess.sudo_run_background()
+                    - fixed issue with run() blocking when an error triggered
+                      during the scan
 v0.4.5, 06/04/2014 -- minor fixes and botox injections
                     - Added "incomplete" argument in NmapReport.parse()
                       in order to enable parsing of incomplete or interrupted
