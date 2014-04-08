@@ -7,6 +7,7 @@ import threading
 from threading import Thread
 from xml.dom import pulldom
 import warnings
+import time
 try:
     from Queue import Queue, Empty, Full
 except ImportError:
@@ -301,6 +302,7 @@ class NmapProcess(Thread):
                     self.__nmap_event_callback(self)
                 self.__stdout += thread_stream
                 self.__io_queue.task_done()
+            time.sleep(0.01)
 
         self.__nmap_rc = self.__nmap_proc.poll()
         if self.rc is None:
