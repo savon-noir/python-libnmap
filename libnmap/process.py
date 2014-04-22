@@ -3,19 +3,14 @@ import os
 import pwd
 import shlex
 import subprocess
-import threading
+import multiprocessing
 from threading import Thread
 from xml.dom import pulldom
 import warnings
-import time
 try:
-    from Queue import Queue, Empty, Full
+    from Queue import Empty, Full
 except ImportError:
-    from queue import Queue, Empty, Full
-
-__all__ = [
-    'NmapProcess'
-]
+    from queue import Empty, Full
 
 
 class NmapProcess(Thread):
@@ -51,21 +46,17 @@ class NmapProcess(Thread):
 
         """
         Thread.__init__(self)
-        self.__nmap_proc = None
-        self.__nmap_rc = 0
-
         unsafe_opts = set(['-oG', '-oN', '-iL', '-oA', '-oS', '-oX',
                            '--iflist', '--resume', '--stylesheet',
                            '--datadir'])
 
-        self.__nmap_binary_name = "nmap"
+        nmap_binary_name = "nmap"
         self.__nmap_fixed_options = "-oX - -vvv --stats-every 2s"
-        self.__nmap_binary = self._whereis(self.__nmap_binary_name)
+        self.__nmap_binary = self._whereis(nmap_binary_name)
         if self.__nmap_binary is None:
             raise EnvironmentError(1, "nmap is not installed or could "
                                       "not be found in system path")
 
-        self.__sudo_run = ""
         if isinstance(targets, str):
             self.__nmap_targets = targets.replace(" ", "").split(',')
         elif isinstance(targets, list):
@@ -79,6 +70,7 @@ class NmapProcess(Thread):
             raise Exception("unsafe options activated while safe_mode "
                             "is set True")
         self.__nmap_dynamic_options = options
+        self.__sudo_run = ''
         self.__nmap_command_line = self.get_command_line()
 
         if event_callback and callable(event_callback):
@@ -88,42 +80,19 @@ class NmapProcess(Thread):
         (self.DONE, self.READY, self.RUNNING,
          self.CANCELLED, self.FAILED) = range(5)
 
-        self.__io_queue = Queue()
-        self.__ioerr_queue = Queue()
-        self.__process_killed = threading.Event()
-        self.__thread_stdout = None
-        self.__thread_stderr = None
+        self.__process_killed = multiprocessing.Event()
 
         # API usable in callback function
-        self.__state = self.READY
-        self.__starttime = 0
-        self.__endtime = 0
-        self.__version = ''
-        self.__progress = 0
-        self.__etc = 0
-        self.__elapsed = ''
-        self.__summary = ''
-        self.__stdout = ''
-        self.__stderr = ''
-
-    def _run_init(self):
-        """
-        Protected method ran at every call to run(). This ensures that no
-        no parameters are polluted.
-        """
         self.__nmap_proc = None
-        self.__nmap_rc = -1
-        self.__nmap_command_line = self.get_command_line()
+        self.__nmap_rc = 0
         self.__state = self.READY
-        self.__progress = 0
-        self.__etc = 0
         self.__starttime = 0
         self.__endtime = 0
+        self.__version = ''
+        self.__progress = 0
+        self.__etc = 0
         self.__elapsed = ''
         self.__summary = ''
-        self.__version = ''
-        self.__io_queue = Queue()
-        self.__ioerr_queue = Queue()
         self.__stdout = ''
         self.__stderr = ''
 
@@ -141,7 +110,7 @@ class NmapProcess(Thread):
         """
         for path in os.environ.get('PATH', '').split(':'):
             if (os.path.exists(os.path.join(path, program)) and not
-                    os.path.isdir(os.path.join(path, program))):
+               os.path.isdir(os.path.join(path, program))):
                 return os.path.join(path, program)
         return None
 
@@ -174,7 +143,9 @@ class NmapProcess(Thread):
         try:
             pwd.getpwnam(sudo_user).pw_uid
         except KeyError:
-            raise
+            _exmsg = ("Username {0} does not exists. Please supply"
+                      " a valid username".format(run_as))
+            raise EnvironmentError(_exmsg)
 
         sudo_path = self._whereis("sudo")
         if sudo_path is None:
@@ -205,7 +176,9 @@ class NmapProcess(Thread):
         try:
             pwd.getpwnam(sudo_user).pw_uid
         except KeyError:
-            raise
+            _exmsg = ("Username {0} does not exists. Please supply"
+                      " a valid username".format(run_as))
+            raise EnvironmentError(_exmsg)
 
         sudo_path = self._whereis("sudo")
         if sudo_path is None:
@@ -220,93 +193,85 @@ class NmapProcess(Thread):
         """
         Public method which is usually called right after the constructor
         of NmapProcess. This method starts the nmap executable's subprocess.
-        It will also bind to threads that will read from subprocess' stdout
+        It will also bind a Process that will read from subprocess' stdout
         and stderr and push the lines read in a python queue for futher
-        processing.
+        processing. This processing is waken-up each time data is pushed
+        from the nmap binary into the stdout reading routine. Processing
+        could be performed by a user-provided callback. The whole
+        NmapProcess object could be accessible asynchroneously.
 
-        return: return code from nmap execution from self.__wait()
+        return: return code from nmap execution
         """
-        def stream_reader(thread_stdout, io_queue):
+        def ioreader_routine(proc_stdout, io_queue, data_pushed, producing):
             """
             local function that will read lines from a file descriptor
             and put the data in a python queue for futher processing.
 
-            :param thread_stdout: file descriptor to read lines from.
+            :param proc_stdout: file descriptor to read lines from.
             :param io_queue: queue in which read lines will be pushed.
+            :param data_pushed: queue used to push data read from the
+            nmap stdout back into the parent process
+            :param producing: shared variable to notify the parent process
+            that processing is either running, either over.
             """
-            for streamline in iter(thread_stdout.readline, b''):
-                try:
-                    if streamline is not None:
+            producing.value = 1
+            for streamline in iter(proc_stdout.readline, b''):
+                if streamline is not None:
+                    try:
                         io_queue.put(streamline)
-                except Full:
-                    raise Exception("Queue ran out of buffer: "
-                                    "increase q.get(timeout) value")
-            thread_stdout.close()
+                    except Full:
+                        pass
+                    data_pushed.set()
+            producing.value = 0
+            data_pushed.set()
 
-        self._run_init()
+        producing = multiprocessing.Value('i', 1)
+        data_pushed = multiprocessing.Event()
+        qout = multiprocessing.Queue()
+
+        _tmp_cmdline = shlex.split(self.__nmap_command_line)
         try:
-            _tmp_cmdline = shlex.split(self.__nmap_command_line)
             self.__nmap_proc = subprocess.Popen(args=_tmp_cmdline,
                                                 stdout=subprocess.PIPE,
                                                 stderr=subprocess.PIPE,
                                                 bufsize=0)
-            self.__thread_stdout = Thread(target=stream_reader,
-                                          name='stdout-reader',
-                                          args=(self.__nmap_proc.stdout,
-                                                self.__io_queue))
-            self.__thread_stderr = Thread(target=stream_reader,
-                                          name='stderr-reader',
-                                          args=(self.__nmap_proc.stderr,
-                                                self.__ioerr_queue))
-
-            self.__thread_stdout.start()
-            self.__thread_stderr.start()
-
+            ioreader = multiprocessing.Process(target=ioreader_routine,
+                                               args=(self.__nmap_proc.stdout,
+                                                     qout,
+                                                     data_pushed,
+                                                     producing))
+            ioreader.start()
             self.__state = self.RUNNING
         except OSError:
             self.__state = self.FAILED
-            raise
+            raise EnvironmentError(1, "nmap is not installed or could "
+                                      "not be found in system path")
 
-        return self.__wait()
-
-    def active_fd(self):
-        return (self.__thread_stdout.is_alive() or
-                self.__thread_stderr.is_alive())
-
-    def __wait(self):
-        """
-        Private method, called by run() which will loop and
-        process the data from the python queues. Those queues are fed by
-        the stream_readers of run, reading lines from subprocess.stdout/err.
-        Each time data is pushed in the nmap's stdout queue:
-        1. __process_event is called with the acquired data as input
-        2. if a event callback was provided, the function passed in the
-           constructor is called.
-
-        :return: return code from nmap execution
-        """
         thread_stream = ''
-        while (self.__nmap_proc.poll() is None or
-               self.active_fd() is True or
-               not self.__io_queue.empty() or
-               not self.__ioerr_queue.empty()):
-            if self.__process_killed.isSet():
+        while(self.__nmap_proc.poll() is None or producing.value == 1):
+            if self.__process_killed.is_set():
                 break
-            if not self.__ioerr_queue.empty():
-                self.__stderr += self.__ioerr_queue.get_nowait()
+            if producing.value == 1:
+                try:
+                    data_pushed.wait()
+                except KeyboardInterrupt:
+                    break
             try:
-                thread_stream = self.__io_queue.get_nowait()
+                thread_stream = qout.get_nowait()
             except Empty:
                 pass
             except KeyboardInterrupt:
                 break
             else:
+                self.__stdout += thread_stream
                 evnt = self.__process_event(thread_stream)
                 if self.__nmap_event_callback and evnt:
                     self.__nmap_event_callback(self)
-                self.__stdout += thread_stream
-                self.__io_queue.task_done()
-            time.sleep(0.01)
+            data_pushed.clear()
+        ioreader.join()
+        # queue clean-up
+        while not qout.empty():
+            self.__stdout += qout.get_nowait()
 
         self.__nmap_rc = self.__nmap_proc.poll()
         if self.rc is None:
@@ -316,11 +281,7 @@ class NmapProcess(Thread):
             self.__progress = 100
         else:
             self.__state = self.FAILED
-            try:
-                self.__stderr += self.__ioerr_queue.get(timeout=1)
-                self.__ioerr_queue.task_done()
-            except Empty:
-                pass
+            self.__stderr += self.__nmap_proc.stderr.read()
         return self.rc
 
     def run_background(self):
@@ -410,6 +371,16 @@ class NmapProcess(Thread):
         except:
             pass
         return rval
+
+    @property
+    def command(self):
+        """
+        return the constructed nmap command or empty string if not
+        constructed yet.
+
+        :return: string
+        """
+        return self.__nmap_command_line or ''
 
     @property
     def targets(self):
