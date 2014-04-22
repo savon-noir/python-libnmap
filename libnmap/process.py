@@ -13,6 +13,10 @@ try:
 except ImportError:
     from queue import Queue, Empty, Full
 
+__all__ = [
+    'NmapProcess'
+]
+
 
 class NmapProcess(Thread):
     """
