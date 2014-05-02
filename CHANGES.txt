@@ -1,4 +1,4 @@
-v0.4.7, 23/04/2014 -- Rewrite of NmapProcess.run()
+v0.4.7, 23/04/2014 -- Rewrite of NmapProcess
                     - removed Threads to read stdout/stderr
                     - replaced by Process
                     - use of semaphore to not consume CPU while looping

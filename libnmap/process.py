@@ -51,7 +51,7 @@ class NmapProcess(Thread):
                            '--datadir'])
 
         nmap_binary_name = "nmap"
-        self.__nmap_fixed_options = "-oX - -vvv --stats-every 2s"
+        self.__nmap_fixed_options = "-oX - -vvv --stats-every 1s"
         self.__nmap_binary = self._whereis(nmap_binary_name)
         if self.__nmap_binary is None:
             raise EnvironmentError(1, "nmap is not installed or could "
@@ -79,9 +79,11 @@ class NmapProcess(Thread):
             self.__nmap_event_callback = None
         (self.DONE, self.READY, self.RUNNING,
          self.CANCELLED, self.FAILED) = range(5)
+        self._run_init()
 
+    def _run_init(self):
         self.__process_killed = multiprocessing.Event()
-
+        self.__nmap_command_line = self.get_command_line()
         # API usable in callback function
         self.__nmap_proc = None
         self.__nmap_rc = 0
@@ -225,6 +227,7 @@ class NmapProcess(Thread):
             producing.value = 0
             data_pushed.set()
 
+        self._run_init()
         producing = multiprocessing.Value('i', 1)
         data_pushed = multiprocessing.Event()
         qout = multiprocessing.Queue()
@@ -272,6 +275,7 @@ class NmapProcess(Thread):
         # queue clean-up
         while not qout.empty():
             self.__stdout += qout.get_nowait()
+        self.__stderr += self.__nmap_proc.stderr.read()
 
         self.__nmap_rc = self.__nmap_proc.poll()
         if self.rc is None:
@@ -281,7 +285,6 @@ class NmapProcess(Thread):
             self.__progress = 100
         else:
             self.__state = self.FAILED
-            self.__stderr += self.__nmap_proc.stderr.read()
         return self.rc
 
     def run_background(self):
@@ -520,7 +523,6 @@ def main():
         if nmapscan.is_running():
             print("Progress: {0}% - ETC: {1}").format(nmapscan.progress,
                                                       nmapscan.etc)
-
     nm = NmapProcess("localhost", options="-sV",
                      event_callback=mycallback)
     rc = nm.run()
