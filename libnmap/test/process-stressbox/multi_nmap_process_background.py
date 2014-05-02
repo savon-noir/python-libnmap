@@ -14,7 +14,7 @@ def any_running(nmprocs):
  
 def summarize(nmprocs):
   for nmp in nmprocs:
-    print "rc: {0} output: {1}".format(nmp.rc, nmp.summary)
+      print "rc: {0} output: {1} stdout len: {2}".format(nmp.rc, nmp.summary, len(nmp.stdout))
  
 nm_targets = ["localhost", "localhost", "localhost"]
 nm_opts = "-sT"

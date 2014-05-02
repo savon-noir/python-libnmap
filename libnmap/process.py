@@ -17,6 +17,30 @@ __all__ = [
 ]
 
 
+class NmapTask(object):
+    """
+    NmapTask is a internal class used by process. Each time nmap
+    starts a new task during the scan, a new class will be instanciated.
+    Classes examples are: "Ping Scan", "NSE script", "DNS Resolve",..
+    To each class an estimated time to complete is assigned and updated
+    at least every second within the NmapProcess.
+    A property NmapProcess.current_task points to the running task at
+    time T and a dictionnary NmapProcess.tasks with "task name" as key
+    is built during scan execution
+    """
+    def __init__(self, name, starttime=0, extrainfo=''):
+        self.name = name
+        self.etc = 0
+        self.progress = 0
+        self.percent = 0
+        self.remaining = 0
+        self.status = 'started'
+        self.starttime = starttime
+        self.endtime = 0
+        self.extrainfo = extrainfo
+        self.updated = 0
+
+
 class NmapProcess(Thread):
     """
     NmapProcess is a class which wraps around the nmap executable.
@@ -95,12 +119,12 @@ class NmapProcess(Thread):
         self.__starttime = 0
         self.__endtime = 0
         self.__version = ''
-        self.__progress = 0
-        self.__etc = 0
         self.__elapsed = ''
         self.__summary = ''
         self.__stdout = ''
         self.__stderr = ''
+        self.__current_task = ''
+        self.__nmap_tasks = {}
 
     def _whereis(self, program):
         """
@@ -286,12 +310,17 @@ class NmapProcess(Thread):
             self.__state = self.CANCELLED
         elif self.rc == 0:
             self.__state = self.DONE
-            self.__progress = 100
+            if self.current_task:
+                self.__nmap_tasks[self.current_task.name].progress = 100
         else:
             self.__state = self.FAILED
         return self.rc
 
     def run_background(self):
+        """
+        run nmap scan in background as a thread.
+        For privileged scans, consider NmapProcess.sudo_run_background()
+        """
         super(NmapProcess, self).start()
 
     def is_running(self):
@@ -357,12 +386,42 @@ class NmapProcess(Thread):
             edomdoc = pulldom.parseString(eventdata)
             for xlmnt, xmlnode in edomdoc:
                 if xlmnt is not None and xlmnt == pulldom.START_ELEMENT:
-                    if (xmlnode.nodeName == 'taskprogress' and
+                    if (xmlnode.nodeName == 'taskbegin' and
                             xmlnode.attributes.keys()):
-                        percent_done = xmlnode.attributes['percent'].value
-                        etc_done = xmlnode.attributes['etc'].value
-                        self.__progress = percent_done
-                        self.__etc = etc_done
+                        xt = xmlnode.attributes
+                        taskname = xt['task'].value
+                        starttime = xt['time'].value
+                        xinfo=''
+                        if xt.has_key('extrainfo'):
+                            xinfo = xt['extrainfo'].value
+                        newtask = NmapTask(taskname, starttime, xinfo)
+                        self.__nmap_tasks[newtask.name] = newtask
+                        self.__current_task = newtask.name
+                        rval = True
+                    elif (xmlnode.nodeName == 'taskend' and
+                            xmlnode.attributes.keys()):
+                        xt = xmlnode.attributes
+                        tname = xt['task'].value
+                        xinfo = ''
+                        self.__nmap_tasks[tname].endtime = xt['time'].value
+                        if xt.has_key('extrainfo'):
+                            xinfo = xt['extrainfo'].value
+                        self.__nmap_tasks[tname].extrainfo = xinfo
+                        self.__nmap_tasks[tname].status = "ended"
+                        rval = True
+                    elif (xmlnode.nodeName == 'taskprogress' and
+                            xmlnode.attributes.keys()):
+                        xt = xmlnode.attributes
+                        tname = xt['task'].value
+                        percent = xt['percent'].value
+                        etc = xt['etc'].value
+                        remaining = xt['remaining'].value
+                        updated = xt['time'].value
+                        self.__nmap_tasks[tname].percent = percent
+                        self.__nmap_tasks[tname].progress = percent
+                        self.__nmap_tasks[tname].etc = etc
+                        self.__nmap_tasks[tname].remaining = remaining
+                        self.__nmap_tasks[tname].updated = updated
                         rval = True
                     elif (xmlnode.nodeName == 'nmaprun' and
                             xmlnode.attributes.keys()):
@@ -465,13 +524,13 @@ class NmapProcess(Thread):
         return self.__summary
 
     @property
-    def etc(self):
+    def tasks(self):
         """
-        Accessor for estimated time to completion
+        Accessor returning for the list of tasks ran during nmap scan
 
-        :return:  estimated time to completion
+        :return: dict of NmapTask object
         """
-        return self.__etc
+        return self.__nmap_tasks
 
     @property
     def version(self):
@@ -484,13 +543,40 @@ class NmapProcess(Thread):
         return self.__version
 
     @property
+    def current_task(self):
+        """
+        Accessor for the current NmapTask beeing run
+
+        :return: NmapTask or None if no task started yet
+        """
+        rval = None
+        if len(self.__current_task):
+            rval = self.tasks[self.__current_task]
+        return rval
+
+    @property
+    def etc(self):
+        """
+        Accessor for estimated time to completion
+
+        :return:  estimated time to completion
+        """
+        rval = 0
+        if self.current_task:
+            rval = self.current_task.etc
+        return rval
+
+    @property
     def progress(self):
         """
         Accessor for progress status in percentage
 
         :return: percentage of job processed.
         """
-        return self.__progress
+        rval = 0
+        if self.current_task:
+            rval = self.current_task.progress
+        return rval
 
     @property
     def rc(self):
@@ -524,13 +610,16 @@ class NmapProcess(Thread):
 
 def main():
     def mycallback(nmapscan=None):
-        if nmapscan.is_running():
-            print("Progress: {0}% - ETC: {1}").format(nmapscan.progress,
-                                                      nmapscan.etc)
-    nm = NmapProcess("localhost", options="-sV",
+        if nmapscan.is_running() and nmapscan.current_task:
+            ntask = nmapscan.current_task
+            print "Task {0} ({1}): ETC: {2} DONE: {3}%".format(ntask.name,
+                                                               ntask.status,
+                                                               ntask.etc,
+                                                               ntask.progress)
+    nm = NmapProcess("scanme.nmap.org",
+                     options="-A",
                      event_callback=mycallback)
     rc = nm.run()
-
     if rc == 0:
         print("Scan started at {0} nmap version: {1}").format(nm.starttime,
                                                               nm.version)
