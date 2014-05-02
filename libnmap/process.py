@@ -391,8 +391,8 @@ class NmapProcess(Thread):
                         xt = xmlnode.attributes
                         taskname = xt['task'].value
                         starttime = xt['time'].value
-                        xinfo=''
-                        if xt.has_key('extrainfo'):
+                        xinfo = ''
+                        if 'extrainfo' in xt.keys():
                             xinfo = xt['extrainfo'].value
                         newtask = NmapTask(taskname, starttime, xinfo)
                         self.__nmap_tasks[newtask.name] = newtask
@@ -404,7 +404,7 @@ class NmapProcess(Thread):
                         tname = xt['task'].value
                         xinfo = ''
                         self.__nmap_tasks[tname].endtime = xt['time'].value
-                        if xt.has_key('extrainfo'):
+                        if 'extrainfo' in xt.keys():
                             xinfo = xt['extrainfo'].value
                         self.__nmap_tasks[tname].extrainfo = xinfo
                         self.__nmap_tasks[tname].status = "ended"
