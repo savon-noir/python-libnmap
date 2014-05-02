@@ -1,7 +1,10 @@
-v0.4.7, 23/04/2014 -- Rewrite of NmapProcess
+v0.4.7, 02/05/2014 -- Rewrite of NmapProcess
                     - removed Threads to read stdout/stderr
                     - replaced by Process
                     - use of semaphore to not consume CPU while looping
+                    - added NmapTask class
+                    - added NmapProcess.current_task
+                    - added NmapProcess.tasks list
 v0.4.6, 06/04/2014 -- minor fix
                     - corrected missing incomplete parameter on parse_fromfile
                       and parse_fromstring
