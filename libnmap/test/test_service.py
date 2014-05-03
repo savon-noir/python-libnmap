@@ -146,6 +146,19 @@ port_string_other13 = """
     <service name="smtp" method="table" conf="3"/>
 </port>"""
 
+port_noservice = """
+<port protocol="udp" portid="3306">
+<state state="closed" reason="port-unreach" reason_ttl="64" />
+</port>"""
+
+port_owner = """
+<port protocol="tcp" portid="25">
+    <state state="open" reason="syn-ack" reason_ttl="64"/>
+    <service name="smtp" product="Postfix smtpd"
+        hostname=" jambon.localdomain" method="probed" conf="10"/>
+    <owner name="edwige"/>
+</port>"""
+
 
 class TestNmapService(unittest.TestCase):
     def setUp(self):
@@ -220,6 +233,15 @@ class TestNmapService(unittest.TestCase):
         nservice13 = NmapParser.parse(port_string_other13)
         ddict = nservice12.diff(nservice13)
         self.assertEqual(ddict.changed(), set(['reason']))
+
+    def test_noservice(self):
+        noservice = NmapParser.parse(port_noservice)
+        self.assertEqual(noservice.service, "")
+
+    def test_owner(self):
+        serviceowner = NmapParser.parse(port_owner)
+        self.assertEqual(serviceowner.owner, "edwige")
+
 
 if __name__ == '__main__':
     test_suite = ['test_port_state_changed', 'test_port_state_unchanged',
