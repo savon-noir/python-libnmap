@@ -11,7 +11,7 @@ class NmapService(object):
         available or not. Like banner or extra datas from NSE (nmap scripts).
     """
     def __init__(self, portid, protocol='tcp', state=None,
-                 service=None, service_extras=None):
+                 service=None, owner=None, service_extras=None):
         """
             Constructor
 
@@ -36,6 +36,10 @@ class NmapService(object):
         self._protocol = protocol
         self._state = state if state is not None else {}
         self._service = service if service is not None else {}
+
+        self._owner = ''
+        if owner is not None and 'name' in owner:
+            self._owner = owner['name']
 
         self._reason = ''
         self._reason_ip = ''
@@ -170,7 +174,7 @@ class NmapService(object):
 
             :return: dict or None
         """
-        return self._service['name'] if 'name' in self._service else None
+        return self._service['name'] if 'name' in self._service else ''
 
     def open(self):
         """
@@ -179,6 +183,13 @@ class NmapService(object):
             :return: boolean
         """
         return 'state' in self._state and self._state['state'] == 'open'
+
+    @property
+    def owner(self):
+        """
+            Accessor for service owner if available
+        """
+        return self._owner
 
     @property
     def banner(self):

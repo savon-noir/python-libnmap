@@ -1,3 +1,8 @@
+v0.4.7, 03/05/2014 -- minor fix for issue25
+                    - fixed exception when optional service tag is not present
+                      in <port> tag
+                    - added support for <owner> if present in <port>:
+                      accessible via NmapService.owner
 v0.4.6, 06/04/2014 -- minor fix
                     - corrected missing incomplete parameter on parse_fromfile
                       and parse_fromstring

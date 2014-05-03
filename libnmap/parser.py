@@ -386,6 +386,7 @@ class NmapParser(object):
 
         _state = None
         _service = None
+        _owner = None
         _service_scripts = []
         _service_extras = {}
         for xport in xelement:
@@ -393,21 +394,23 @@ class NmapParser(object):
                 _state = cls.__format_attributes(xport)
             elif xport.tag == 'service':
                 _service = cls.__format_attributes(xport)
+            elif xport.tag == 'owner':
+                _owner = cls.__format_attributes(xport)
             elif xport.tag == 'script':
                 _script_dict = cls.__parse_script(xport)
                 _service_scripts.append(_script_dict)
         _service_extras['scripts'] = _service_scripts
 
-        if(_portid is None or _protocol is None
-                or _state is None or _service is None):
+        if(_portid is None or _protocol is None or _state is None):
             raise NmapParserException("XML <port> tag is incomplete. One "
                                       "of the following tags is missing: "
-                                      "portid, protocol state or service.")
+                                      "portid, protocol or state or tag.")
 
         nport = NmapService(_portid,
                             _protocol,
                             _state,
                             _service,
+                            _owner,
                             _service_extras)
         return nport
 
