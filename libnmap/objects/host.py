@@ -1,81 +1,8 @@
 #!/usr/bin/env python
 from libnmap.diff import NmapDiff
-
+from libnmap.objects.os import NmapOSFingerprint
 
 class NmapHost(object):
-    """
-        NmapHost is a class representing a host object of NmapReport
-    """
-    class NmapOSFingerprint(object):
-        """
-            NmapOSFingerprint is a easier API for using os fingerprinting
-        """
-        def __init__(self, osfp_data):
-            self.__fingerprint = ''
-            self.__osmatch = ''
-            self.__osclass = ''
-            if 'osfingerprint' in osfp_data:
-                self.__fingerprint = osfp_data['osfingerprint']
-
-            __sortfct = lambda osent: int(osent['accuracy'])
-            if 'osmatch' in osfp_data:
-                try:
-                    self.__osmatch = sorted(osfp_data['osmatch'],
-                                            key=__sortfct,
-                                            reverse=True)
-                except (KeyError, TypeError):
-                    self.__osmatch = []
-
-            if 'osclass' in osfp_data:
-                try:
-                    self.__osclass = sorted(osfp_data['osclass'],
-                                            key=__sortfct,
-                                            reverse=True)
-                except (KeyError, TypeError):
-                    self.__osclass = []
-
-        def osmatch(self, min_accuracy=90):
-            os_array = []
-            for match_entry in self.__osmatch:
-                try:
-                    if int(match_entry['accuracy']) >= min_accuracy:
-                        os_array.append(match_entry['name'])
-                except (KeyError, TypeError):
-                    pass
-            return os_array
-
-        def osclass(self, min_accuracy=90):
-            os_array = []
-            for osclass_entry in self.__osclass:
-                try:
-                    if int(osclass_entry['accuracy']) >= min_accuracy:
-                        _relevantkeys = ['type', 'vendor', 'osfamily', 'osgen']
-                        _ftstr = "|".join([vkey + ": " + osclass_entry[vkey]
-                                          for vkey in osclass_entry
-                                          if vkey in _relevantkeys])
-                        os_array.append(_ftstr)
-                except (KeyError, TypeError):
-                    pass
-            return os_array
-
-        def fingerprint(self):
-            return self.__fingerprint
-
-        def __repr__(self):
-            _fmtstr = ''
-            if len(self.osmatch()):
-                _fmtstr += "OS:\r\n"
-                for _osmline in self.osmatch():
-                    _fmtstr += "  {0}\r\n".format(_osmline)
-            elif len(self.osclass()):
-                _fmtstr += "OS CLASS:\r\n"
-                for _oscline in self.osclass():
-                    _fmtstr += "  {0}\r\n".format(_oscline)
-            elif len(self.fingerprint()):
-                _fmtstr += "OS FINGERPRINT:\r\n"
-                _fmtstr += "  {0}".format(self.fingerprint())
-            return _fmtstr
-
     """
         NmapHost is a class representing a host object of NmapReport
     """
@@ -102,7 +29,7 @@ class NmapHost(object):
         self._extras = extras if extras is not None else {}
         self._osfingerprinted = False
         if 'os' in self._extras:
-            self.os = self.NmapOSFingerprint(self._extras['os'])
+            self.os = NmapOSFingerprint(self._extras['os'])
             self._osfingerprinted = True
 
         self._ipv4_addr = None
@@ -381,7 +308,7 @@ class NmapHost(object):
         """
         rval = ''
         try:
-            rval = self._extras['os']['osfingerprint']
+            rval = self.os.fingerprints.join("\n")
         except (KeyError, TypeError):
             pass
         return rval

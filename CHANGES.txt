@@ -1,3 +1,22 @@
+v0.4.8, 05/05/2014 -- Changes in OS fingerprint data API
+                    - NmapHost now holds its OS fingerprint data in NmapHost.os
+                      (NmapOSFingerpring object)
+                    - fingerprint is now a property which means you have to call
+                      it without () NmapHost.os.fingerprint and should be called
+                      directly from NmapHost.os
+                    - NmapHost.os.fingerprints return an array of os
+                      fingerprints (strings)
+                    - NmapHost.os.fingerprint return a concatenated string of
+                      all fingerprints
+                    - Fingerprints data are now accessible via
+                      NmapHost.os.osmatches which returns a list of NmapOSMatch
+                      objects
+                    - NmapOSMatch objects might contain a list of NmapOSClass
+                      objects matching with it
+                    - NmapOSClass objects might contain a list of CPE object
+                      related to the os class (CPE class will be improved and
+                      API enriched)
+                    - TODO: finalize API and create all related unit tests
 v0.4.7, 03/05/2014 -- minor fix for issue25
                     - fixed exception when optional service tag is not present
                       in <port> tag
