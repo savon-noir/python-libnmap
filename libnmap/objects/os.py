@@ -1,3 +1,6 @@
+import warnings
+
+
 class CPE(object):
     """
         CPE class offers an API for basic CPE objects.
@@ -52,14 +55,18 @@ class NmapOSMatch(object):
 
         # create osclass list
         self._osclasses = []
-        for _osclass in osmatch_dict['osclasses']:
-            try:
-                _osclassobj = NmapOSClass(_osclass)
-            except:
-                raise Exception("Could not create NmapOSClass object")
-            self._osclasses.append(_osclassobj)
+        try:
+            for _osclass in osmatch_dict['osclasses']:
+                try:
+                    _osclassobj = NmapOSClass(_osclass)
+                except:
+                    raise Exception("Could not create NmapOSClass object")
+                self._osclasses.append(_osclassobj)
+        except KeyError:
+            pass
 
-    def add_class(self, class_dict):
+    def add_osclass(self, class_dict):
+
         """
             Add a NmapOSClass object to the OSMatch object. This method is
             useful to implement compatibility with older versions of NMAP
@@ -145,6 +152,16 @@ class NmapOSClass(object):
             self._cpelist.append(CPE(_cpe))
 
     @property
+    def cpelist(self):
+        """
+            Returns a list of CPE Objects matching with this os class
+
+            :return: list of CPE objects
+            :rtype: Array
+        """
+        return self._cpelist
+
+    @property
     def vendor(self):
         """
             Accessor for vendor information (Microsoft, Linux,...)
@@ -208,24 +225,68 @@ class NmapOSFingerprint(object):
         self.__osmatches = []
         self.__ports_used = []
         self.__fingerprints = []
-        _osclasses = []
 
         if 'osmatches' in osfp_data:
             for _osmatch in osfp_data['osmatches']:
                 _osmatch_obj = NmapOSMatch(_osmatch)
                 self.__osmatches.append(_osmatch_obj)
         if 'osclasses' in osfp_data:
-            _osclasses = osfp_data['osclasses']
-        if 'ports_used' in osfp_data:
-            self.__ports_used = osfp_data['ports_used']
+            for _osclass in osfp_data['osclasses']:
+                _osclass_obj = NmapOSClass(_osclass)
+                _osmatched = self.get_osmatch(_osclass_obj)
+                if _osmatched is not None:
+                    _osmatched.add_osclass(_osclass_obj)
+                else:
+                    self._add_dummy_osmatch(_osclass_obj)
         if 'osfingerprints' in osfp_data:
             for _osfp in osfp_data['osfingerprints']:
                 if 'fingerprint' in _osfp:
                     self.__fingerprints.append(_osfp['fingerprint'])
+        if 'ports_used' in osfp_data:
+            self.__ports_used = osfp_data['ports_used']
+
+    def get_osmatch(self, accuracy):
+        """
+            This function enables NmapOSFingerprint to determine if an
+            NmapOSClass object could be attached to an existing NmapOSMatch
+            object in order to respect the common interface for
+            the nmap xml version < 1.04 and >= 1.04
+
+            :return: an NmapOSMatch object matching with the NmapOSClass
+            provided in parameter (match is performed based on accuracy)
+        """
+        rval = None
+        for _osmatch in self.__osmatches:
+            if _osmatch.accuracy == accuracy:
+                rval = _osmatch
+                break  # sorry
+        return rval
+
+    def _add_dummy_osmatch(self, osclass_obj):
+        """
+            This functions creates a dummy NmapOSMatch object in order to
+            encapsulate an NmapOSClass object which was not matched with an
+            existing NmapOSMatch object
+        """
+        _dname = "{0}:{1}:{2}".format(osclass_obj.type,
+                                      osclass_obj.vendor,
+                                      osclass_obj.osfamily)
+        _dummy_dict = {'osmatch': {'name': _dname,
+                                   'accuracy': osclass_obj.accuracy,
+                                   'line': -1},
+                       'osclasses': []}
+        _dummy_osmatch = NmapOSMatch(_dummy_dict)
+        self.__osmatches.append(_dummy_osmatch)
 
     @property
-    def osmatches(self):
-        return self.__osmatches
+    def osmatches(self, min_accuracy=0):
+        _osmatches = []
+
+        for _osmatch in self.__osmatches:
+            if _osmatch.accuracy >= min_accuracy:
+                _osmatches.append(_osmatch)
+
+        return _osmatches
 
     @property
     def fingerprint(self):
@@ -235,48 +296,28 @@ class NmapOSFingerprint(object):
     def fingerprints(self):
         return self.__fingerprints
 
-#        for _osclass in _osclasses:
-#            _matched = self.is_matched(_osclass)
-#
-#        __sortfct = lambda osent: int(osent['accuracy'])
-#        if 'osmatch' in osfp_data:
-#            try:
-#                self.__osmatch = sorted(osfp_data['osmatch'],
-#                                        key=__sortfct,
-#                                        reverse=True)
-#            except (KeyError, TypeError):
-#                self.__osmatch = []
-#
-#        if 'osclass' in osfp_data:
-#            try:
-#                self.__osclass = sorted(osfp_data['osclass'],
-#                                        key=__sortfct,
-#                                        reverse=True)
-#            except (KeyError, TypeError):
-#                self.__osclass = []
-
     def osmatch(self, min_accuracy=90):
+        warnings.warn("NmapOSFingerprint.osmatch is deprecated: "
+                      "use NmapOSFingerprint.osmatches", DeprecationWarning)
         os_array = []
-        for match_entry in self.__osmatch:
-            try:
-                if int(match_entry['accuracy']) >= min_accuracy:
-                    os_array.append(match_entry['name'])
-            except (KeyError, TypeError):
-                pass
+        for _osmatch in self.__osmatches:
+            if _osmatch.accuracy >= min_accuracy:
+                os_array.append(_osmatch.name)
         return os_array
 
     def osclass(self, min_accuracy=90):
+        warnings.warn("NmapOSFingerprint.osclass() is deprecated: "
+                      "use NmapOSFingerprint.osclasses() if applicable",
+                      DeprecationWarning)
         os_array = []
-        for osclass_entry in self.__osclass:
-            try:
-                if int(osclass_entry['accuracy']) >= min_accuracy:
-                    _relevantkeys = ['type', 'vendor', 'osfamily', 'osgen']
-                    _ftstr = "|".join([vkey + ": " + osclass_entry[vkey]
-                                      for vkey in osclass_entry
-                                      if vkey in _relevantkeys])
+        for osmatch_entry in self.osmatches():
+            if osmatch_entry.accuracy >= min_accuracy:
+                for oclass in osmatch_entry.osclasses:
+                    _ftstr = "type:{0}|vendor:{1}|osfamily{2}".format(
+                             oclass.type,
+                             oclass.vendor,
+                             oclass.osfamily)
                     os_array.append(_ftstr)
-            except (KeyError, TypeError):
-                pass
         return os_array
 
     def __repr__(self):
