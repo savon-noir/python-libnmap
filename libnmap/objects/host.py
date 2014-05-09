@@ -2,6 +2,7 @@
 from libnmap.diff import NmapDiff
 from libnmap.objects.os import NmapOSFingerprint
 
+
 class NmapHost(object):
     """
         NmapHost is a class representing a host object of NmapReport
@@ -28,6 +29,7 @@ class NmapHost(object):
         self._services = services if services is not None else []
         self._extras = extras if extras is not None else {}
         self._osfingerprinted = False
+        self.os = None
         if 'os' in self._extras:
             self.os = NmapOSFingerprint(self._extras['os'])
             self._osfingerprinted = True
@@ -263,16 +265,11 @@ class NmapHost(object):
             Returns an array of possible OS class detected during
             the OS fingerprinting.
 
-            Example [{'accuracy': '96', 'osfamily': 'embedded',
-                      'type': 'WAP', 'vendor': 'Netgear'}, {...}]
-
-            :return: dict describing the OS class detected and the accuracy
+            :return: Array of NmapOSClass objects
         """
         rval = []
-        try:
-            rval = self._extras['os']['osclass']
-        except (KeyError, TypeError):
-            pass
+        if self.os is not None:
+            rval = self.os.osclasses
         return rval
 
     def os_match_probabilities(self):
@@ -280,14 +277,11 @@ class NmapHost(object):
             Returns an array of possible OS match detected during
             the OS fingerprinting
 
-            :return: dict describing the OS version detected and the accuracy
+            :return: array of NmapOSMatches objects
         """
-
         rval = []
-        try:
-            rval = self._extras['os']['osmatch']
-        except (KeyError, TypeError):
-            pass
+        if self.os is not None:
+            rval = self.os.osmatches
         return rval
 
     @property
@@ -307,10 +301,8 @@ class NmapHost(object):
             :return: string
         """
         rval = ''
-        try:
+        if self.os is not None:
             rval = self.os.fingerprints.join("\n")
-        except (KeyError, TypeError):
-            pass
         return rval
 
     def os_ports_used(self):

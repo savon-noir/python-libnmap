@@ -23,6 +23,42 @@ class CPE(object):
         return self._cpestring
 
 
+class OSFPPortUsed(object):
+    """
+        Port used class: this enables the user of NmapOSFingerprint class
+        to have a common and clear interface to access portused data which
+        were collected and used during os fingerprint scan
+    """
+    def __init__(self, port_used_dict):
+        try:
+            self._state = port_used_dict['state']
+            self._proto = port_used_dict['proto']
+            self._portid = port_used_dict['portid']
+        except KeyError:
+            raise Exception("Cannot create OSFPPortUsed: missing required key")
+
+    @property
+    def state(self):
+        """
+            Accessor for the portused state (closed, open,...)
+        """
+        return self._state
+
+    @property
+    def proto(self):
+        """
+            Accessor for the portused protocol (tcp, udp,...)
+        """
+        return self._proto
+
+    @property
+    def portid(self):
+        """
+            Accessor for the referenced port number used
+        """
+        return self._portid
+
+
 class NmapOSMatch(object):
     """
         NmapOSMatch is an internal class used for offering results
@@ -65,17 +101,14 @@ class NmapOSMatch(object):
         except KeyError:
             pass
 
-    def add_osclass(self, class_dict):
+    def add_osclass(self, osclass_obj):
 
         """
             Add a NmapOSClass object to the OSMatch object. This method is
             useful to implement compatibility with older versions of NMAP
             by providing a common interface to access os fingerprint data.
         """
-        if 'osclass' in class_dict:
-            self.__osclasses.append(class_dict)
-        else:
-            raise Exception("Cannot add: no osclass data in provided dict")
+        self._osclasses.append(osclass_obj)
 
     @property
     def osclasses(self):
@@ -243,9 +276,11 @@ class NmapOSFingerprint(object):
                 if 'fingerprint' in _osfp:
                     self.__fingerprints.append(_osfp['fingerprint'])
         if 'ports_used' in osfp_data:
-            self.__ports_used = osfp_data['ports_used']
+            for _pused_dict in osfp_data['ports_used']:
+                _pused = OSFPPortUsed(_pused_dict)
+                self.__ports_used.append(_pused)
 
-    def get_osmatch(self, accuracy):
+    def get_osmatch(self, osclass_obj):
         """
             This function enables NmapOSFingerprint to determine if an
             NmapOSClass object could be attached to an existing NmapOSMatch
@@ -257,7 +292,7 @@ class NmapOSFingerprint(object):
         """
         rval = None
         for _osmatch in self.__osmatches:
-            if _osmatch.accuracy == accuracy:
+            if _osmatch.accuracy == osclass_obj.accuracy:
                 rval = _osmatch
                 break  # sorry
         return rval
@@ -295,6 +330,15 @@ class NmapOSFingerprint(object):
     @property
     def fingerprints(self):
         return self.__fingerprints
+
+    @property
+    def ports_used(self):
+        """
+            Return an array of OSFPPortUsed object with the ports used to
+            perform the os fingerprint. This dict might contain another dict
+            embedded containing the ports_reason values.
+        """
+        return self.__ports_used
 
     def osmatch(self, min_accuracy=90):
         warnings.warn("NmapOSFingerprint.osmatch is deprecated: "
