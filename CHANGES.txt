@@ -16,7 +16,7 @@ v0.4.8, 05/05/2014 -- Changes in OS fingerprint data API
                     - NmapOSClass objects might contain a list of CPE object
                       related to the os class (CPE class will be improved and
                       API enriched)
-                    - TODO: finalize API and create all related unit tests
+                    - TODO: finalize API doc and create all related unit tests
 v0.4.7, 03/05/2014 -- minor fix for issue25
                     - fixed exception when optional service tag is not present
                       in <port> tag

@@ -33,6 +33,8 @@ class NmapHost(object):
         if 'os' in self._extras:
             self.os = NmapOSFingerprint(self._extras['os'])
             self._osfingerprinted = True
+        else:
+            self.os = NmapOSFingerprint({})
 
         self._ipv4_addr = None
         self._ipv6_addr = None

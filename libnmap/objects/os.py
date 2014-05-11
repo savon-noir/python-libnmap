@@ -19,8 +19,8 @@ class CPE(object):
         """
         return self._cpestring
 
-    def __repr__(self):
-        return self._cpestring
+#    def __repr__(self):
+#        return self._cpestring
 
 
 class OSFPPortUsed(object):
@@ -144,11 +144,11 @@ class NmapOSMatch(object):
         """
         return int(self._accuracy)
 
-    def __repr__(self):
-        rval = "{0}: {1}".format(self.name, self.accuracy)
-        for _osclass in self._osclasses:
-            rval += "\r\n  |__ os class: {0}".format(str(_osclass))
-        return rval
+#    def __repr__(self):
+#        rval = "{0}: {1}".format(self.name, self.accuracy)
+#        for _osclass in self._osclasses:
+#            rval += "\r\n  |__ os class: {0}".format(str(_osclass))
+#        return rval
 
 
 class NmapOSClass(object):
@@ -239,13 +239,13 @@ class NmapOSClass(object):
         """
         return self._type
 
-    def __repr__(self):
-        rval = "{0}: {1}, {2}".format(self.type, self.vendor, self.osfamily)
-        if len(self.osgen):
-            rval += "({0})".format(self.osgen)
-        for _cpe in self._cpelist:
-            rval += "\r\n    |__ {0}".format(str(_cpe))
-        return rval
+#    def __repr__(self):
+#        rval = "{0}: {1}, {2}".format(self.type, self.vendor, self.osfamily)
+#        if len(self.osgen):
+#            rval += "({0})".format(self.osgen)
+#        for _cpe in self._cpelist:
+#            rval += "\r\n    |__ {0}".format(str(_cpe))
+#        return rval
 
 
 class NmapOSFingerprint(object):

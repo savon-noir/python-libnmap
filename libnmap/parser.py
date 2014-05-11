@@ -513,7 +513,6 @@ class NmapParser(object):
             elif xos.tag == 'osmatch':
                 os_match_proba = cls.__parse_osmatch(xos)
                 os_match_probability.append(os_match_proba)
-                print os_match_proba
             elif xos.tag == 'portused':
                 os_portused = cls.__format_attributes(xos)
                 os_ports_used.append(os_portused)
