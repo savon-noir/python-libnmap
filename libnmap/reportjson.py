@@ -1,13 +1,18 @@
 #!/usr/bin/env python
 import json
 from libnmap.objects import NmapHost, NmapService, NmapReport
+from libnmap.objects.os import *
 from libnmap.parser import NmapParser
 
 
 class ReportEncoder(json.JSONEncoder):
     def default(self, obj):
         otype = {'NmapHost': NmapHost,
-                 'NmapOSFingerprint': NmapHost.NmapOSFingerprint,
+                 'NmapOSFingerprint': NmapOSFingerprint,
+                 'NmapOSMatch': NmapOSMatch,
+                 'NmapOSClass': NmapOSClass,
+                 'CPE': CPE,
+                 'OSFPPortUsed': OSFPPortUsed,
                  'NmapService': NmapService,
                  'NmapReport': NmapReport}
         if isinstance(obj, tuple(otype.values())):

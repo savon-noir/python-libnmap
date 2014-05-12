@@ -225,6 +225,7 @@ class NmapParser(object):
                     slist.append(NmapService(portid=s[cname]['_portid'],
                                              protocol=s[cname]['_protocol'],
                                              state=s[cname]['_state'],
+                                             owner=s[cname]['_owner'],
                                              service=s[cname]['_service']))
 
                 nh = NmapHost(starttime=h['__NmapHost__']['_starttime'],
