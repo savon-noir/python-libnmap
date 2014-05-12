@@ -225,6 +225,7 @@ class NmapParser(object):
                     slist.append(NmapService(portid=s[cname]['_portid'],
                                              protocol=s[cname]['_protocol'],
                                              state=s[cname]['_state'],
+                                             owner=s[cname]['_owner'],
                                              service=s[cname]['_service']))
 
                 nh = NmapHost(starttime=h['__NmapHost__']['_starttime'],
@@ -503,28 +504,78 @@ class NmapParser(object):
         os_class_probability = []
         os_match_probability = []
         os_ports_used = []
-        os_fp = {}
+        os_fingerprints = []
         for xos in xelement:
+            # for nmap xml version < 1.04, osclass is not
+            # embedded in osmatch
             if xos.tag == 'osclass':
-                os_class_proba = cls.__format_attributes(xos)
+                os_class_proba = cls.__parse_osclass(xos)
                 os_class_probability.append(os_class_proba)
             elif xos.tag == 'osmatch':
-                os_match_proba = cls.__format_attributes(xos)
+                os_match_proba = cls.__parse_osmatch(xos)
                 os_match_probability.append(os_match_proba)
             elif xos.tag == 'portused':
                 os_portused = cls.__format_attributes(xos)
                 os_ports_used.append(os_portused)
             elif xos.tag == 'osfingerprint':
-                os_fp = cls.__format_attributes(xos)
+                os_fp_dict = cls.__format_attributes(xos)
+                os_fingerprints.append(os_fp_dict)
 
-        rdict['osmatch'] = os_match_probability
-        rdict['osclass'] = os_class_probability
+        rdict['osmatches'] = os_match_probability
+        rdict['osclasses'] = os_class_probability
         rdict['ports_used'] = os_ports_used
-        if 'fingerprint' in os_fp:
-            rdict['osfingerprint'] = os_fp['fingerprint']
-        else:
-            rdict['osfingerprint'] = ''
+        rdict['osfingerprints'] = os_fingerprints
 
+        return rdict
+
+    @classmethod
+    def __parse_osmatch(cls, osmatch_data):
+        """
+            This methods parses osmatch data and returns a dict. Depending
+            on the nmap xml version, osmatch could contain an osclass
+            dict.
+
+            :param osmatch_data: <osmatch> XML tag from a nmap scan
+            :type osmatch_data: xml.ElementTree.Element or a string
+
+            :return: python dict representing the XML osmatch tag
+        """
+        rdict = {}
+        xelement = cls.__format_element(osmatch_data)
+        rdict['osmatch'] = cls.__format_attributes(xelement)
+        rdict['osclasses'] = []
+        for xmltag in xelement:
+            if xmltag.tag == 'osclass':
+                _osclass_dict = cls.__parse_osclass(xmltag)
+                rdict['osclasses'].append(_osclass_dict)
+            else:
+                exmsg = "Unexcepted node in <osmatch>: {0}".format(xmltag.tag)
+                raise NmapParserException(exmsg)
+        return rdict
+
+    @classmethod
+    def __parse_osclass(cls, osclass_data):
+        """
+            This methods parses osclass data and returns a dict. Depending
+            on the nmap xml version, osclass could contain a cpe
+            dict.
+
+            :param osclass_data: <osclass> XML tag from a nmap scan
+            :type osclass_data: xml.ElementTree.Element or a string
+
+            :return: python dict representing the XML osclass tag
+        """
+        rdict = {}
+        xelement = cls.__format_element(osclass_data)
+        rdict['osclass'] = cls.__format_attributes(xelement)
+        rdict['cpe'] = []
+        for xmltag in xelement:
+            if xmltag.tag == 'cpe':
+                _cpe_string = xmltag.text
+                rdict['cpe'].append(_cpe_string)
+            else:
+                exmsg = "Unexcepted node in <osclass>: {0}".format(xmltag.tag)
+                raise NmapParserException(exmsg)
         return rdict
 
     @classmethod
@@ -546,8 +597,8 @@ class NmapParser(object):
             if xmltag.tag in ['finished', 'hosts']:
                 rdict[xmltag.tag] = cls.__format_attributes(xmltag)
             else:
-                raise NmapParserException("Unpexpected data structure "
-                                          "for <runstats>")
+                exmsg = "Unexcepted node in <runstats>: {0}".format(xmltag.tag)
+                raise NmapParserException(exmsg)
 
         return rdict
 
