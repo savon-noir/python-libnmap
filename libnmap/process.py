@@ -282,7 +282,7 @@ class NmapProcess(Thread):
         while(self.__nmap_proc.poll() is None or producing.value == 1):
             if self.__process_killed.is_set():
                 break
-            if producing.value == 1:
+            if producing.value == 1 and qout.empty():
                 try:
                     data_pushed.wait()
                 except KeyboardInterrupt:
