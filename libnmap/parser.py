@@ -394,7 +394,7 @@ class NmapParser(object):
             if xport.tag == 'state':
                 _state = cls.__format_attributes(xport)
             elif xport.tag == 'service':
-                _service = cls.__format_attributes(xport)
+                _service = cls.__parse_service(xport)
             elif xport.tag == 'owner':
                 _owner = cls.__format_attributes(xport)
             elif xport.tag == 'script':
@@ -414,6 +414,20 @@ class NmapParser(object):
                             _owner,
                             _service_extras)
         return nport
+
+    @classmethod
+    def __parse_service(cls, xserv):
+        """
+            Parse <service> tag to manage CPE object
+        """
+        _service = cls.__format_attributes(xserv)
+        _cpelist = []
+        for _servnode in xserv:
+            if _servnode.tag == 'cpe':
+                _cpe_string = _servnode.text
+                _cpelist.append(_cpe_string)
+        _service['cpelist'] = _cpelist
+        return _service
 
     @classmethod
     def __parse_extraports(cls, extraports_data):

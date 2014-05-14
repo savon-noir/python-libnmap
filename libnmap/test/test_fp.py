@@ -15,6 +15,7 @@ class TestNmapFP(unittest.TestCase):
                 { 'file': "%s/%s" % (fdir, 'files/1_hosts_down.xml'), 'os': 0}]
         self.flist = self.flist_full
         self.flist_os =  {'nv6': {'file': "%s/%s" % (fdir, 'files/full_sudo6.xml'), 'os': 0},
+                'fullscan': { 'file': "%s/%s" % (fdir, 'files/fullscan.xml'), 'os': 0},
                 'nv5': { 'file': "%s/%s" % (fdir, 'files/os_scan5.xml'), 'os': 0}}
 
     def test_fp(self):
@@ -114,9 +115,17 @@ class TestNmapFP(unittest.TestCase):
         self.assertEqual(h1.os.fingerprint, fpval)
         self.assertEqual(h1.os.fingerprints, fparray)
 
+    def test_cpeservice(self):
+        cpelist = ['cpe:/a:openbsd:openssh:5.9p1','cpe:/o:linux:linux_kernel']
+        rep = NmapParser.parse_fromfile(self.flist_os['fullscan']['file'])
+        h1 = rep.hosts.pop()
+        s = h1.services[0]
+        self.assertEqual(s.cpelist[0].cpestring, cpelist[0])
+        self.assertEqual(s.cpelist[1].cpestring, cpelist[1])
+        
 
 if __name__ == '__main__':
     test_suite = ['test_fp', 'test_fpv6', 'test_osmatches_new', 'test_osclasses_new',
-            'test_fpv5', 'test_osmatches_old']
+            'test_fpv5', 'test_osmatches_old', 'test_cpeservice']
     suite = unittest.TestSuite(map(TestNmapFP, test_suite))
     test_result = unittest.TextTestRunner(verbosity=2).run(suite)

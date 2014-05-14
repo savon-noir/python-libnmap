@@ -1,3 +1,4 @@
+v0.4.9, 14/05/2014 -- Fix for issue 28 and added code samples
 v0.4.8, 05/05/2014 -- Changes in OS fingerprint data API
                     - NmapHost now holds its OS fingerprint data in NmapHost.os
                       (NmapOSFingerpring object)

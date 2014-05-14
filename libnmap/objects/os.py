@@ -144,6 +144,21 @@ class NmapOSMatch(object):
         """
         return int(self._accuracy)
 
+    def get_cpe(self):
+        """
+            This method return a list of cpe stings and not CPE objects as
+            the NmapOSClass.cpelist property. This method is a helper to
+            simplify data management.
+
+            For more advanced handling of CPE data, use NmapOSClass.cpelist
+            and use the methods from CPE class
+        """
+        _cpelist = []
+        for osc in self.osclasses:
+            for cpe in osc.cpelist:
+                _cpelist.append(cpe.cpestring)
+        return _cpelist
+
     def __repr__(self):
         rval = "{0}: {1}".format(self.name, self.accuracy)
         for _osclass in self._osclasses:
@@ -238,6 +253,19 @@ class NmapOSClass(object):
             :return: string
         """
         return self._type
+
+    @property
+    def description(self):
+        """
+            Accessor helper which returns a concataned string of
+            the valuable attributes from NmapOSClass object
+
+            :return: string
+        """
+        rval = "{0}: {1}, {2}".format(self.type, self.vendor, self.osfamily)
+        if len(self.osgen):
+            rval += "({0})".format(self.osgen)
+        return rval
 
     def __repr__(self):
         rval = "{0}: {1}, {2}".format(self.type, self.vendor, self.osfamily)

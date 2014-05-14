@@ -200,6 +200,17 @@ class NmapHost(object):
         """
         self._status = statusdict
 
+    def is_up(self):
+        """
+            method to determine if host is up or not
+
+            :return: bool
+        """
+        rval = False
+        if self.status == 'up':
+            rval = True
+        return rval
+
     @property
     def hostnames(self):
         """
