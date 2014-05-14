@@ -39,9 +39,10 @@ class NmapService(object):
         self._service = service if service is not None else {}
 
         self._cpelist = []
-        for _cpe in service['cpelist']:
-            _cpeobj = CPE(_cpe)
-            self._cpelist.append(_cpeobj)
+        if 'cpelist' in self._service:
+            for _cpe in self._service['cpelist']:
+                _cpeobj = CPE(_cpe)
+                self._cpelist.append(_cpeobj)
 
         self._owner = ''
         if owner is not None and 'name' in owner:
