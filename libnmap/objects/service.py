@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from libnmap.diff import NmapDiff
+from libnmap.objects.os import CPE
 
 
 class NmapService(object):
@@ -36,6 +37,11 @@ class NmapService(object):
         self._protocol = protocol
         self._state = state if state is not None else {}
         self._service = service if service is not None else {}
+
+        self._cpelist = []
+        for _cpe in service['cpelist']:
+            _cpeobj = CPE(_cpe)
+            self._cpelist.append(_cpeobj)
 
         self._owner = ''
         if owner is not None and 'name' in owner:
@@ -199,13 +205,20 @@ class NmapService(object):
 
             :return: string
         """
-        notrelevant = ['name', 'method', 'conf']
+        notrelevant = ['name', 'method', 'conf', 'cpelist']
         b = ''
         if 'method' in self._service and self._service['method'] == "probed":
             b = " ".join([k + ": " + self._service[k]
                           for k in self._service.keys()
                               if k not in notrelevant])
         return b
+
+    @property
+    def cpelist(self):
+        """
+            Accessor for list of CPE for this particular service
+        """
+        return self._cpelist
 
     @property
     def scripts_results(self):
