@@ -27,7 +27,7 @@ class NmapProcess(Thread):
     parsed out via the NmapParser class from libnmap.parser module.
     """
     def __init__(self, targets="127.0.0.1",
-                 options="-sT", event_callback=None, safe_mode=True):
+                 options="-sT", event_callback=None, safe_mode=True, fqp=None):
         """
         Constructor of NmapProcess class.
 
@@ -47,6 +47,9 @@ class NmapProcess(Thread):
         :param safe_mode: parameter to protect unsafe options like -oN, -oG,
         -iL, -oA,...
 
+        :param fqp: full qualified path, if None, nmap will be searched
+        in the PATH
+
         :return: NmapProcess object
 
         """
@@ -57,10 +60,16 @@ class NmapProcess(Thread):
         unsafe_opts = set(['-oG', '-oN', '-iL', '-oA', '-oS', '-oX',
                            '--iflist', '--resume', '--stylesheet',
                            '--datadir'])
-
-        self.__nmap_binary_name = "nmap"
+        if fqp:
+            if os.path.isfile(fqp) and os.access(fqp, os.X_OK):
+                self.__nmap_binary = fqp
+            else:
+                raise EnvironmentError(1, "wrong path or not executable", fqp)
+        else:
+            self.__nmap_binary_name = "nmap"
+            self.__nmap_binary = self._whereis(self.__nmap_binary_name)
         self.__nmap_fixed_options = "-oX - -vvv --stats-every 2s"
-        self.__nmap_binary = self._whereis(self.__nmap_binary_name)
+
         if self.__nmap_binary is None:
             raise EnvironmentError(1, "nmap is not installed or could "
                                       "not be found in system path")
