@@ -4,8 +4,8 @@ from libnmap.parser import NmapParser, NmapParserException
 
 
 # start a new nmap scan on localhost with some specific options
-def do_scan(targets, options):
-    nm = NmapProcess(targets, options)
+def do_scan(targets, options, fqp=None):
+    nm = NmapProcess(targets, options, fqp=fqp)
     rc = nm.run()
     if rc != 0:
         print "nmap scan failed: %s" % (nm.stderr)
@@ -50,4 +50,11 @@ def print_scan(nmap_report):
 
 if __name__ == "__main__":
     report = do_scan("127.0.0.1", "-sV")
+    print_scan(report)
+    # test with full path to bin
+    # /usr/bin/nmap
+    report = do_scan("127.0.0.1", "-sV", fqp="/usr/bin/nmap")
+    print_scan(report)
+    # /usr/bin/lol --> will throw exception
+    report = do_scan("127.0.0.1", "-sV", fqp="/usr/bin/lol")
     print_scan(report)
