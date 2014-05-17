@@ -1,5 +1,5 @@
-- review OS fingerprint API and add NmapOSFP class
-- add unit test for os fingerprint class
+- improve API for NSE scripts
+- add support for post,pre and host scripts
 - support for python3
 - complete unit tests with coverall support
 - support for windows

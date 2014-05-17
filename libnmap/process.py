@@ -4,6 +4,7 @@ import pwd
 import shlex
 import subprocess
 import multiprocessing
+import signal
 from threading import Thread
 from xml.dom import pulldom
 import warnings
@@ -114,8 +115,9 @@ class NmapProcess(Thread):
         self.__nmap_command_line = self.get_command_line()
         # API usable in callback function
         self.__nmap_proc = None
+        self.__qout = None
         self.__nmap_rc = 0
-        self.__state = self.READY
+        self.__state = self.RUNNING
         self.__starttime = 0
         self.__endtime = 0
         self.__version = ''
@@ -246,6 +248,8 @@ class NmapProcess(Thread):
             """
             producing.value = 1
             for streamline in iter(proc_stdout.readline, b''):
+                if self.__process_killed.is_set():
+                    break
                 if streamline is not None:
                     try:
                         io_queue.put(streamline)
@@ -258,7 +262,7 @@ class NmapProcess(Thread):
         self._run_init()
         producing = multiprocessing.Value('i', 1)
         data_pushed = multiprocessing.Event()
-        qout = multiprocessing.Queue()
+        self.__qout = multiprocessing.Queue()
 
         _tmp_cmdline = shlex.split(self.__nmap_command_line)
         try:
@@ -268,7 +272,7 @@ class NmapProcess(Thread):
                                                 bufsize=0)
             ioreader = multiprocessing.Process(target=ioreader_routine,
                                                args=(self.__nmap_proc.stdout,
-                                                     qout,
+                                                     self.__qout,
                                                      data_pushed,
                                                      producing))
             ioreader.start()
@@ -282,13 +286,13 @@ class NmapProcess(Thread):
         while(self.__nmap_proc.poll() is None or producing.value == 1):
             if self.__process_killed.is_set():
                 break
-            if producing.value == 1 and qout.empty():
+            if producing.value == 1 and self.__qout.empty():
                 try:
                     data_pushed.wait()
                 except KeyboardInterrupt:
                     break
             try:
-                thread_stream = qout.get_nowait()
+                thread_stream = self.__qout.get_nowait()
             except Empty:
                 pass
             except KeyboardInterrupt:
@@ -301,8 +305,8 @@ class NmapProcess(Thread):
             data_pushed.clear()
         ioreader.join()
         # queue clean-up
-        while not qout.empty():
-            self.__stdout += qout.get_nowait()
+        while not self.__qout.empty():
+            self.__stdout += self.__qout.get_nowait()
         self.__stderr += self.__nmap_proc.stderr.read()
 
         self.__nmap_rc = self.__nmap_proc.poll()
@@ -321,6 +325,7 @@ class NmapProcess(Thread):
         run nmap scan in background as a thread.
         For privileged scans, consider NmapProcess.sudo_run_background()
         """
+        self.__state = self.RUNNING
         super(NmapProcess, self).start()
 
     def is_running(self):
@@ -361,7 +366,10 @@ class NmapProcess(Thread):
         Send KILL -15 to the nmap subprocess and gently ask the threads to
         stop.
         """
-        self.__nmap_proc.terminate()
+        self.__state = self.CANCELLED
+        if self.__nmap_proc.poll() is None:
+            self.__nmap_proc.kill()
+        self.__qout.cancel_join_thread()
         self.__process_killed.set()
 
     def __process_event(self, eventdata):
@@ -612,10 +620,10 @@ def main():
     def mycallback(nmapscan=None):
         if nmapscan.is_running() and nmapscan.current_task:
             ntask = nmapscan.current_task
-            print "Task {0} ({1}): ETC: {2} DONE: {3}%".format(ntask.name,
+            print("Task {0} ({1}): ETC: {2} DONE: {3}%".format(ntask.name,
                                                                ntask.status,
                                                                ntask.etc,
-                                                               ntask.progress)
+                                                               ntask.progress))
     nm = NmapProcess("scanme.nmap.org",
                      options="-A",
                      event_callback=mycallback)

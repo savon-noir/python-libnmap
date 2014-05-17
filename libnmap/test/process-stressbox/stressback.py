@@ -10,7 +10,7 @@ def start_all_bg(nmprocs):
     for nmp in nmprocs: nmp.run_background()
  
 def any_running(nmprocs):
-    return any([nmp.is_alive() for nmp in nmprocs])
+    return any([nmp.is_running() for nmp in nmprocs])
  
 def summarize(nmprocs):
     for nmp in nmprocs:
