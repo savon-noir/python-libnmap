@@ -4,7 +4,6 @@ import pwd
 import shlex
 import subprocess
 import multiprocessing
-import signal
 from threading import Thread
 from xml.dom import pulldom
 import warnings

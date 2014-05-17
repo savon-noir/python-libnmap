@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 from libnmap.process import NmapProcess
-from time import sleep
 
 def mycallback(nmaptask):
     nmaptask = nmap_proc.current_task
