@@ -1,10 +1,8 @@
-- review OS fingerprint API and add NmapOSFP class
-- add unit test for os fingerprint class
-- complete unit tests with coverall support
-- review and improve threading for NmapProcess
+- improve API for NSE scripts
+- add support for post,pre and host scripts
 - support for python3
+- complete unit tests with coverall support
 - support for windows
 - Add new plugins to support import/export from mysql, couchdb, csv
 - add unittest for udp scans, ping sweeping
 - add support for 'resume' capability (see nmap --resume)
-- add support for "not shown ports" (extra ports) in NmapHost (via NmapParser)

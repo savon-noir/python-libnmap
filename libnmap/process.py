@@ -3,19 +3,43 @@ import os
 import pwd
 import shlex
 import subprocess
-import threading
+import multiprocessing
+import signal
 from threading import Thread
 from xml.dom import pulldom
 import warnings
-import time
 try:
-    from Queue import Queue, Empty, Full
+    from Queue import Empty, Full
 except ImportError:
-    from queue import Queue, Empty, Full
+    from queue import Empty, Full
 
 __all__ = [
     'NmapProcess'
 ]
+
+
+class NmapTask(object):
+    """
+    NmapTask is a internal class used by process. Each time nmap
+    starts a new task during the scan, a new class will be instanciated.
+    Classes examples are: "Ping Scan", "NSE script", "DNS Resolve",..
+    To each class an estimated time to complete is assigned and updated
+    at least every second within the NmapProcess.
+    A property NmapProcess.current_task points to the running task at
+    time T and a dictionnary NmapProcess.tasks with "task name" as key
+    is built during scan execution
+    """
+    def __init__(self, name, starttime=0, extrainfo=''):
+        self.name = name
+        self.etc = 0
+        self.progress = 0
+        self.percent = 0
+        self.remaining = 0
+        self.status = 'started'
+        self.starttime = starttime
+        self.endtime = 0
+        self.extrainfo = extrainfo
+        self.updated = 0
 
 
 class NmapProcess(Thread):
@@ -54,9 +78,6 @@ class NmapProcess(Thread):
 
         """
         Thread.__init__(self)
-        self.__nmap_proc = None
-        self.__nmap_rc = 0
-
         unsafe_opts = set(['-oG', '-oN', '-iL', '-oA', '-oS', '-oX',
                            '--iflist', '--resume', '--stylesheet',
                            '--datadir'])
@@ -66,15 +87,14 @@ class NmapProcess(Thread):
             else:
                 raise EnvironmentError(1, "wrong path or not executable", fqp)
         else:
-            self.__nmap_binary_name = "nmap"
-            self.__nmap_binary = self._whereis(self.__nmap_binary_name)
-        self.__nmap_fixed_options = "-oX - -vvv --stats-every 2s"
+            nmap_binary_name = "nmap"
+            self.__nmap_binary = self._whereis(nmap_binary_name)
+        self.__nmap_fixed_options = "-oX - -vvv --stats-every 1s"
 
         if self.__nmap_binary is None:
             raise EnvironmentError(1, "nmap is not installed or could "
                                       "not be found in system path")
 
-        self.__sudo_run = ""
         if isinstance(targets, str):
             self.__nmap_targets = targets.replace(" ", "").split(',')
         elif isinstance(targets, list):
@@ -88,6 +108,7 @@ class NmapProcess(Thread):
             raise Exception("unsafe options activated while safe_mode "
                             "is set True")
         self.__nmap_dynamic_options = options
+        self.__sudo_run = ''
         self.__nmap_command_line = self.get_command_line()
 
         if event_callback and callable(event_callback):
@@ -96,45 +117,25 @@ class NmapProcess(Thread):
             self.__nmap_event_callback = None
         (self.DONE, self.READY, self.RUNNING,
          self.CANCELLED, self.FAILED) = range(5)
-
-        self.__io_queue = Queue()
-        self.__ioerr_queue = Queue()
-        self.__process_killed = threading.Event()
-        self.__thread_stdout = None
-        self.__thread_stderr = None
-
-        # API usable in callback function
-        self.__state = self.READY
-        self.__starttime = 0
-        self.__endtime = 0
-        self.__version = ''
-        self.__progress = 0
-        self.__etc = 0
-        self.__elapsed = ''
-        self.__summary = ''
-        self.__stdout = ''
-        self.__stderr = ''
+        self._run_init()
 
     def _run_init(self):
-        """
-        Protected method ran at every call to run(). This ensures that no
-        no parameters are polluted.
-        """
-        self.__nmap_proc = None
-        self.__nmap_rc = -1
+        self.__process_killed = multiprocessing.Event()
         self.__nmap_command_line = self.get_command_line()
-        self.__state = self.READY
-        self.__progress = 0
-        self.__etc = 0
+        # API usable in callback function
+        self.__nmap_proc = None
+        self.__qout = None
+        self.__nmap_rc = 0
+        self.__state = self.RUNNING
         self.__starttime = 0
         self.__endtime = 0
+        self.__version = ''
         self.__elapsed = ''
         self.__summary = ''
-        self.__version = ''
-        self.__io_queue = Queue()
-        self.__ioerr_queue = Queue()
         self.__stdout = ''
         self.__stderr = ''
+        self.__current_task = ''
+        self.__nmap_tasks = {}
 
     def _whereis(self, program):
         """
@@ -150,7 +151,7 @@ class NmapProcess(Thread):
         """
         for path in os.environ.get('PATH', '').split(':'):
             if (os.path.exists(os.path.join(path, program)) and not
-                    os.path.isdir(os.path.join(path, program))):
+               os.path.isdir(os.path.join(path, program))):
                 return os.path.join(path, program)
         return None
 
@@ -183,7 +184,9 @@ class NmapProcess(Thread):
         try:
             pwd.getpwnam(sudo_user).pw_uid
         except KeyError:
-            raise
+            _exmsg = ("Username {0} does not exists. Please supply"
+                      " a valid username".format(run_as))
+            raise EnvironmentError(_exmsg)
 
         sudo_path = self._whereis("sudo")
         if sudo_path is None:
@@ -214,7 +217,9 @@ class NmapProcess(Thread):
         try:
             pwd.getpwnam(sudo_user).pw_uid
         except KeyError:
-            raise
+            _exmsg = ("Username {0} does not exists. Please supply"
+                      " a valid username".format(run_as))
+            raise EnvironmentError(_exmsg)
 
         sudo_path = self._whereis("sudo")
         if sudo_path is None:
@@ -229,110 +234,107 @@ class NmapProcess(Thread):
         """
         Public method which is usually called right after the constructor
         of NmapProcess. This method starts the nmap executable's subprocess.
-        It will also bind to threads that will read from subprocess' stdout
+        It will also bind a Process that will read from subprocess' stdout
         and stderr and push the lines read in a python queue for futher
-        processing.
+        processing. This processing is waken-up each time data is pushed
+        from the nmap binary into the stdout reading routine. Processing
+        could be performed by a user-provided callback. The whole
+        NmapProcess object could be accessible asynchroneously.
 
-        return: return code from nmap execution from self.__wait()
+        return: return code from nmap execution
         """
-        def stream_reader(thread_stdout, io_queue):
+        def ioreader_routine(proc_stdout, io_queue, data_pushed, producing):
             """
             local function that will read lines from a file descriptor
             and put the data in a python queue for futher processing.
 
-            :param thread_stdout: file descriptor to read lines from.
+            :param proc_stdout: file descriptor to read lines from.
             :param io_queue: queue in which read lines will be pushed.
+            :param data_pushed: queue used to push data read from the
+            nmap stdout back into the parent process
+            :param producing: shared variable to notify the parent process
+            that processing is either running, either over.
             """
-            for streamline in iter(thread_stdout.readline, b''):
-                try:
-                    if streamline is not None:
+            producing.value = 1
+            for streamline in iter(proc_stdout.readline, b''):
+                if self.__process_killed.is_set():
+                    break
+                if streamline is not None:
+                    try:
                         io_queue.put(streamline)
-                except Full:
-                    raise Exception("Queue ran out of buffer: "
-                                    "increase q.get(timeout) value")
-            thread_stdout.close()
+                    except Full:
+                        pass
+                    data_pushed.set()
+            producing.value = 0
+            data_pushed.set()
 
         self._run_init()
+        producing = multiprocessing.Value('i', 1)
+        data_pushed = multiprocessing.Event()
+        self.__qout = multiprocessing.Queue()
+
+        _tmp_cmdline = shlex.split(self.__nmap_command_line)
         try:
-            _tmp_cmdline = shlex.split(self.__nmap_command_line)
             self.__nmap_proc = subprocess.Popen(args=_tmp_cmdline,
                                                 stdout=subprocess.PIPE,
                                                 stderr=subprocess.PIPE,
                                                 bufsize=0)
-            self.__thread_stdout = Thread(target=stream_reader,
-                                          name='stdout-reader',
-                                          args=(self.__nmap_proc.stdout,
-                                                self.__io_queue))
-            self.__thread_stderr = Thread(target=stream_reader,
-                                          name='stderr-reader',
-                                          args=(self.__nmap_proc.stderr,
-                                                self.__ioerr_queue))
-
-            self.__thread_stdout.start()
-            self.__thread_stderr.start()
-
+            ioreader = multiprocessing.Process(target=ioreader_routine,
+                                               args=(self.__nmap_proc.stdout,
+                                                     self.__qout,
+                                                     data_pushed,
+                                                     producing))
+            ioreader.start()
             self.__state = self.RUNNING
         except OSError:
             self.__state = self.FAILED
-            raise
+            raise EnvironmentError(1, "nmap is not installed or could "
+                                      "not be found in system path")
 
-        return self.__wait()
-
-    def active_fd(self):
-        return (self.__thread_stdout.is_alive() or
-                self.__thread_stderr.is_alive())
-
-    def __wait(self):
-        """
-        Private method, called by run() which will loop and
-        process the data from the python queues. Those queues are fed by
-        the stream_readers of run, reading lines from subprocess.stdout/err.
-        Each time data is pushed in the nmap's stdout queue:
-        1. __process_event is called with the acquired data as input
-        2. if a event callback was provided, the function passed in the
-           constructor is called.
-
-        :return: return code from nmap execution
-        """
         thread_stream = ''
-        while (self.__nmap_proc.poll() is None or
-               self.active_fd() is True or
-               not self.__io_queue.empty() or
-               not self.__ioerr_queue.empty()):
-            if self.__process_killed.isSet():
+        while(self.__nmap_proc.poll() is None or producing.value == 1):
+            if self.__process_killed.is_set():
                 break
-            if not self.__ioerr_queue.empty():
-                self.__stderr += self.__ioerr_queue.get_nowait()
+            if producing.value == 1 and self.__qout.empty():
+                try:
+                    data_pushed.wait()
+                except KeyboardInterrupt:
+                    break
             try:
-                thread_stream = self.__io_queue.get_nowait()
+                thread_stream = self.__qout.get_nowait()
             except Empty:
                 pass
             except KeyboardInterrupt:
                 break
             else:
+                self.__stdout += thread_stream
                 evnt = self.__process_event(thread_stream)
                 if self.__nmap_event_callback and evnt:
                     self.__nmap_event_callback(self)
-                self.__stdout += thread_stream
-                self.__io_queue.task_done()
-            time.sleep(0.01)
+            data_pushed.clear()
+        ioreader.join()
+        # queue clean-up
+        while not self.__qout.empty():
+            self.__stdout += self.__qout.get_nowait()
+        self.__stderr += self.__nmap_proc.stderr.read()
 
         self.__nmap_rc = self.__nmap_proc.poll()
         if self.rc is None:
             self.__state = self.CANCELLED
         elif self.rc == 0:
             self.__state = self.DONE
-            self.__progress = 100
+            if self.current_task:
+                self.__nmap_tasks[self.current_task.name].progress = 100
         else:
             self.__state = self.FAILED
-            try:
-                self.__stderr += self.__ioerr_queue.get(timeout=1)
-                self.__ioerr_queue.task_done()
-            except Empty:
-                pass
         return self.rc
 
     def run_background(self):
+        """
+        run nmap scan in background as a thread.
+        For privileged scans, consider NmapProcess.sudo_run_background()
+        """
+        self.__state = self.RUNNING
         super(NmapProcess, self).start()
 
     def is_running(self):
@@ -373,7 +375,10 @@ class NmapProcess(Thread):
         Send KILL -15 to the nmap subprocess and gently ask the threads to
         stop.
         """
-        self.__nmap_proc.terminate()
+        self.__state = self.CANCELLED
+        if self.__nmap_proc.poll() is None:
+            self.__nmap_proc.kill()
+        self.__qout.cancel_join_thread()
         self.__process_killed.set()
 
     def __process_event(self, eventdata):
@@ -398,12 +403,42 @@ class NmapProcess(Thread):
             edomdoc = pulldom.parseString(eventdata)
             for xlmnt, xmlnode in edomdoc:
                 if xlmnt is not None and xlmnt == pulldom.START_ELEMENT:
-                    if (xmlnode.nodeName == 'taskprogress' and
+                    if (xmlnode.nodeName == 'taskbegin' and
                             xmlnode.attributes.keys()):
-                        percent_done = xmlnode.attributes['percent'].value
-                        etc_done = xmlnode.attributes['etc'].value
-                        self.__progress = percent_done
-                        self.__etc = etc_done
+                        xt = xmlnode.attributes
+                        taskname = xt['task'].value
+                        starttime = xt['time'].value
+                        xinfo = ''
+                        if 'extrainfo' in xt.keys():
+                            xinfo = xt['extrainfo'].value
+                        newtask = NmapTask(taskname, starttime, xinfo)
+                        self.__nmap_tasks[newtask.name] = newtask
+                        self.__current_task = newtask.name
+                        rval = True
+                    elif (xmlnode.nodeName == 'taskend' and
+                            xmlnode.attributes.keys()):
+                        xt = xmlnode.attributes
+                        tname = xt['task'].value
+                        xinfo = ''
+                        self.__nmap_tasks[tname].endtime = xt['time'].value
+                        if 'extrainfo' in xt.keys():
+                            xinfo = xt['extrainfo'].value
+                        self.__nmap_tasks[tname].extrainfo = xinfo
+                        self.__nmap_tasks[tname].status = "ended"
+                        rval = True
+                    elif (xmlnode.nodeName == 'taskprogress' and
+                            xmlnode.attributes.keys()):
+                        xt = xmlnode.attributes
+                        tname = xt['task'].value
+                        percent = xt['percent'].value
+                        etc = xt['etc'].value
+                        remaining = xt['remaining'].value
+                        updated = xt['time'].value
+                        self.__nmap_tasks[tname].percent = percent
+                        self.__nmap_tasks[tname].progress = percent
+                        self.__nmap_tasks[tname].etc = etc
+                        self.__nmap_tasks[tname].remaining = remaining
+                        self.__nmap_tasks[tname].updated = updated
                         rval = True
                     elif (xmlnode.nodeName == 'nmaprun' and
                             xmlnode.attributes.keys()):
@@ -419,6 +454,16 @@ class NmapProcess(Thread):
         except:
             pass
         return rval
+
+    @property
+    def command(self):
+        """
+        return the constructed nmap command or empty string if not
+        constructed yet.
+
+        :return: string
+        """
+        return self.__nmap_command_line or ''
 
     @property
     def targets(self):
@@ -496,13 +541,13 @@ class NmapProcess(Thread):
         return self.__summary
 
     @property
-    def etc(self):
+    def tasks(self):
         """
-        Accessor for estimated time to completion
+        Accessor returning for the list of tasks ran during nmap scan
 
-        :return:  estimated time to completion
+        :return: dict of NmapTask object
         """
-        return self.__etc
+        return self.__nmap_tasks
 
     @property
     def version(self):
@@ -515,13 +560,40 @@ class NmapProcess(Thread):
         return self.__version
 
     @property
+    def current_task(self):
+        """
+        Accessor for the current NmapTask beeing run
+
+        :return: NmapTask or None if no task started yet
+        """
+        rval = None
+        if len(self.__current_task):
+            rval = self.tasks[self.__current_task]
+        return rval
+
+    @property
+    def etc(self):
+        """
+        Accessor for estimated time to completion
+
+        :return:  estimated time to completion
+        """
+        rval = 0
+        if self.current_task:
+            rval = self.current_task.etc
+        return rval
+
+    @property
     def progress(self):
         """
         Accessor for progress status in percentage
 
         :return: percentage of job processed.
         """
-        return self.__progress
+        rval = 0
+        if self.current_task:
+            rval = self.current_task.progress
+        return rval
 
     @property
     def rc(self):
@@ -555,14 +627,16 @@ class NmapProcess(Thread):
 
 def main():
     def mycallback(nmapscan=None):
-        if nmapscan.is_running():
-            print("Progress: {0}% - ETC: {1}").format(nmapscan.progress,
-                                                      nmapscan.etc)
-
-    nm = NmapProcess("localhost", options="-sV",
+        if nmapscan.is_running() and nmapscan.current_task:
+            ntask = nmapscan.current_task
+            print("Task {0} ({1}): ETC: {2} DONE: {3}%".format(ntask.name,
+                                                               ntask.status,
+                                                               ntask.etc,
+                                                               ntask.progress))
+    nm = NmapProcess("scanme.nmap.org",
+                     options="-A",
                      event_callback=mycallback)
     rc = nm.run()
-
     if rc == 0:
         print("Scan started at {0} nmap version: {1}").format(nm.starttime,
                                                               nm.version)

@@ -10,13 +10,13 @@ def start_all_bg(nmprocs):
     for nmp in nmprocs: nmp.run_background()
  
 def any_running(nmprocs):
-    return any([nmp.is_alive() for nmp in nmprocs])
+    return any([nmp.is_running() for nmp in nmprocs])
  
 def summarize(nmprocs):
     for nmp in nmprocs:
         print "rc: {0} output: {1}".format(nmp.rc, len(nmp.stdout))
  
-nb_targets = 1000
+nb_targets = 10
 nm_target = "localhost"
 nm_opts = "-sP"
 

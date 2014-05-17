@@ -1,3 +1,12 @@
+v0.5.0, 17/05/2014 -- Rewrite of NmapProcess
+                    - removed Threads to read stdout/stderr
+                    - replaced by Process
+                    - use of semaphore to not consume CPU while looping
+                    - added NmapTask class
+                    - added NmapProcess.current_task
+                    - added NmapProcess.tasks list
+                    - fixed bug in NmapProcess.state
+                    - note NmapProcess.is_alive() is not recommended
 v0.4.9, 14/05/2014 -- Fix for issue 28 and added code samples
 v0.4.8, 05/05/2014 -- Changes in OS fingerprint data API
                     - NmapHost now holds its OS fingerprint data in NmapHost.os
