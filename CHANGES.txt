@@ -1,3 +1,7 @@
+v0.5.1, 26/05/2014 -- Added basic API for class CPE
+                    - interface similar to python-cpe for more
+                      advanced usage of CPE, I strongly recommend you
+                      to use python-cpe. Nice code, good doc.
 v0.5.0, 17/05/2014 -- Rewrite of NmapProcess
                     - removed Threads to read stdout/stderr
                     - replaced by Process

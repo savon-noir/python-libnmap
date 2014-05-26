@@ -1,26 +1,5 @@
 import warnings
-
-
-class CPE(object):
-    """
-        CPE class offers an API for basic CPE objects.
-        These objects could be found in NmapService or in <os> tag
-        within NmapHost.
-
-        :todo: interpret CPE string and provide appropriate API
-    """
-    def __init__(self, cpestring):
-        self._cpestring = cpestring
-
-    @property
-    def cpestring(self):
-        """
-            Accessor for the full CPE string.
-        """
-        return self._cpestring
-
-    def __repr__(self):
-        return self._cpestring
+from libnmap.objects.cpe import CPE
 
 
 class OSFPPortUsed(object):
