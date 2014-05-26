@@ -1,6 +1,7 @@
 import warnings
 from libnmap.objects.cpe import CPE
 
+
 class OSFPPortUsed(object):
     """
         Port used class: this enables the user of NmapOSFingerprint class
