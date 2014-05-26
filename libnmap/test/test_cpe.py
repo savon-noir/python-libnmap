@@ -2,7 +2,6 @@
 
 from libnmap.objects.os import CPE
 import unittest
-import os
 
 
 class TestNmapFP(unittest.TestCase):
