@@ -1,11 +1,32 @@
 libnmap.parser
 ==============
 
-Using libnmap.parser module
----------------------------
+Purpose of libnmap.parser
+-------------------------
 
 This modules enables you to parse nmap scans' output. For now on, only XML parsing is supported. NmapParser is a factory which will return a NmapReport, NmapHost or NmapService object.
 All these objects' API are documented.
+
+The module is capable of parsing:
+
+- a complete nmap XML scan report
+- an incomplete/interrupted nmap XML scan report
+- partial nmap xml tags: <host>, <ports> and <port>
+
+Input the above capabilities could be either a string or a file path.
+
+Based on the provided data, NmapParse.parse() could return the following:
+
+- NmapReport object: in case a full nmap xml/dict report was prodivded
+- NmapHost object: in case a nmap xml <host> section was provided
+- NmapService object: in case a nmap xml <port> section was provided
+- Python dict with following keys: ports and extraports; python lists.
+
+Using libnmap.parser module
+---------------------------
+
+NmapParser parse the whole data and returns nmap objects usable via their documented API.
+
 The NmapParser should never be instanciated and only the following methods should be called:
 
 - NmapParser.parse(string)
