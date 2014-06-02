@@ -21,7 +21,8 @@ Raw results of the scans will be available in the following properties:
 To instanciate a NmapProcess instance, call the constructor with appropriate parameters:
 .. automodule:: libnmap.process
 .. autoclass:: NmapProcess
-    :members: __init__
+    :members:
+    .. automethod:: __init__
 
 
 Processing of events
