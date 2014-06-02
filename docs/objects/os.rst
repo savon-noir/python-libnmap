@@ -16,20 +16,17 @@ NmapOSFingerprint methods
 NmapOSMatch methods
 -------------------
 
-.. automodule:: libnmap.objects.os
 .. autoclass:: NmapOSMatch
     :members:
 
 NmapOSClass methods
 -------------------
 
-.. automodule:: libnmap.objects.os
 .. autoclass:: NmapOSClass
     :members:
 
 OSFPPortUsed methods
 --------------------
 
-.. automodule:: libnmap.objects.os
 .. autoclass:: OSFPPortUsed
     :members:

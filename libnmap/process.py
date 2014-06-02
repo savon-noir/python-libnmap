@@ -44,6 +44,7 @@ class NmapTask(object):
 class NmapProcess(Thread):
     """
     NmapProcess is a class which wraps around the nmap executable.
+
     Consequently, in order to run an NmapProcess, nmap should be installed
     on the host running the script. By default NmapProcess will produce
     the output of the nmap scan in the nmap XML format. This could be then
@@ -54,23 +55,24 @@ class NmapProcess(Thread):
         """
         Constructor of NmapProcess class.
 
-        :param targets: hosts to be scanned. Could be a string of hosts
+        :param targets: hosts to be scanned. Could be a string of hosts \
         separated with a coma or a python list of hosts/ip.
         :type targets: string or list
 
-        :param options: list of nmap options to be applied to scan.
+        :param options: list of nmap options to be applied to scan. \
         These options are all documented in nmap's man pages.
 
-        :param event_callback: callable function which will be ran
-        each time nmap process outputs data. This function will receive
+        :param event_callback: callable function which will be ran \
+        each time nmap process outputs data. This function will receive \
         two parameters:
+
             1. the nmap process object
             2. the data produced by nmap process. See readme for examples.
 
-        :param safe_mode: parameter to protect unsafe options like -oN, -oG,
+        :param safe_mode: parameter to protect unsafe options like -oN, -oG, \
         -iL, -oA,...
 
-        :param fqp: full qualified path, if None, nmap will be searched
+        :param fqp: full qualified path, if None, nmap will be searched \
         in the PATH
 
         :return: NmapProcess object

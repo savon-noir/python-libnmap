@@ -1,5 +1,5 @@
-libnmap.objects.service
-=======================
+libnmap.objects.cpe
+===================
 
 Using libnmap.objects.cpe module
 --------------------------------
