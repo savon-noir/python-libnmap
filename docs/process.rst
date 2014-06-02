@@ -18,14 +18,6 @@ Raw results of the scans will be available in the following properties:
 - NmapProcess.stdout: string, XML output
 - NmapProcess.stderr: string, text error message from nmap process
 
-To instanciate a NmapProcess instance, call the constructor with appropriate parameters:
-
-.. automodule:: libnmap.process
-.. autoclass:: NmapProcess
-    :members:
-    .. automethod:: __init__
-
-
 Processing of events
 --------------------
 
