@@ -11,6 +11,13 @@ libnmap is a python toolkit for manipulating nmap. It currently offers the follo
 - report: enables you to manipulate a parsed scan result and de/serialize scan results in a json format
 - diff: enables you to see what changed between two scans
 - objects: contains basic nmap objects like NmapHost and NmapService. It is to note that each object can be "diff()ed" with another similar object.
+
+  - report: contains NmapReport class definition
+  - host: contains NmapHost class definition
+  - service: contains NmapService class definition
+  - os: contains NmapOSFingerprint class definition and some other classes like NmapOSMatch, NmapOSClass,...
+  - cpe: contains CPE class defdinition
+
 - plugins: enables you to support datastores for your scan results directly in the "NmapReport" object from report module
 
   - mongodb: only plugin implemented so far, ultra basic, for POC purpose only
@@ -35,6 +42,7 @@ The different modules are documented below:
    process
    parser
    objects
+   objects/*
    diff
    plugins_s3
 

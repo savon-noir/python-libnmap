@@ -10,6 +10,11 @@ This module contains the definition and API of all "NmapObjects" which enables u
 2. NmapHost
 3. NmapService
 
+The three objects above are the most common one that one would manipulate. For more advanced usage, the following objects might be useful
+
+1. NmapOSFingerprint (contains: NmapOSMatch, NmapOSClass, OSFPPortUsed)
+2. CPE (Common platform enumeration contained in NmapService or NmapOSClass)
+
 The following structure applies by default:
 
 NmapReport contains:
@@ -33,20 +38,3 @@ of the same type.
 If you read the code you'll see the dirty trick with id() which ensures that proper objects are being compared. The logic of diff will certainly change overtime but the API (i/o) will be kept as is.
 
 For more info on diff, please check the module's `documentation <diff>_`.
-
-NmapReport methods
-------------------
-
-.. automodule:: libnmap.objects
-.. autoclass:: NmapReport
-    :members:
-
-NmapHost methods
-----------------
-.. autoclass:: NmapHost
-    :members:
-
-NmapService methods
--------------------
-.. autoclass:: NmapService
-    :members:

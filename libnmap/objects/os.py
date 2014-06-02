@@ -294,8 +294,11 @@ class NmapOSFingerprint(object):
             object in order to respect the common interface for
             the nmap xml version < 1.04 and >= 1.04
 
-            :return: an NmapOSMatch object matching with the NmapOSClass
-            provided in parameter (match is performed based on accuracy)
+            This method will return an NmapOSMatch object matching with
+            the NmapOSClass provided in parameter
+            (match is performed based on accuracy)
+
+            :return: NmapOSMatch object
         """
         rval = None
         for _osmatch in self.__osmatches:

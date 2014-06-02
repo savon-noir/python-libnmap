@@ -11,22 +11,21 @@ class NmapParser(object):
     def parse(cls, nmap_data=None, data_type='XML', incomplete=False):
         """
             Generic class method of NmapParser class.
+
             The data to be parsed does not need to be a complete nmap
             scan report. You can possibly give <hosts>...</hosts>
             or <port> XML tags.
 
-            :param nmap_data: any portion of nmap scan result.
-
-            nmap_data should always be a string representing a part
+            :param nmap_data: any portion of nmap scan result. \
+            nmap_data should always be a string representing a part \
             or a complete nmap scan report.
-
             :type nmap_data: string
 
             :param data_type: specifies the type of data to be parsed.
             :type data_type: string ("XML"|"JSON"|"YAML").
 
-            :param incomplete: enable you to parse interrupted nmap scans
-            and/or incomplete nmap xml blocks by adding a </nmaprun> at
+            :param incomplete: enable you to parse interrupted nmap scans \
+            and/or incomplete nmap xml blocks by adding a </nmaprun> at \
             the end of the scan.
             :type incomplete: boolean
 
@@ -51,12 +50,12 @@ class NmapParser(object):
             In this case: XML. This method is called by cls.parse class
             method and receives nmap scan results data (in XML).
 
-            :param nmap_data: any portion of nmap scan result can be given
-            as argument. nmap_data should always be a string representing
+            :param nmap_data: any portion of nmap scan result can be given \
+            as argument. nmap_data should always be a string representing \
             a part or a complete nmap scan report.
             :type nmap_data: string
 
-            This method checks which portion of a nmap scan is given
+            This method checks which portion of a nmap scan is given \
             as argument.
             It could be:
 
@@ -66,12 +65,12 @@ class NmapParser(object):
                 4. a list of hosts: <hosts/> tag (TODO)
                 5. a list of ports: <ports/> tag
 
-            :param incomplete: enable you to parse interrupted nmap scans
-            and/or incomplete nmap xml blocks by adding a </nmaprun> at
+            :param incomplete: enable you to parse interrupted nmap scans \
+            and/or incomplete nmap xml blocks by adding a </nmaprun> at \
             the end of the scan.
-
             :type incomplete: boolean
-            :return: NmapObject (NmapHost, NmapService or NmapReport)
+
+            :return: NmapObject (NmapHost, NmapService or NmapReport) \
                     or a list of NmapObject
         """
 
@@ -140,19 +139,18 @@ class NmapParser(object):
     @classmethod
     def parse_fromstring(cls, nmap_data, data_type="XML", incomplete=False):
         """
-            Call generic cls.parse() method and ensure that a string is
+            Call generic cls.parse() method and ensure that a string is \
             passed on as argument. If not, an exception is raised.
 
-            :param nmap_data: Same as for parse(), any portion of nmap scan.
-
+            :param nmap_data: Same as for parse(), any portion of nmap scan. \
             Reports could be passed as argument. Data type _must_ be a string.
 
             :type nmap_data: string
 
             :param data_type: Specifies the type of data passed on as argument.
 
-            :param incomplete: enable you to parse interrupted nmap scans
-            and/or incomplete nmap xml blocks by adding a </nmaprun> at
+            :param incomplete: enable you to parse interrupted nmap scans \
+            and/or incomplete nmap xml blocks by adding a </nmaprun> at \
             the end of the scan.
             :type incomplete: boolean
 
@@ -169,20 +167,18 @@ class NmapParser(object):
                        data_type="XML",
                        incomplete=False):
         """
-            Call generic cls.parse() method and ensure that a correct file
+            Call generic cls.parse() method and ensure that a correct file \
             path is given as argument. If not, an exception is raised.
 
-            :param nmap_data: Same as for parse().
-
-            Any portion of nmap scan reports could be passed as argument.
-
-            Data type _must be a valid path to a file containing
+            :param nmap_data: Same as for parse(). \
+            Any portion of nmap scan reports could be passed as argument. \
+            Data type _must be a valid path to a file containing \
             nmap scan results.
 
             :param data_type: Specifies the type of serialization in the file.
 
-            :param incomplete: enable you to parse interrupted nmap scans
-            and/or incomplete nmap xml blocks by adding a </nmaprun> at
+            :param incomplete: enable you to parse interrupted nmap scans \
+            and/or incomplete nmap xml blocks by adding a </nmaprun> at \
             the end of the scan.
             :type incomplete: boolean
 
@@ -200,9 +196,9 @@ class NmapParser(object):
     @classmethod
     def parse_fromdict(cls, rdict):
         """
-            Strange method which transforms a python dict
-            representation of a NmapReport and turns it into an
-            NmapReport object.
+            Strange method which transforms a python dict \
+            representation of a NmapReport and turns it into an \
+            NmapReport object. \
             Needs to be reviewed and possibly removed.
 
             :param rdict: python dict representation of an NmapReport

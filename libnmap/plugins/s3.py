@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 """
 :mod:`libnmap.plugin.s3` -- S3 Backend Plugin
-===================================
+=============================================
 
 .. module:: libnmap.plugin.s3
+
 :platform: Linux
 :synopsis: a plugin is representation of a S3 backend using boto
+
 .. moduleauthor:: Ronald Bister
 .. moduleauthor:: Mike Boutillier
 """
