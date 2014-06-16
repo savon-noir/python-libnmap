@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 from libnmap.parser import NmapParser
 
@@ -18,11 +19,11 @@ changed_service2 = changed_host2.get_service_byid(changed_service_id)
 service1_items_changed = changed_service1.diff(changed_service2).changed()
 
 for diff_attr in service1_items_changed:
-    print "diff({0}, {1}) [{2}:{3}] [{4}:{5}]".format(changed_service1.id,
+    print("diff({0}, {1}) [{2}:{3}] [{4}:{5}]".format(changed_service1.id,
                                                       changed_service2.id,
                                                       diff_attr,
                                                       getattr(changed_service1,
                                                               diff_attr),
                                                       diff_attr,
                                                       getattr(changed_service2,
-                                                              diff_attr))
+                                                              diff_attr)))

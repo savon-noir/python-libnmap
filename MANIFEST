@@ -10,6 +10,11 @@ docs/objects.rst
 docs/parser.rst
 docs/plugins_s3.rst
 docs/process.rst
+docs/objects/cpe.rst
+docs/objects/nmaphost.rst
+docs/objects/nmapreport.rst
+docs/objects/nmapservice.rst
+docs/objects/os.rst
 libnmap/__init__.py
 libnmap/diff.py
 libnmap/parser.py

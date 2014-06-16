@@ -5,24 +5,26 @@ from libnmap.parser import NmapParser, NmapParserException
 
 # start a new nmap scan on localhost with some specific options
 def do_scan(targets, options, fqp=None):
+    parsed = None
     nm = NmapProcess(targets, options, fqp=fqp)
     rc = nm.run()
     if rc != 0:
-        print "nmap scan failed: %s" % (nm.stderr)
+        print("nmap scan failed: {0}".format(nm.stderr))
 
+    print(nm.stdout)
     try:
         parsed = NmapParser.parse(nm.stdout)
     except NmapParserException as e:
-        print "Exception raised while parsing scan: %s" % (e.msg)
+        print("Exception raised while parsing scan: {0}".format(e.msg))
 
     return parsed
 
 
 # print scan results from a nmap report
 def print_scan(nmap_report):
-    print "Starting Nmap {0} ( http://nmap.org ) at {1}".format(
-        nmap_report._nmaprun['version'],
-        nmap_report._nmaprun['startstr'])
+    print("Starting Nmap {0} ( http://nmap.org ) at {1}".format(
+        nmap_report.version,
+        nmap_report.started))
 
     for host in nmap_report.hosts:
         if len(host.hostnames):
@@ -30,11 +32,11 @@ def print_scan(nmap_report):
         else:
             tmp_host = host.address
 
-        print "Nmap scan report for {0} ({1})".format(
-            tmp_host,
-            host.address)
-        print "Host is {0}.".format(host.status)
-        print "  PORT     STATE         SERVICE"
+        print("Nmap scan report for {0} ({1})".format(
+              tmp_host,
+              host.address))
+        print("Host is {0}.".format(host.status))
+        print("  PORT     STATE         SERVICE")
 
         for serv in host.services:
             pserv = "{0:>5s}/{1:3s}  {2:12s}  {3}".format(
@@ -44,12 +46,13 @@ def print_scan(nmap_report):
                     serv.service)
             if len(serv.banner):
                 pserv += " ({0})".format(serv.banner)
-            print pserv
-    print nmap_report.summary
+            print(pserv)
+    print(nmap_report.summary)
 
 
 if __name__ == "__main__":
     report = do_scan("127.0.0.1", "-sV")
+    print(report)
     print_scan(report)
     # test with full path to bin
     # /usr/bin/nmap
@@ -60,4 +63,4 @@ if __name__ == "__main__":
         report = do_scan("127.0.0.1", "-sV", fqp="/usr/bin/lol")
         print_scan(report)
     except Exception as exc:
-        print exc
+        print(exc)

@@ -3,7 +3,8 @@ python:
 #  - "2.5" Not needed EL can use epel to upgrade to 2.6
   - "2.6"
   - "2.7"
-#  - "3.2" Not ready yet
+  - "3.3"
+  - "3.4"
 # command to install dependencies
 env:
 #  - MONGO_VERSION=1.2.12

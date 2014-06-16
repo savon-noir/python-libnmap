@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import unittest
 import os
@@ -144,7 +145,6 @@ class TestNmapParser(unittest.TestCase):
             self.assertEqual(p.reason_ttl, "253")
             self.assertEqual(p.reason_ip, "109.133.192.1")
 
-
     def test_port_except(self):
         self.assertRaises(ValueError,
                           NmapParser.parse,
@@ -173,7 +173,7 @@ class TestNmapParser(unittest.TestCase):
     def test_parser_generic(self):
         plist = NmapParser.parse_fromstring(self.ports_string)
         for p in plist:
-            print p
+            print(p)
 
 if __name__ == '__main__':
     test_suite = ['test_class_parser', 'test_class_ports_parser',

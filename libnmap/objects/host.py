@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from libnmap.diff import NmapDiff
 from libnmap.objects.os import NmapOSFingerprint
 
@@ -456,7 +457,7 @@ class NmapHost(object):
 
             :return dict
         """
-        d = dict([("%s::%s" % (s.__class__.__name__, str(s.id)),
+        d = dict([("{0}::{1}".format(s.__class__.__name__, str(s.id)),
                    hash(s))
                  for s in self.services])
 

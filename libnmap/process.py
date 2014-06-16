@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import os
 import pwd
 import shlex
@@ -7,6 +9,7 @@ import multiprocessing
 from threading import Thread
 from xml.dom import pulldom
 import warnings
+
 try:
     from Queue import Empty, Full
 except ImportError:
@@ -262,7 +265,7 @@ class NmapProcess(Thread):
                     break
                 if streamline is not None:
                     try:
-                        io_queue.put(streamline)
+                        io_queue.put(str(streamline.decode()))
                     except Full:
                         pass
                     data_pushed.set()
@@ -317,7 +320,7 @@ class NmapProcess(Thread):
         # queue clean-up
         while not self.__qout.empty():
             self.__stdout += self.__qout.get_nowait()
-        self.__stderr += self.__nmap_proc.stderr.read()
+        self.__stderr += str(self.__nmap_proc.stderr.read().decode())
 
         self.__nmap_rc = self.__nmap_proc.poll()
         if self.rc is None:

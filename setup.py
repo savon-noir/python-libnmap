@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from distutils.core import setup
 
 with open("README.rst") as rfile:
@@ -5,7 +6,7 @@ with open("README.rst") as rfile:
 
 setup(
     name='python-libnmap',
-    version='0.5.1',
+    version='0.5.2',
     author='Ronald Bister',
     author_email='mini.pelle@gmail.com',
     packages=['libnmap', 'libnmap.plugins', 'libnmap.objects'],
@@ -19,5 +20,8 @@ setup(
                  "Programming Language :: Python :: 2",
                  "Programming Language :: Python :: 2.6",
                  "Programming Language :: Python :: 2.7",
+                 "Programming Language :: Python :: 3",
+                 "Programming Language :: Python :: 3.3",
+                 "Programming Language :: Python :: 3.4",
                  "Topic :: System :: Networking"]
 )

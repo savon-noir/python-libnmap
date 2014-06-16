@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from libnmap.diff import NmapDiff
 
 
@@ -294,10 +294,9 @@ class NmapReport(object):
 
             :return: dict
         """
-        rdict = dict([("%s::%s" % (_host.__class__.__name__,
-                                   str(_host.id)),
-                      hash(_host))
-                     for _host in self.hosts])
+        rdict = dict([("{0}::{1}".format(_host.__class__.__name__,
+                                         str(_host.id)),
+                     hash(_host)) for _host in self.hosts])
         rdict.update({'commandline': self.commandline,
                       'version': self.version,
                       'scan_type': self.scan_type,

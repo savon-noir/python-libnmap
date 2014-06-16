@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 from libnmap.parser import NmapParser
 
@@ -13,15 +14,15 @@ for _host in rep.hosts:
 
         # get CPE from service if available
         for s in _host.services:
-            print "    Service: {0}/{1} ({2})".format(s.port,
+            print("    Service: {0}/{1} ({2})".format(s.port,
                                                       s.protocol,
-                                                      s.state)
+                                                      s.state))
             # NmapService.cpelist returns an array of CPE objects
             for _serv_cpe in s.cpelist:
-                print "        CPE: {0}".format(_serv_cpe.cpestring)
+                print("        CPE: {0}".format(_serv_cpe.cpestring))
 
         if _host.os_fingerprinted:
-            print "  OS Fingerprints"
+            print("  OS Fingerprints")
             for osm in _host.os.osmatches:
                 print("    Found Match:{0} ({1}%)".format(osm.name,
                                                           osm.accuracy))

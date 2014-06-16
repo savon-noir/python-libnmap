@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import unittest
 import os
@@ -54,8 +55,8 @@ class TestNmapParser(unittest.TestCase):
                                   '631': 'product: CUPS version: 1.4',
                                   '3306':
                                       'product: MySQL version: 5.1.61',
-                                  '22': ("product: OpenSSH extrainfo:"
-                                         " protocol 2.0 version: 5.3"),
+                                  '22': ("product: OpenSSH version: 5.3"
+                                         " extrainfo: protocol 2.0"),
                                   '25': ("product: Postfix smtpd"
                                          " hostname:  jambon.localdomain"),
                                   '111': ''}}]

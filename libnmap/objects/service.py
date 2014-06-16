@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from libnmap.diff import NmapDiff
 from libnmap.objects.os import CPE
 
@@ -206,13 +206,19 @@ class NmapService(object):
 
             :return: string
         """
-        notrelevant = ['name', 'method', 'conf', 'cpelist']
+        notrelevant = ['name', 'method', 'conf', 'cpelist',
+                       'servicefp', 'tunnel']
+        relevant = ['product', 'version', 'extrainfo']
         b = ''
+        skeys = self._service.keys()
         if 'method' in self._service and self._service['method'] == "probed":
-            b = " ".join([k + ": " + self._service[k]
-                          for k in self._service.keys()
-                              if k not in notrelevant])
-        return b
+            for relk in relevant:
+                if relk in skeys:
+                    b += '{0}: {1} '.format(relk, self._service[relk])
+            for mkey in skeys:
+                if mkey not in notrelevant and mkey not in relevant:
+                    b += '{0}: {1} '.format(mkey, self._service[mkey])
+        return b.rstrip()
 
     @property
     def cpelist(self):

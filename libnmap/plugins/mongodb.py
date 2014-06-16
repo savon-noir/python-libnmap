@@ -36,7 +36,7 @@ class NmapMongodbPlugin(NmapBackendPlugin):
         try:
             oid = self.collection.insert(json.loads(j))
         except:
-            print "MONGODB cannot insert"
+            print("MONGODB cannot insert")
             raise
         return str(oid)
 

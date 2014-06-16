@@ -19,7 +19,7 @@ class BackendPluginFactory(object):
            :return: NmapBackend (abstract class on top of all plugin)
         """
         backendplugin = None
-        plugin_path = "libnmap.plugins.%s" % (plugin_name)
+        plugin_path = "libnmap.plugins.{0}".format(plugin_name)
         __import__(plugin_path)
         pluginobj = sys.modules[plugin_path]
         pluginclasses = inspect.getmembers(pluginobj, inspect.isclass)
@@ -28,5 +28,5 @@ class BackendPluginFactory(object):
                 try:
                     backendplugin = classobj(**kwargs)
                 except Exception as error:
-                    print "Cannot create Backend: %s" % (error)
+                    print("Cannot create Backend: {0}".format(error))
         return backendplugin

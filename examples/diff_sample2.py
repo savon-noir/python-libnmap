@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 from libnmap.parser import NmapParser
 
@@ -19,9 +20,9 @@ def print_diff_added(obj1, obj2, added):
                 subobj1 = obj1.get_host_byid(nested[1])
             elif nested[0] == 'NmapService':
                 subobj1 = obj1.get_service_byid(nested[1])
-            print "+ {0}".format(subobj1)
+            print("+ {0}".format(subobj1))
         else:
-            print "+ {0} {1}: {2}".format(obj1, akey, getattr(obj1, akey))
+            print("+ {0} {1}: {2}".format(obj1, akey, getattr(obj1, akey)))
 
 
 def print_diff_removed(obj1, obj2, removed):
@@ -32,9 +33,9 @@ def print_diff_removed(obj1, obj2, removed):
                 subobj2 = obj2.get_host_byid(nested[1])
             elif nested[0] == 'NmapService':
                 subobj2 = obj2.get_service_byid(nested[1])
-            print "- {0}".format(subobj2)
+            print("- {0}".format(subobj2))
         else:
-            print "- {0} {1}: {2}".format(obj2, rkey, getattr(obj2, rkey))
+            print("- {0} {1}: {2}".format(obj2, rkey, getattr(obj2, rkey)))
 
 
 def print_diff_changed(obj1, obj2, changes):
@@ -49,9 +50,9 @@ def print_diff_changed(obj1, obj2, changes):
                 subobj2 = obj2.get_service_byid(nested[1])
             print_diff(subobj1, subobj2)
         else:
-            print "~ {0} {1}: {2} => {3}".format(obj1, mkey,
+            print("~ {0} {1}: {2} => {3}".format(obj1, mkey,
                                                  getattr(obj2, mkey),
-                                                 getattr(obj1, mkey))
+                                                 getattr(obj1, mkey)))
 
 
 def print_diff(obj1, obj2):

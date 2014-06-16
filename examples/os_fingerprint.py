@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 from libnmap.parser import NmapParser
 
@@ -18,4 +19,4 @@ for _host in rep.hosts:
                     for cpe in osc.cpelist:
                         print("\tCPE: {0}".format(cpe.cpestring))
         else:
-            print "No fingerprint available"
+            print("No fingerprint available")
