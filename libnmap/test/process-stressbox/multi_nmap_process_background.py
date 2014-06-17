@@ -14,7 +14,7 @@ def any_running(nmprocs):
  
 def summarize(nmprocs):
   for nmp in nmprocs:
-      print "rc: {0} output: {1} stdout len: {2}".format(nmp.rc, nmp.summary, len(nmp.stdout))
+      print("rc: {0} output: {1} stdout len: {2}".format(nmp.rc, nmp.summary, len(nmp.stdout)))
 
 nm_targets = []
 for h in range(10):
@@ -25,7 +25,7 @@ nm_procs = [make_nmproc_obj(t, nm_opts) for t in nm_targets]
 start_all_bg(nm_procs)
  
 while any_running(nm_procs):
-    print "Nmap Scan running..."
+    print("Nmap Scan running...")
     sleep(2)
  
 summarize(nm_procs)

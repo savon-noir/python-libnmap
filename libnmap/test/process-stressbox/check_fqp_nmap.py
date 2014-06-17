@@ -11,7 +11,6 @@ def do_scan(targets, options, fqp=None):
     if rc != 0:
         print("nmap scan failed: {0}".format(nm.stderr))
 
-    print(nm.stdout)
     try:
         parsed = NmapParser.parse(nm.stdout)
     except NmapParserException as e:
@@ -51,16 +50,16 @@ def print_scan(nmap_report):
 
 
 if __name__ == "__main__":
-    report = do_scan("127.0.0.1", "-sV")
-    print(report)
+    report = do_scan("127.0.0.1", "-sT")
     print_scan(report)
     # test with full path to bin
     # /usr/bin/nmap
-    report = do_scan("127.0.0.1", "-sV", fqp="/usr/bin/nmap")
+    report = do_scan("127.0.0.1", "-sT", fqp="/usr/bin/nmap")
     print_scan(report)
     # /usr/bin/lol --> will throw exception
     try:
         report = do_scan("127.0.0.1", "-sV", fqp="/usr/bin/lol")
+        print("lolbin")
         print_scan(report)
     except Exception as exc:
         print(exc)

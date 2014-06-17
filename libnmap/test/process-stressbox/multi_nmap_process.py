@@ -12,7 +12,7 @@ def start_all(nmprocs):
  
 def summarize(nmprocs):
     for nmp in nmprocs:
-        print "rc: {0} output: {1}".format(nmp.rc, len(nmp.stdout))
+        print("rc: {0} output: {1}".format(nmp.rc, len(nmp.stdout)))
 
 nm_targets = []
 for h in range(20): nm_targets.append("localhost")

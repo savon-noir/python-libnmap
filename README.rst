@@ -35,7 +35,7 @@ The lib currently offers the following modules:
 
  - mongodb: insert/get/getAll/delete
  - sqlalchemy: insert/get/getAll/delete
- - aws s3: insert/get/getAll/delete
+ - aws s3: insert/get/getAll/delete (not supported for python3 since boto is not supporting py3)
  - csv: todo (easy to implement)
  - elastic search: todo
 
@@ -56,6 +56,16 @@ Below the list of optional dependencies:
 - `sqlalchemy`_ (+the driver ie:MySQL-python)
 - `pymongo`_
 - `boto`_
+
+Python Support
+--------------
+
+The libnmap code is tested against the following python interpreters:
+
+- Python 2.6
+- Python 2.7
+- Python 3.3
+- Python 3.4
 
 Install
 -------
