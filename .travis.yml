@@ -14,6 +14,9 @@ env:
 
 services: mongodb
 
+before_install:
+  - "sudo apt-get update -qq"
+  - "sudo apt-get install nmap -qq"
 install:
   - "pip install pep8 --use-mirrors"
   - "pip install pyflakes --use-mirrors"
@@ -25,7 +28,6 @@ before_script:
   - "pep8 . --exclude test,docs,examples"
   - "pyflakes ."
   - mysql -e 'create database poulet;'
-  - "apt-get install nmap"
 script: nosetests --with-coverage --cover-package=libnmap
 after_success:
   coveralls
