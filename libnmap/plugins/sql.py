@@ -103,8 +103,10 @@ class NmapSqlPlugin(NmapBackendPlugin):
     def insert(self, nmap_report):
         """
            insert NmapReport in the backend
+
            :param NmapReport:
-           :return: the ident of the object in the backend for future usage
+
+           :returns: the ident of the object in the backend for future usage \
            or None
         """
         sess = self.Session()
@@ -118,8 +120,10 @@ class NmapSqlPlugin(NmapBackendPlugin):
     def get(self, report_id=None):
         """
             retreive a NmapReport from the backend
+
             :param id: str
-            :return: NmapReport
+
+            :returns: NmapReport
         """
         if report_id is None:
             raise ValueError
@@ -131,8 +135,9 @@ class NmapSqlPlugin(NmapBackendPlugin):
 
     def getall(self):
         """
-            :return: collection of tuple (id,NmapReport)
             :param filter: Nice to have implement a filter capability
+
+            :returns: collection of tuple (id,NmapReport)
         """
         sess = self.Session()
         nmapreportList = []
@@ -146,8 +151,10 @@ class NmapSqlPlugin(NmapBackendPlugin):
     def delete(self, report_id=None):
         """
             Remove a report from the backend
+
             :param id: str
-            :return: The number of rows deleted
+
+            :returns: The number of rows deleted
         """
         if report_id is None:
             raise ValueError

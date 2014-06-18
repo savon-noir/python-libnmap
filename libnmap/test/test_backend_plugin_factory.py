@@ -60,7 +60,8 @@ class TestNmapBackendPlugin(unittest.TestCase):
                          'url': 'sqlite:////tmp/reportdb.sql',
                          'echo': False},
                      {'plugin_name': 'sql',
-                         'url': 'mysql+mysqldb://root@localhost/poulet',
+                         #'url': 'mysql+mysqldb://root@localhost/poulet', (mySQL-Python not supporting python3)
+                         'url': 'mysql+pymysql://root@localhost/poulet',
                          'echo': False},
                      #Walrus
                      ###{'plugin_name': 's3',

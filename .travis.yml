@@ -21,7 +21,8 @@ install:
   - "pip install pep8 --use-mirrors"
   - "pip install pyflakes --use-mirrors"
 #  - "pip install boto --use-mirrors" # disabled: since boto not supporting py3
-  - "pip install pymongo sqlalchemy MySQL-python --use-mirrors"
+#  - "pip install pymongo sqlalchemy MySQL-python --use-mirrors" # disabled MySQL-python (not py3 compatible)
+  - "pip install pymongo sqlalchemy pymysql --use-mirrors"
   - "pip install coveralls"
   - "python setup.py install"
 before_script:
