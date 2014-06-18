@@ -128,6 +128,7 @@ class TestNmapBackendPlugin(unittest.TestCase):
                 result_list.append(backend.get(rep_id))
             #print result_list[0]
             #print self.reportList[0]
+            i=0
             self.assertEqual(len(result_list), len(self.reportList))
             self.assertEqual((result_list), (self.reportList))
             id_list = []
