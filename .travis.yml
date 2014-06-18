@@ -25,6 +25,7 @@ before_script:
   - "pep8 . --exclude test,docs,examples"
   - "pyflakes ."
   - mysql -e 'create database poulet;'
+  - "apt-get install nmap"
 script: nosetests --with-coverage --cover-package=libnmap
 after_success:
   coveralls
