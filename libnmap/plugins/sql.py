@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from sqlalchemy import create_engine
 from sqlalchemy.schema import Column
-from sqlalchemy.types import Integer, DateTime, LargeBinary, Text
+from sqlalchemy.types import Integer, DateTime, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
