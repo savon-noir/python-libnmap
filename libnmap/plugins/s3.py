@@ -88,8 +88,7 @@ class NmapS3Plugin(NmapBackendPlugin):
             strjsonnmapreport = json.dumps(report, cls=ReportEncoder)
             mykey.set_contents_from_string(strjsonnmapreport)
         except:
-            print("Bucket cannot insert")
-            raise
+            raise Exception("Failed to add nmap object in s3 bucket")
         return str(oid)
 
     def get(self, str_report_id=None):
@@ -108,7 +107,7 @@ class NmapS3Plugin(NmapBackendPlugin):
                 nmapreportjson = json.loads(mykey.get_contents_as_string())
                 nmapreport = NmapParser.parse_fromdict(nmapreportjson)
             except S3ResponseError:
-                print("Not Found")
+                pass
         return nmapreport
 
     def getall(self, dict_filter=None):

@@ -28,5 +28,5 @@ class BackendPluginFactory(object):
                 try:
                     backendplugin = classobj(**kwargs)
                 except Exception as error:
-                    print("Cannot create Backend: {0}".format(error))
+                    raise Exception("Cannot create Backend: {0}".format(error))
         return backendplugin
