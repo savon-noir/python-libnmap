@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*- 
 
 import json
-
-from libnmap.reportjson import ReportDecoder, ReportEncoder
+from libnmap.reportjson import ReportEncoder
 from libnmap.plugins.backendplugin import NmapBackendPlugin
 from elasticsearch import Elasticsearch
 from datetime import datetime
@@ -15,7 +14,7 @@ class NmapElasticsearchPlugin(NmapBackendPlugin):
     """
     def __init__(self, index=None):
         if index is None:
-            self.index = datetime.now().strftime('%Y-%m-%d')
+            self.index = "nmap.{0}".format(datetime.now().strftime('%Y-%m-%d'))
         else:
             self.index = index
         self._esapi = Elasticsearch()

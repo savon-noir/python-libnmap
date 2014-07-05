@@ -376,6 +376,13 @@ class NmapOSFingerprint(object):
                     os_array.append(_ftstr)
         return os_array
 
+    def os_cpelist(self):
+        cpelist = []
+        for _osmatch in self.osmatches:
+            for oclass in _osmatch.osclasses:
+                cpelist.extend(oclass.cpelist)
+        return cpelist
+
     def __repr__(self):
         rval = ""
         for _osmatch in self.osmatches:

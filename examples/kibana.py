@@ -2,59 +2,62 @@
 # -*- coding: utf-8 -*-
 
 from libnmap.parser import NmapParser
-from libnmap.reportjson import ReportDecoder
-from libnmap.plugins.es import NmapElasticsearchPlugin
+from elasticsearch import Elasticsearch
 from datetime import datetime
-import json
+import pygeoip
 
 
-def report_store(nmap_report, database):
-    jhostlist = []
+def store_report(nmap_report, database, index):
+    rval = True
     for nmap_host in nmap_report.hosts:
-        jhost = host_store(nmap_host, database)
-        jhostlist.append(jhost)
+        rv = store_reportitem(nmap_host, database, index)
+        if rv is False:
+            print("Failed to store host {0} in elasticsearch".format(nmap_host.address))
+            rval = False
 
-    for jhost in jhostlist:
-        database.insert(jhost, doc_type="NmapHost")
-
-    return jhostlist
-
-
-def get_os(nmap_host):
-    rval = {'os': '', 'accuracy': 0}
-    if nmap_host.is_up() and nmap_host.os_fingerprinted:
-        os_list = []
-        for osm in nmap_host.os.osmatches:
-            os_list.append({"os": osm.name, "accuracy": osm.accuracy})
-            os_list.sort(key=lambda x: x['accuracy'], reverse=True)
-
-        if len(os_list):
-            rval.update(os_list[0])
     return rval
 
 
-def host_store(nmap_host, database):
+def get_os(nmap_host):
+    rval = {'vendor': 'unknown', 'product': 'unknown'}
+    if nmap_host.is_up() and nmap_host.os_fingerprinted:
+        cpelist = nmap_host.os.os_cpelist()
+        if len(cpelist):
+            mcpe = cpelist.pop()
+            rval.update({'vendor': mcpe.get_vendor(), 'product': mcpe.get_product()})
+    return rval
+
+
+def get_geoip_code(address):
+    gi = pygeoip.GeoIP('/usr/share/GeoIP/GeoIP.dat')
+    return gi.country_code_by_addr(address)
+
+
+def store_reportitem(nmap_host, database, index):
     host_keys = ["starttime", "endtime", "address", "hostnames",
                  "ipv4", "ipv6", "mac", "status"]
     jhost = {}
     for hkey in host_keys:
         if hkey == "starttime" or hkey == "endtime":
             val = getattr(nmap_host, hkey)
-            jhost[hkey] = int(val) if len(val) else 0
+            jhost[hkey] = datetime.fromtimestamp(int(val) if len(val) else 0)
         else:
             jhost[hkey] = getattr(nmap_host, hkey)
 
+    jhost.update({'country': get_geoip_code(nmap_host.address)})
+    jhost.update(get_os(nmap_host))
     for nmap_service in nmap_host.services:
-        reportitems = item_store(nmap_service, database)
+        reportitems = get_item(nmap_service)
 
         for ritem in reportitems:
             ritem.update(jhost)
-            database.insert(ritem, doc_type="ReportItem")
-    
-    jhost.update(get_os(nmap_host))
+            database.index(index=index,
+                           doc_type="NmapItem",
+                           body=ritem)
     return jhost
 
-def item_store(nmap_service, database):
+
+def get_item(nmap_service):
     service_keys = ["port", "protocol", "state"]
     ritems = []
 
@@ -80,11 +83,15 @@ def item_store(nmap_service, database):
     return ritems
 
 
-xmlscans = ['../libnmap/test/files/1_hosts.xml', '../libnmap/test/files/full_sudo6.xml']
+xmlscans = ['../libnmap/test/files/1_hosts.xml',
+            '../libnmap/test/files/full_sudo6.xml',
+            '/vagrant/nmap_switches.xml',
+            '/vagrant/nmap-5hosts.xml'
+    ]
 for xmlscan in xmlscans:
     nmap_report = NmapParser.parse_fromfile(xmlscan)
 
     if nmap_report:
-        mindex = datetime.fromtimestamp(nmap_report.started).strftime('%Y-%m-%d')
-        db = NmapElasticsearchPlugin(index=mindex)
-        j = report_store(nmap_report, db)
+        index = "nmap.{0}".format(datetime.fromtimestamp(int(nmap_report.started)).strftime('nmap.%Y-%m-%d'))
+        db = Elasticsearch()
+        j = store_report(nmap_report, db, index)
