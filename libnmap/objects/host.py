@@ -436,7 +436,7 @@ class NmapHost(object):
 
             :return: dict with keys 'state' and 'count' or None
         """
-        _xtrports = self._extras['extraports']
+        _xtrports = self._extras.get('extraports', None)
         if _xtrports is None:
             return None
             
@@ -450,7 +450,7 @@ class NmapHost(object):
 
             :return: array of dict containing keys 'state' and 'count' or None
         """
-        r = self._extras['extraports']
+        r = self._extras.get('extraports', None)
         if r is None:
             return None
             
