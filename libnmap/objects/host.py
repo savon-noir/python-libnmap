@@ -437,9 +437,10 @@ class NmapHost(object):
             :return: dict with keys 'state' and 'count' or None
         """
         _xtrports = self._extras.get('extraports', None)
+
         if _xtrports is None:
             return None
-            
+
         return {'state': _xtrports['state'], 'count': _xtrports['count']}
 
     @property
@@ -450,11 +451,9 @@ class NmapHost(object):
 
             :return: array of dict containing keys 'state' and 'count' or None
         """
-        r = self._extras.get('extraports', None)
-        if r is None:
-            return None
-            
-        return r['reasons']
+        r = self._extras.get('extraports', {})
+
+        return r.get('reasons', None)
 
     def get_dict(self):
         """
