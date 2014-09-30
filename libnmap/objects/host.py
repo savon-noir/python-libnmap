@@ -434,9 +434,13 @@ class NmapHost(object):
             dictionnary containing state and amount of extra ports scanned
             for which a common state, usually, closed was discovered.
 
-            :return: dict with keys 'state' and 'count'
+            :return: dict with keys 'state' and 'count' or None
         """
-        _xtrports = self._extras['extraports']
+        _xtrports = self._extras.get('extraports', None)
+
+        if _xtrports is None:
+            return None
+
         return {'state': _xtrports['state'], 'count': _xtrports['count']}
 
     @property
@@ -445,9 +449,11 @@ class NmapHost(object):
             dictionnary containing reasons why extra ports scanned
             for which a common state, usually, closed was discovered.
 
-            :return: array of dict containing keys 'state' and 'count'
+            :return: array of dict containing keys 'state' and 'count' or None
         """
-        return self._extras['extraports']['reasons']
+        r = self._extras.get('extraports', {})
+
+        return r.get('reasons', None)
 
     def get_dict(self):
         """
