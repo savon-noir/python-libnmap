@@ -64,7 +64,7 @@ class NmapService(object):
         if 'servicefp' in self._service:
             self._servicefp = self._service['servicefp']
         if 'tunnel' in self._service:
-            self._servicefp = self._service['tunnel']
+            self._tunnel = self._service['tunnel']
 
         self._service_extras = []
         if service_extras is not None:
