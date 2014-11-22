@@ -12,7 +12,8 @@ def store_report(nmap_report, database, index):
     for nmap_host in nmap_report.hosts:
         rv = store_reportitem(nmap_host, database, index)
         if rv is False:
-            print("Failed to store host {0} in elasticsearch".format(nmap_host.address))
+            print("Failed to store host {0} in "
+                  "elasticsearch".format(nmap_host.address))
             rval = False
 
     return rval
@@ -24,7 +25,8 @@ def get_os(nmap_host):
         cpelist = nmap_host.os.os_cpelist()
         if len(cpelist):
             mcpe = cpelist.pop()
-            rval.update({'vendor': mcpe.get_vendor(), 'product': mcpe.get_product()})
+            rval.update({'vendor': mcpe.get_vendor(),
+                         'product': mcpe.get_product()})
     return rval
 
 
@@ -86,12 +88,13 @@ def get_item(nmap_service):
 xmlscans = ['../libnmap/test/files/1_hosts.xml',
             '../libnmap/test/files/full_sudo6.xml',
             '/vagrant/nmap_switches.xml',
-            '/vagrant/nmap-5hosts.xml'
-    ]
+            '/vagrant/nmap-5hosts.xml']
+
 for xmlscan in xmlscans:
     nmap_report = NmapParser.parse_fromfile(xmlscan)
 
     if nmap_report:
-        index = "nmap.{0}".format(datetime.fromtimestamp(int(nmap_report.started)).strftime('nmap.%Y-%m-%d'))
+        rep_date = datetime.fromtimestamp(int(nmap_report.started))
+        index = "nmap-{0}".format(rep_date.strftime('%Y-%m-%d'))
         db = Elasticsearch()
         j = store_report(nmap_report, db, index)
