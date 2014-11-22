@@ -316,7 +316,7 @@ class NmapHost(object):
         """
         rval = ''
         if self.os is not None:
-            rval = self.os.fingerprints.join("\n")
+            rval = "\n".join(self.os.fingerprints)
         return rval
 
     def os_ports_used(self):
