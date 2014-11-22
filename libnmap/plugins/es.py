@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 
 import json
 from libnmap.reportjson import ReportEncoder
@@ -50,16 +50,18 @@ class NmapElasticsearchPlugin(NmapBackendPlugin):
             :param id: str
             :return: NmapReport
         """
-        res = self._esapi.get(index=self.index, doc_type="NmapReport", id=id)['_source']
+        res = self._esapi.get(index=self.index,
+                              doc_type="NmapReport",
+                              id=id)['_source']
         return res
-
 
     def getall(self, filter=None):
         """
             :return: collection of tuple (id,NmapReport)
             :param filter: Nice to have implement a filter capability
         """
-        rsearch = self._esapi.search(index=self.index, body={"query": {"match_all": {}}})
+        rsearch = self._esapi.search(index=self.index,
+                                     body={"query": {"match_all": {}}})
         print("--------------------")
         print(type(rsearch))
         print(rsearch)
