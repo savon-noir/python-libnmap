@@ -85,6 +85,12 @@ Examples
 
 Some codes samples are available in the examples directory or in the `documentation`_.
 
+Among other example, you notice an sample code pushing nmap scan reports in an ElasticSearch instance and allowing you to create fancy dashboards in Kibana like the screenshot below:
+
+.. image:: https://github.com/savon-noir/python-libnmap/blob/es/examples/kibanalibnmap.png
+    :alt: Kibanane
+    :align: center
+
 Contributors
 ------------
 
