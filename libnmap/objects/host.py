@@ -40,6 +40,7 @@ class NmapHost(object):
         self._ipv4_addr = None
         self._ipv6_addr = None
         self._mac_addr = None
+        self._vendor = None
         for addr in address:
             if addr['addrtype'] == "ipv4":
                 self._ipv4_addr = addr['addr']
@@ -47,6 +48,8 @@ class NmapHost(object):
                 self._ipv6_addr = addr['addr']
             elif addr['addrtype'] == 'mac':
                 self._mac_addr = addr['addr']
+            if 'vendor' in addr:
+                self._vendor = addr['vendor']
 
         self._main_address = self._ipv4_addr or self._ipv6_addr or ''
         self._address = address
@@ -147,8 +150,10 @@ class NmapHost(object):
             self._ipv4_addr = addrdict['addr']
         elif addrdict['addrtype'] == 'ipv6':
             self._ipv6_addr = addrdict['addr']
-        if addrdict['addrtype'] == 'mac':
+        elif addrdict['addrtype'] == 'mac':
             self._mac_addr = addrdict['addr']
+        if 'vendor' in addrdict:
+            self._vendor = addrdict['vendor']
 
         self._main_address = self._ipv4_addr or self._ipv6_addr or ''
         self._address = addrdict
@@ -170,6 +175,15 @@ class NmapHost(object):
             :return: MAC address as a string
         """
         return self._mac_addr or ''
+
+    @property
+    def vendor(self):
+        """
+            Accessor for the vendor attribute of the scanned host
+
+            :return: string (vendor) of empty string if no vendor defined
+        """
+        return self._vendor or ''
 
     @property
     def ipv6(self):
@@ -316,7 +330,7 @@ class NmapHost(object):
         """
         rval = ''
         if self.os is not None:
-            rval = self.os.fingerprints.join("\n")
+            rval = "\n".join(self.os.fingerprints)
         return rval
 
     def os_ports_used(self):
@@ -434,9 +448,13 @@ class NmapHost(object):
             dictionnary containing state and amount of extra ports scanned
             for which a common state, usually, closed was discovered.
 
-            :return: dict with keys 'state' and 'count'
+            :return: dict with keys 'state' and 'count' or None
         """
-        _xtrports = self._extras['extraports']
+        _xtrports = self._extras.get('extraports', None)
+
+        if _xtrports is None:
+            return None
+
         return {'state': _xtrports['state'], 'count': _xtrports['count']}
 
     @property
@@ -445,9 +463,11 @@ class NmapHost(object):
             dictionnary containing reasons why extra ports scanned
             for which a common state, usually, closed was discovered.
 
-            :return: array of dict containing keys 'state' and 'count'
+            :return: array of dict containing keys 'state' and 'count' or None
         """
-        return self._extras['extraports']['reasons']
+        r = self._extras.get('extraports', {})
+
+        return r.get('reasons', None)
 
     def get_dict(self):
         """

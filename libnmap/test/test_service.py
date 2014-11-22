@@ -160,6 +160,11 @@ port_owner = """
     <owner name="edwige"/>
 </port>"""
 
+port_tunnel = """
+<port protocol="tcp" portid="443">
+    <state state="open" reason="syn-ack" reason_ttl="64"/>
+    <service name="https" method="probed" tunnel="ssl" conf="10"/>
+</port>"""
 
 class TestNmapService(unittest.TestCase):
     def setUp(self):
@@ -242,6 +247,10 @@ class TestNmapService(unittest.TestCase):
     def test_owner(self):
         serviceowner = NmapParser.parse(port_owner)
         self.assertEqual(serviceowner.owner, "edwige")
+
+    def test_tunnel(self):
+        servicetunnel = NmapParser.parse(port_tunnel)
+        self.assertEqual(servicetunnel.tunnel, "ssl")
 
 
 if __name__ == '__main__':

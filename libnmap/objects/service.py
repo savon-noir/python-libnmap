@@ -64,7 +64,7 @@ class NmapService(object):
         if 'servicefp' in self._service:
             self._servicefp = self._service['servicefp']
         if 'tunnel' in self._service:
-            self._servicefp = self._service['tunnel']
+            self._tunnel = self._service['tunnel']
 
         self._service_extras = []
         if service_extras is not None:
@@ -177,11 +177,20 @@ class NmapService(object):
     @property
     def service(self):
         """
-            Accessor for service dictionnary.
+            Accessor for service name.
+
+            :return: string or empty
+        """
+        return self._service['name'] if 'name' in self._service else ''
+
+    @property
+    def service_dict(self):
+        """
+            Accessor for service dictionary.
 
             :return: dict or None
         """
-        return self._service['name'] if 'name' in self._service else ''
+        return self._service
 
     def open(self):
         """
