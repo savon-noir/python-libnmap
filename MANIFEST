@@ -29,6 +29,7 @@ libnmap/objects/service.py
 libnmap/plugins/__init__.py
 libnmap/plugins/backendplugin.py
 libnmap/plugins/backendpluginFactory.py
+libnmap/plugins/es.py
 libnmap/plugins/mongodb.py
 libnmap/plugins/s3.py
 libnmap/plugins/sql.py

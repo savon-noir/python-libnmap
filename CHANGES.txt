@@ -1,3 +1,9 @@
+v0.6.2, 03/01/2015 -- Fixed a few bugs
+                    - bulk fix for issues 37, 41, 42, 43, 44, 46
+                    - added cpe_list method
+                    - added elasticsearch example code
+v0.6.1, 29/06/2014 -- Added full support for python 3.X
+                    - python now supports python 2.6, 2.7, 3.3, 3.4
 v0.5.1, 26/05/2014 -- Added basic API for class CPE
                     - interface similar to python-cpe for more
                       advanced usage of CPE, I strongly recommend you
