@@ -336,6 +336,15 @@ class NmapOSFingerprint(object):
         return _osmatches
 
     @property
+    def osclasses(self, min_accuracy=0):
+        osc_array = []
+        for _osm in self.osmatches:
+            for _osc in _osm.osclasses:
+                if _osc.accuracy >= min_accuracy:
+                    osc_array.append(_osc)
+        return osc_array
+
+    @property
     def fingerprint(self):
         return "\r\n".join(self.__fingerprints)
 

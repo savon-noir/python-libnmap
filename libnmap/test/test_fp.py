@@ -17,7 +17,9 @@ class TestNmapFP(unittest.TestCase):
         self.flist = self.flist_full
         self.flist_os =  {'nv6': {'file': "%s/%s" % (fdir, 'files/full_sudo6.xml'), 'os': 0},
                 'fullscan': { 'file': "%s/%s" % (fdir, 'files/fullscan.xml'), 'os': 0},
-                'nv5': { 'file': "%s/%s" % (fdir, 'files/os_scan5.xml'), 'os': 0}}
+                'nv5': { 'file': "%s/%s" % (fdir, 'files/os_scan5.xml'), 'os': 0}
+        }
+        self.fos_class_probabilities = "{0}/{1}".format(fdir, "files/test_osclass.xml")
 
     def test_fp(self):
         for file_e in self.flist_full:
@@ -123,10 +125,22 @@ class TestNmapFP(unittest.TestCase):
         s = h1.services[0]
         self.assertEqual(s.cpelist[0].cpestring, cpelist[0])
         self.assertEqual(s.cpelist[1].cpestring, cpelist[1])
+
+    def test_os_class_probabilities(self):
+        p = NmapParser.parse_fromfile(self.fos_class_probabilities)
+        h = p.hosts.pop()
+        osc = h.os_class_probabilities().pop()
+        self.assertEqual(osc.type, "general purpose")
+        self.assertEqual(osc.vendor, "Linux")
+        self.assertEqual(osc.osfamily, "Linux")
+        self.assertEqual(osc.osgen, "3.X")
+        self.assertEqual(osc.accuracy, 100)
+
+        #<osclass type="general purpose" vendor="Linux" osfamily="Linux" osgen="3.X" accuracy="100"><cpe>cpe:/o:linux:linux_kernel:3</cpe></osclass>
         
 
 if __name__ == '__main__':
     test_suite = ['test_fp', 'test_fpv6', 'test_osmatches_new', 'test_osclasses_new',
-            'test_fpv5', 'test_osmatches_old', 'test_cpeservice']
+            'test_fpv5', 'test_osmatches_old', 'test_cpeservice', 'test_os_class_probabilities']
     suite = unittest.TestSuite(map(TestNmapFP, test_suite))
     test_result = unittest.TextTestRunner(verbosity=2).run(suite)
