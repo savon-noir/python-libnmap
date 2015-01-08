@@ -130,7 +130,6 @@ class NmapProcess(Thread):
         self.__nmap_command_line = self.get_command_line()
         # API usable in callback function
         self.__nmap_proc = None
-        self.__qout = None
         self.__nmap_rc = 0
         self.__state = self.RUNNING
         self.__starttime = 0
