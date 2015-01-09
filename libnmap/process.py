@@ -262,15 +262,12 @@ class NmapProcess(Thread):
             raise EnvironmentError(1, "nmap is not installed or could "
                                       "not be found in system path")
 
-        thread_stream = ''
         while self.__nmap_proc.poll() is None:
-            for streamline in iter(self.__nmap_proc.stdout.readline, b''):
-                if streamline is not None:
-                    thread_stream = str(streamline.decode())
-                    self.__stdout += thread_stream
-                    evnt = self.__process_event(thread_stream)
-                    if self.__nmap_event_callback and evnt:
-                        self.__nmap_event_callback(self)
+            for streamline in iter(self.__nmap_proc.stdout.readline, ''):
+                self.__stdout += streamline
+                evnt = self.__process_event(streamline)
+                if self.__nmap_event_callback and evnt:
+                    self.__nmap_event_callback(self)
 
         self.__stderr += str(self.__nmap_proc.stderr.read().decode())
 
