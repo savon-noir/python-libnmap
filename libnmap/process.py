@@ -9,10 +9,6 @@ from threading import Thread
 from xml.dom import pulldom
 import warnings
 
-try:
-    from Queue import Empty, Full
-except ImportError:
-    from queue import Empty, Full
 
 __all__ = [
     'NmapProcess'
