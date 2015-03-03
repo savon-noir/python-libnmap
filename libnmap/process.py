@@ -358,8 +358,8 @@ class NmapProcess(Thread):
 
         :return: True if nmap process is not running anymore.
         """
-        return (self.state == self.DONE or self.state == self.FAILED
-                or self.state == self.CANCELLED)
+        return (self.state == self.DONE or self.state == self.FAILED or
+                self.state == self.CANCELLED)
 
     def has_failed(self):
         """
