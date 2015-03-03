@@ -331,6 +331,9 @@ class NmapProcess(Thread):
                 self.__nmap_tasks[self.current_task.name].progress = 100
         else:
             self.__state = self.FAILED
+        # Call the callback one last time to signal the new state
+        if self.__nmap_event_callback:
+            self.__nmap_event_callback(self)
         return self.rc
 
     def run_background(self):
@@ -355,8 +358,8 @@ class NmapProcess(Thread):
 
         :return: True if nmap process is not running anymore.
         """
-        return (self.state == self.DONE or self.state == self.FAILED
-                or self.state == self.CANCELLED)
+        return (self.state == self.DONE or self.state == self.FAILED or
+                self.state == self.CANCELLED)
 
     def has_failed(self):
         """
