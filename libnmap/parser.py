@@ -8,10 +8,8 @@ except ImportError:
         import xml.etree.cElementTree as ET
     except ImportError:
         import xml.etree.ElementTree as ET
-
 from xml.etree.ElementTree import iselement as et_iselement
-
-from libnmap.objects import NmapHost, NmapReport, NmapService
+from libnmap.objects import NmapHost, NmapService, NmapReport, NmapExtraPort
 
 
 class NmapParser(object):
@@ -385,17 +383,18 @@ class NmapParser(object):
 
         xelement = cls.__format_element(scanports_data)
 
-        rdict = {"ports": [], "extraports": None}
+        rdict = {'ports': [], 'extraports': []}
         for xservice in xelement:
             if xservice.tag == "port":
                 nport = cls._parse_xml_port(xservice)
                 rdict["ports"].append(nport)
             elif xservice.tag == "extraports":
                 extraports = cls.__parse_extraports(xservice)
-                rdict["extraports"] = extraports
-            # else:
-            #    print "struct port unknown attr: %s value: %s" %
-            #           (h.tag, h.get(h.tag))
+                rdict['extraports'].append(extraports)
+            # DEBUG REMOVE ME    
+            else:
+               print "struct port unknown attr: %s value: %s" %
+                      (h.tag, h.get(h.tag))
         return rdict
 
     @classmethod
@@ -485,8 +484,9 @@ class NmapParser(object):
         for xelt in xelement:
             if xelt.tag == "extrareasons":
                 extrareasons_dict = cls.__format_attributes(xelt)
-                rdict["reasons"].append(extrareasons_dict)
-        return rdict
+                rdict['reasons'].append(extrareasons_dict)
+        robj = NmapExtraPort(rdict)
+        return robj
 
     @classmethod
     def __parse_script_table(cls, script_table):
