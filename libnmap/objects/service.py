@@ -366,3 +366,51 @@ class NmapService(object):
         :return: NmapDiff object
         """
         return NmapDiff(self, other)
+
+
+class NmapExtraPort(object):
+    """
+        NmapExtraPort is an object which documents unlisted ports/services
+        which are possibly closed, filtered, ignored,...
+    """
+    def __init__(self, xdict):
+        """
+            Constructor
+            :param xdict: python dict containing the following structure:
+                          {
+                             'state': <str>,
+                             'count': <int>,
+                             'reasons': [{'reason': <str>, 'count' <int>}]
+                          }
+        """
+        self._count = xdict.get('count', 0)
+        self._state = xdict.get('state', 'unknown')
+        self._reasons = xdict.get('reasons', [])
+
+    @property
+    def count(self):
+        """
+           Accessor for the number of extraports
+
+           :return: int
+        """
+        return int(self._count)
+
+    @property
+    def state(self):
+        """
+           Accessor for the state of extraports listed
+
+           :return: string
+        """
+        return self._state
+
+    @property
+    def reason(self):
+        """
+           Return the first reason available for the extraport listed.
+
+           :return: dict, empty if no extraports reason available
+        """
+
+        return self.reasons[0] if len(self.reasons) else {}

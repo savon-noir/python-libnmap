@@ -38,6 +38,7 @@ class NmapHost(object):
         self._status = status if status is not None else {}
         self._services = services if services is not None else []
         self._extras = extras if extras is not None else {}
+        self._extraports = self._extras.get('extraports', None)
         self._osfingerprinted = False
         self.os = None
         if "os" in self._extras:
@@ -469,12 +470,13 @@ class NmapHost(object):
 
         :return: dict with keys 'state' and 'count' or None
         """
-        _xtrports = self._extras.get("extraports", None)
+        rval = None
+        _xports = self._extras.get('extraports', None)
 
-        if _xtrports is None:
-            return None
+        if _xports is not None:
+            rval = {'state': _xtrports['state'], 'count': _xtrports['count']}
 
-        return {"state": _xtrports["state"], "count": _xtrports["count"]}
+        return rval
 
     @property
     def extraports_reasons(self):
