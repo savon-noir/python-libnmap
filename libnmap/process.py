@@ -5,15 +5,10 @@ import os
 import pwd
 import shlex
 import subprocess
-import multiprocessing
 from threading import Thread
 from xml.dom import pulldom
 import warnings
 
-try:
-    from Queue import Empty, Full
-except ImportError:
-    from queue import Empty, Full
 
 __all__ = [
     'NmapProcess'
@@ -21,6 +16,7 @@ __all__ = [
 
 
 class NmapTask(object):
+
     """
     NmapTask is a internal class used by process. Each time nmap
     starts a new task during the scan, a new class will be instanciated.
@@ -31,6 +27,7 @@ class NmapTask(object):
     time T and a dictionnary NmapProcess.tasks with "task name" as key
     is built during scan execution
     """
+
     def __init__(self, name, starttime=0, extrainfo=''):
         self.name = name
         self.etc = 0
@@ -45,6 +42,7 @@ class NmapTask(object):
 
 
 class NmapProcess(Thread):
+
     """
     NmapProcess is a class which wraps around the nmap executable.
 
@@ -53,6 +51,7 @@ class NmapProcess(Thread):
     the output of the nmap scan in the nmap XML format. This could be then
     parsed out via the NmapParser class from libnmap.parser module.
     """
+
     def __init__(self, targets="127.0.0.1",
                  options="-sT", event_callback=None, safe_mode=True, fqp=None):
         """
@@ -124,11 +123,9 @@ class NmapProcess(Thread):
         self._run_init()
 
     def _run_init(self):
-        self.__process_killed = multiprocessing.Event()
         self.__nmap_command_line = self.get_command_line()
         # API usable in callback function
         self.__nmap_proc = None
-        self.__qout = None
         self.__nmap_rc = 0
         self.__state = self.RUNNING
         self.__starttime = 0
@@ -155,7 +152,7 @@ class NmapProcess(Thread):
         """
         for path in os.environ.get('PATH', '').split(':'):
             if (os.path.exists(os.path.join(path, program)) and not
-               os.path.isdir(os.path.join(path, program))):
+                    os.path.isdir(os.path.join(path, program))):
                 return os.path.join(path, program)
         return None
 
@@ -247,35 +244,7 @@ class NmapProcess(Thread):
 
         return: return code from nmap execution
         """
-        def ioreader_routine(proc_stdout, io_queue, data_pushed, producing):
-            """
-            local function that will read lines from a file descriptor
-            and put the data in a python queue for futher processing.
-
-            :param proc_stdout: file descriptor to read lines from.
-            :param io_queue: queue in which read lines will be pushed.
-            :param data_pushed: queue used to push data read from the
-            nmap stdout back into the parent process
-            :param producing: shared variable to notify the parent process
-            that processing is either running, either over.
-            """
-            producing.value = 1
-            for streamline in iter(proc_stdout.readline, b''):
-                if self.__process_killed.is_set():
-                    break
-                if streamline is not None:
-                    try:
-                        io_queue.put(str(streamline.decode()))
-                    except Full:
-                        pass
-                    data_pushed.set()
-            producing.value = 0
-            data_pushed.set()
-
         self._run_init()
-        producing = multiprocessing.Value('i', 1)
-        data_pushed = multiprocessing.Event()
-        self.__qout = multiprocessing.Queue()
 
         _tmp_cmdline = shlex.split(self.__nmap_command_line)
         try:
@@ -283,43 +252,19 @@ class NmapProcess(Thread):
                                                 stdout=subprocess.PIPE,
                                                 stderr=subprocess.PIPE,
                                                 bufsize=0)
-            ioreader = multiprocessing.Process(target=ioreader_routine,
-                                               args=(self.__nmap_proc.stdout,
-                                                     self.__qout,
-                                                     data_pushed,
-                                                     producing))
-            ioreader.start()
             self.__state = self.RUNNING
         except OSError:
             self.__state = self.FAILED
             raise EnvironmentError(1, "nmap is not installed or could "
                                       "not be found in system path")
 
-        thread_stream = ''
-        while(self.__nmap_proc.poll() is None or producing.value == 1):
-            if self.__process_killed.is_set():
-                break
-            if producing.value == 1 and self.__qout.empty():
-                try:
-                    data_pushed.wait()
-                except KeyboardInterrupt:
-                    break
-            try:
-                thread_stream = self.__qout.get_nowait()
-            except Empty:
-                pass
-            except KeyboardInterrupt:
-                break
-            else:
-                self.__stdout += thread_stream
-                evnt = self.__process_event(thread_stream)
+        while self.__nmap_proc.poll() is None:
+            for streamline in iter(self.__nmap_proc.stdout.readline, ''):
+                self.__stdout += streamline
+                evnt = self.__process_event(streamline)
                 if self.__nmap_event_callback and evnt:
                     self.__nmap_event_callback(self)
-            data_pushed.clear()
-        ioreader.join()
-        # queue clean-up
-        while not self.__qout.empty():
-            self.__stdout += self.__qout.get_nowait()
+
         self.__stderr += str(self.__nmap_proc.stderr.read().decode())
 
         self.__nmap_rc = self.__nmap_proc.poll()
@@ -385,8 +330,6 @@ class NmapProcess(Thread):
         self.__state = self.CANCELLED
         if self.__nmap_proc.poll() is None:
             self.__nmap_proc.kill()
-        self.__qout.cancel_join_thread()
-        self.__process_killed.set()
 
     def __process_event(self, eventdata):
         """
