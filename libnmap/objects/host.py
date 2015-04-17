@@ -482,7 +482,8 @@ class NmapHost(object):
                  for s in self.services])
 
         d.update({'address': self.address, 'status': self.status,
-                  'hostnames': " ".join(self._hostnames)})
+                  'hostnames': " ".join(self._hostnames),
+                  'mac': self._mac_addr})
         return d
 
     def diff(self, other):
