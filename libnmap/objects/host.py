@@ -510,8 +510,10 @@ class NmapHost(object):
                 "address": self.address,
                 "status": self.status,
                 "hostnames": " ".join(self._hostnames),
+                "mac_addr": self._mac_addr,
             }
         )
+
         return d
 
     def diff(self, other):

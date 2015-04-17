@@ -149,6 +149,10 @@ host4 = """
 
 
 class TestNmapHost(unittest.TestCase):
+    def setUp(self):
+        self.fdir = os.path.dirname(os.path.realpath(__file__))
+        self.dionaea_path = "{0}/files/dionaea_scan.xml"
+
     def test_eq_host(self):
         h1 = NmapParser.parse(host1)
         h2 = NmapParser.parse(host2)
@@ -218,6 +222,7 @@ class TestNmapHost(unittest.TestCase):
                     "NmapService::tcp.3306",
                     "address",
                     "NmapService::tcp.25",
+                    "mac_addr",
                 ]
             ),
         )
@@ -236,6 +241,7 @@ class TestNmapHost(unittest.TestCase):
                     "NmapService::tcp.22",
                     "NmapService::tcp.111",
                     "address",
+                    "mac_addr",
                 ]
             ),
         )
@@ -253,6 +259,7 @@ class TestNmapHost(unittest.TestCase):
                     "NmapService::tcp.22",
                     "NmapService::tcp.111",
                     "address",
+                    "mac_addr",
                 ]
             ),
         )
