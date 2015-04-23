@@ -72,7 +72,7 @@ Install
 
 You can install libnmap via pip::
 
-    pip install libnmap
+    pip install python-libnmap 
 
 or via git::
 
