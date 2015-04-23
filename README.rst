@@ -9,7 +9,7 @@ Code status
 Use cases
 ---------
 
-libnmap is a python library enabling python developpers to manipulate nmap process and data.
+libnmap is a python library enabling python developers to manipulate nmap process and data.
 
 libnmap is what you were looking for if you need to implement the following:
 
