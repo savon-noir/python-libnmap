@@ -260,7 +260,7 @@ class NmapProcess(Thread):
 
         while self.__nmap_proc.poll() is None:
             for streamline in iter(self.__nmap_proc.stdout.readline, ''):
-                self.__stdout += streamline
+                self.__stdout += str(streamline)
                 evnt = self.__process_event(streamline)
                 if self.__nmap_event_callback and evnt:
                     self.__nmap_event_callback(self)
