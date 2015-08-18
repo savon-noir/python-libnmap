@@ -32,3 +32,10 @@ before_script:
 script: nosetests --with-coverage --cover-package=libnmap
 after_success:
   coveralls
+deploy:
+  on:
+    tags: true
+  provider: pypi
+  user: savon_noir 
+  password:
+    secure: WiMQsq+IMzAsS+cNKyKT7u7PlwGwkH0t2eoBitP0ckIw6kNWlbM/HCCm6aa9Ns9LpIzI82x26Vg77bu+yiMxUzZPS8pxCJXL9fFGs7Qc6VC9S0iHUX+FCkhFEFvPl35YRGFuY0YQyF2oj9vZPPFFmXzY2JSOBHxVevgdsrw1BQM=
