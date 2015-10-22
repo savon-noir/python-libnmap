@@ -473,19 +473,19 @@ class NmapParser(object):
             elif script_elem.tag == 'table':
                 tdict = {}
                 for telem in script_elem:
-                    #Handle duplicate element keys
+                    # Handle duplicate element keys
                     tkey = telem.get('key')
                     if tkey in tdict:
                         if not isinstance(tdict[tkey], list):
-                            tdict[tkey] = [tdict[tkey],]
+                            tdict[tkey] = [tdict[tkey], ]
                         tdict[tkey].append(telem.text)
                     else:
                         tdict[tkey] = telem.text
-                #Handle duplicate table keys
+                # Handle duplicate table keys
                 skey = script_elem.get('key')
                 if skey in _elt_dict:
                     if not isinstance(_elt_dict[skey], list):
-                        _elt_dict[skey] = [_elt_dict[skey],]
+                        _elt_dict[skey] = [_elt_dict[skey], ]
                     _elt_dict[skey].append(tdict)
                 else:
                     _elt_dict[skey] = tdict
