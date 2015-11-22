@@ -2,12 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import os
-import pwd
 import shlex
 import subprocess
 from threading import Thread
 from xml.dom import pulldom
 import warnings
+try:
+    import pwd
+except ImportError:
+    pass
 
 
 __all__ = [
