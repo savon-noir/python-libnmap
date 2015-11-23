@@ -88,7 +88,8 @@ class NmapProcess(Thread):
         unsafe_opts = set(['-oG', '-oN', '-iL', '-oA', '-oS', '-oX',
                            '--iflist', '--resume', '--stylesheet',
                            '--datadir'])
-        self.__is_windows = platform.system() == 'Windows'  # more reliable than just using os.name()
+        # more reliable than just using os.name() (cygwin)
+        self.__is_windows = platform.system() == 'Windows'
         if fqp:
             if os.path.isfile(fqp) and os.access(fqp, os.X_OK):
                 self.__nmap_binary = fqp
@@ -252,7 +253,8 @@ class NmapProcess(Thread):
         return: return code from nmap execution
         """
         self._run_init()
-        _tmp_cmdline = self.__build_windows_cmdline() if self.__is_windows else shlex.split(self.__nmap_command_line)
+        _tmp_cmdline = self.__build_windows_cmdline() if self.__is_windows \
+            else shlex.split(self.__nmap_command_line)
         try:
             self.__nmap_proc = subprocess.Popen(args=_tmp_cmdline,
                                                 stdout=subprocess.PIPE,
