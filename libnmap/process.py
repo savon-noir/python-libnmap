@@ -421,6 +421,7 @@ class NmapProcess(Thread):
         if self.__nmap_targets:
             cmdline += self.__nmap_targets  # already a list
         return cmdline
+
     @property
     def command(self):
         """
