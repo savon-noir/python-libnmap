@@ -7,6 +7,7 @@ import subprocess
 from threading import Thread
 from xml.dom import pulldom
 import warnings
+import platform
 try:
     import pwd
 except ImportError:
@@ -87,6 +88,7 @@ class NmapProcess(Thread):
         unsafe_opts = set(['-oG', '-oN', '-iL', '-oA', '-oS', '-oX',
                            '--iflist', '--resume', '--stylesheet',
                            '--datadir'])
+        self.__is_windows = platform.system() == 'Windows'  # more reliable than just using os.name()
         if fqp:
             if os.path.isfile(fqp) and os.access(fqp, os.X_OK):
                 self.__nmap_binary = fqp
@@ -153,7 +155,9 @@ class NmapProcess(Thread):
 
         :todo: add a default path list in case PATH is empty.
         """
-        for path in os.environ.get('PATH', '').split(':'):
+        split_char = ';' if self.__is_windows else ':'
+        program = program + '.exe' if self.__is_windows else program
+        for path in os.environ.get('PATH', '').split(split_char):
             if (os.path.exists(os.path.join(path, program)) and not
                     os.path.isdir(os.path.join(path, program))):
                 return os.path.join(path, program)
@@ -248,8 +252,7 @@ class NmapProcess(Thread):
         return: return code from nmap execution
         """
         self._run_init()
-
-        _tmp_cmdline = shlex.split(self.__nmap_command_line)
+        _tmp_cmdline = self.__build_windows_cmdline() if self.__is_windows else shlex.split(self.__nmap_command_line)
         try:
             self.__nmap_proc = subprocess.Popen(args=_tmp_cmdline,
                                                 stdout=subprocess.PIPE,
@@ -408,6 +411,16 @@ class NmapProcess(Thread):
             pass
         return rval
 
+    def __build_windows_cmdline(self):
+        cmdline = []
+        cmdline.append(self.__nmap_binary)
+        if self.__nmap_fixed_options:
+            cmdline += self.__nmap_fixed_options.split()
+        if self.__nmap_dynamic_options:
+            cmdline += self.__nmap_dynamic_options.split()
+        if self.__nmap_targets:
+            cmdline += self.__nmap_targets  # already a list
+        return cmdline
     @property
     def command(self):
         """
