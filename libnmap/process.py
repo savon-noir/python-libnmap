@@ -259,6 +259,7 @@ class NmapProcess(Thread):
             self.__nmap_proc = subprocess.Popen(args=_tmp_cmdline,
                                                 stdout=subprocess.PIPE,
                                                 stderr=subprocess.PIPE,
+                                                universal_newlines=True,
                                                 bufsize=0)
             self.__state = self.RUNNING
         except OSError:
@@ -268,12 +269,12 @@ class NmapProcess(Thread):
 
         while self.__nmap_proc.poll() is None:
             for streamline in iter(self.__nmap_proc.stdout.readline, ''):
-                self.__stdout += str(streamline)
+                self.__stdout += streamline
                 evnt = self.__process_event(streamline)
                 if self.__nmap_event_callback and evnt:
                     self.__nmap_event_callback(self)
 
-        self.__stderr += str(self.__nmap_proc.stderr.read().decode())
+        self.__stderr += self.__nmap_proc.stderr.read()
 
         self.__nmap_rc = self.__nmap_proc.poll()
         if self.rc is None:
