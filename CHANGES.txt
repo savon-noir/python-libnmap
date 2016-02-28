@@ -1,3 +1,5 @@
+v0.7.0, 28/02/2016 -- A few bugfixes
+                    - fixe of endless loop in Nmap.Process. Fix provided by @rcarrillo, many thanks!
 v0.6.3, 18/08/2015 -- Merged pull requests for automatic pypi upload, thanks @bmx0r
 v0.6.2, 03/01/2015 -- Fixed a few bugs
                     - bulk fix for issues 37, 41, 42, 43, 44, 46
