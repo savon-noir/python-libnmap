@@ -1,8 +1,6 @@
 - improve API for NSE scripts
 - add support for post,pre and host scripts
-- support for python3
 - complete unit tests with coverall support
-- support for windows
 - Add new plugins to support import/export from mysql, couchdb, csv
 - add unittest for udp scans, ping sweeping
 - add support for 'resume' capability (see nmap --resume)
