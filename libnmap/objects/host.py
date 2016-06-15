@@ -466,7 +466,7 @@ class NmapHost(object):
             :return: array of dict containing keys 'state' and 'count' or None
         """
         r = self._extras.get('extraports', {})
-                
+
         if r is None:
             return None
 
