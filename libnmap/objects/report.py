@@ -110,7 +110,7 @@ class NmapReport(object):
 
             :return: string
         """
-        return self._scaninfo['type']
+        return self._scaninfo.get('type')
 
     @property
     def hosts(self):
