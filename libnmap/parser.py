@@ -224,7 +224,9 @@ class NmapParser(object):
                                              protocol=s[cname]['_protocol'],
                                              state=s[cname]['_state'],
                                              owner=s[cname]['_owner'],
-                                             service=s[cname]['_service']))
+                                             service=s[cname]['_service'],
+                                             service_extras=s[cname]['_service_extras']))
+
 
                 nh = NmapHost(starttime=h['__NmapHost__']['_starttime'],
                               endtime=h['__NmapHost__']['_endtime'],
