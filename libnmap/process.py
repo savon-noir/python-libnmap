@@ -311,12 +311,8 @@ class NmapProcess(Thread):
             )
 
         while self.__nmap_proc.poll() is None:
-            for streamline in iter(self.__nmap_proc.stdout.readline, ""):
-                self.__stdout += streamline
-                evnt = self.__process_event(streamline)
-                if self.__nmap_event_callback and evnt:
-                    self.__nmap_event_callback(self)
-
+            self.__process_nmap_proc_stdout()
+        self.__process_nmap_proc_stdout()
         self.__stderr += self.__nmap_proc.stderr.read()
 
         self.__nmap_rc = self.__nmap_proc.poll()
@@ -385,6 +381,13 @@ class NmapProcess(Thread):
         self.__state = self.CANCELLED
         if self.__nmap_proc.poll() is None:
             self.__nmap_proc.kill()
+
+    def __process_nmap_proc_stdout(self):
+        for streamline in iter(self.__nmap_proc.stdout.readline, ''):
+            self.__stdout += streamline
+            evnt = self.__process_event(streamline)
+            if self.__nmap_event_callback and evnt:
+                self.__nmap_event_callback(self)
 
     def __process_event(self, eventdata):
         """
