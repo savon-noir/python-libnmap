@@ -3,8 +3,8 @@
 
 from libnmap.parser import NmapParser
 
-rep1 = NmapParser.parse_fromfile('libnmap/test/files/1_hosts.xml')
-rep2 = NmapParser.parse_fromfile('libnmap/test/files/1_hosts_diff.xml')
+rep1 = NmapParser.parse_fromfile('../libnmap/test/files/1_hosts.xml')
+rep2 = NmapParser.parse_fromfile('../libnmap/test/files/1_hosts_diff.xml')
 
 rep1_items_changed = rep1.diff(rep2).changed()
 changed_host_id = rep1_items_changed.pop().split('::')[1]

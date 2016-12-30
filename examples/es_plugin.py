@@ -6,7 +6,7 @@ from libnmap.plugins.es import NmapElasticsearchPlugin
 from datetime import datetime
 import json
 
-nmap_report = NmapParser.parse_fromfile('libnmap/test/files/1_hosts.xml')
+nmap_report = NmapParser.parse_fromfile('../libnmap/test/files/1_hosts.xml')
 mindex = datetime.fromtimestamp(nmap_report.started).strftime('%Y-%m-%d')
 db = NmapElasticsearchPlugin(index=mindex)
 dbid = db.insert(nmap_report)

@@ -3,7 +3,7 @@
 
 from libnmap.parser import NmapParser
 
-rep = NmapParser.parse_fromfile('libnmap/test/files/os_scan6.xml')
+rep = NmapParser.parse_fromfile('../libnmap/test/files/os_scan6.xml')
 
 print("{0}/{1} hosts up".format(rep.hosts_up, rep.hosts_total))
 for _host in rep.hosts:
