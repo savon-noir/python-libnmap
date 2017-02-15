@@ -5,6 +5,8 @@ python:
   - "2.7"
   - "3.3"
   - "3.4"
+  - "3.5"
+  - "3.6"
 # command to install dependencies
 env:
 #  - MONGO_VERSION=1.2.12
@@ -18,11 +20,11 @@ before_install:
   - "sudo apt-get update -qq"
   - "sudo apt-get install nmap -qq"
 install:
-  - "pip install pep8 --use-mirrors"
-  - "pip install pyflakes --use-mirrors"
-#  - "pip install boto --use-mirrors" # disabled: since boto not supporting py3
-#  - "pip install pymongo sqlalchemy MySQL-python --use-mirrors" # disabled MySQL-python (not py3 compatible)
-  - "pip install pymongo sqlalchemy pymysql --use-mirrors"
+  - "pip install pep8"
+  - "pip install pyflakes"
+#  - "pip install boto" # disabled: since boto not supporting py3
+#  - "pip install pymongo sqlalchemy MySQL-python" # disabled MySQL-python (not py3 compatible)
+  - "pip install pymongo sqlalchemy pymysql"
   - "pip install coveralls"
   - "python setup.py install"
 before_script:
@@ -36,6 +38,6 @@ deploy:
   on:
     tags: true
   provider: pypi
-  user: savon_noir 
+  user: savon_noir
   password:
     secure: WiMQsq+IMzAsS+cNKyKT7u7PlwGwkH0t2eoBitP0ckIw6kNWlbM/HCCm6aa9Ns9LpIzI82x26Vg77bu+yiMxUzZPS8pxCJXL9fFGs7Qc6VC9S0iHUX+FCkhFEFvPl35YRGFuY0YQyF2oj9vZPPFFmXzY2JSOBHxVevgdsrw1BQM=

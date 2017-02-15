@@ -66,13 +66,15 @@ The libnmap code is tested against the following python interpreters:
 - Python 2.7
 - Python 3.3
 - Python 3.4
+- Python 3.5
+- Python 3.6
 
 Install
 -------
 
 You can install libnmap via pip::
 
-    pip install python-libnmap 
+    pip install python-libnmap
 
 or via git::
 
