@@ -5,6 +5,8 @@ python:
   - "2.7"
   - "3.3"
   - "3.4"
+  - "3.5"
+  - "3.6"
 # command to install dependencies
 env:
 #  - MONGO_VERSION=1.2.12
@@ -36,6 +38,6 @@ deploy:
   on:
     tags: true
   provider: pypi
-  user: savon_noir 
+  user: savon_noir
   password:
     secure: WiMQsq+IMzAsS+cNKyKT7u7PlwGwkH0t2eoBitP0ckIw6kNWlbM/HCCm6aa9Ns9LpIzI82x26Vg77bu+yiMxUzZPS8pxCJXL9fFGs7Qc6VC9S0iHUX+FCkhFEFvPl35YRGFuY0YQyF2oj9vZPPFFmXzY2JSOBHxVevgdsrw1BQM=
