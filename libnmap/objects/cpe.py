@@ -11,8 +11,6 @@ class CPE(object):
     """
     def __init__(self, cpestring):
         self._cpestring = cpestring
-        self.cpedict = {}
-
         zk = ['cpe', 'part', 'vendor', 'product', 'version',
               'update', 'edition', 'language']
         self._cpedict = dict((k, '') for k in zk)
@@ -25,6 +23,13 @@ class CPE(object):
             Accessor for the full CPE string.
         """
         return self._cpestring
+
+    @property
+    def cpedict(self):
+        """
+            Accessor for _cpedict
+        """
+        return self._cpedict
 
     def __repr__(self):
         return self._cpestring

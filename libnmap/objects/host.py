@@ -467,6 +467,9 @@ class NmapHost(object):
         """
         r = self._extras.get('extraports', {})
 
+        if r is None:
+            return None
+
         return r.get('reasons', None)
 
     def get_dict(self):
