@@ -480,8 +480,7 @@ class NmapHost(object):
 
             :return dict
         """
-        d = dict([("{0}::{1}".format(s.__class__.__name__, str(s.id)),
-                   hash(s))
+        d = dict([(s.report_format, s.state)
                  for s in self.services])
 
         d.update({'address': self.address, 'status': self.status,

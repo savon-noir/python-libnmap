@@ -20,7 +20,7 @@ class NmapReport(object):
         end user of the lib. NmapReport is certainly the output interface for
         the end user of the lib.
     """
-    def __init__(self, raw_data=None):
+    def __init__(self, raw_data=None, source_filename=None):
         """
             Constructor for NmapReport object.
 
@@ -29,7 +29,9 @@ class NmapReport(object):
         self._nmaprun = {}
         self._scaninfo = {}
         self._hosts = []
+        self._services = {}
         self._runstats = {}
+        self._source_filename = source_filename
         if raw_data is not None:
             self.__set_raw_data(raw_data)
 
@@ -122,6 +124,72 @@ class NmapReport(object):
             :return: array of NmapHost
         """
         return self._hosts
+
+    @property
+    def services(self):
+        """
+            Accessor returning an array of scanned services among all hosts.
+
+            Scanned hosts are NmapHost objects.
+
+            :return: list of report-formatted services
+        """
+        return list(self._services.keys())
+
+    def get_hosts_byservice(self, report_formatted_service):
+        """
+           Gets a host addresses from services list.
+
+           :param report_formatted_service: service to look up
+           :type report_formatted_service: report_format service
+
+           :return: NmapHost
+        """
+        if report_formatted_service in self._services:
+            return self._services[report_formatted_service]
+        else:
+            return None
+
+    def get_hosts_by_services_list(self, services_list):
+        """
+           Gets a host addresses from services list.
+
+           :param report_formatted_service: service to look up
+           :type report_formatted_service: report_format service
+
+           :return: NmapHost
+        """
+        res_hosts = {}
+        for service in self._services:
+            if '.' in service:
+                port, sname = service.split('.')
+            if '/' in sname:
+                sname = sname.split('/')[0]
+            if port in services_list or sname in services_list:
+                hosts = []
+                for host in self._services[service]:
+                    for addr_dict in host:
+                        host_str = addr_dict['addr']
+                        if port:
+                            host_str += ':' +  port
+                        hosts.append(host_str)
+                res_hosts[service] = hosts
+        return res_hosts
+
+    def export_web_hosts(self):
+        """
+           Gets a host addresses from services list.
+
+           :param report_formatted_service: service to look up
+           :type report_formatted_service: report_format service
+
+           :return: NmapHost
+        """
+        web_ports = ['80', '443', '8080', '8443']
+        #web_ports = ['22']
+        #web_services = ['http']
+        web_services = ['http', 'https']
+        return self.get_hosts_by_services_list(web_ports + web_services)
 
     def get_host_byid(self, host_id):
         """
@@ -252,6 +320,31 @@ class NmapReport(object):
             rval = -1
         return rval
 
+    @property
+    def is_from_file(self):
+        """
+            Returning whether the NmapReport object was created from
+            existing file or not.
+
+            :return: boolean
+        """
+        return True if self._source_filename is not None else False
+
+
+    @property
+    def filename(self):
+        """
+            Returning the filenmae that NmapReport object was created from.
+            Return empty string if none.
+
+            :return: str
+        """
+        if self.is_from_file:
+            return self._source_filename
+        else:
+            return ''
+
+
     def get_raw_data(self):
         """
             Returns a dict representing the NmapReport object.
@@ -269,6 +362,7 @@ class NmapReport(object):
         self._nmaprun = raw_data['_nmaprun']
         self._scaninfo = raw_data['_scaninfo']
         self._hosts = raw_data['_hosts']
+        self._services = raw_data['_services']
         self._runstats = raw_data['_runstats']
 
     def is_consistent(self):

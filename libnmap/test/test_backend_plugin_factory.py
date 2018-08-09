@@ -48,21 +48,23 @@ class TestNmapBackendPlugin(unittest.TestCase):
         #build a list of NmapReport
         self.reportList = []
         for testfile in self.flist:
-            fd = open(testfile['file'], 'r')
-            s = fd.read()
-            fd.close()
-            nrp = NmapParser.parse(s)
-            self.reportList.append(nrp)
+            # fd = open(testfile['file'], 'r')
+            # s = fd.read()
+            # fd.close()
+            # nrp = NmapParser.parse(s)
+            # self.reportList.append(nrp)
+            self.reportList.append(NmapParser.parse_fromfile(testfile['file']))
 
-        self.urls = [{'plugin_name': "mongodb"},
-                     #{'plugin_name':'sql','url':'sqlite://','echo':'debug'},
-                     {'plugin_name': 'sql',
-                         'url': 'sqlite:////tmp/reportdb.sql',
-                         'echo': False},
-                     {'plugin_name': 'sql',
-                         #'url': 'mysql+mysqldb://root@localhost/poulet', (mySQL-Python not supporting python3)
-                         'url': 'mysql+pymysql://root@localhost/poulet',
-                         'echo': False},
+        self.urls = [ {'plugin_name': "csv"},
+                     # {'plugin_name': "mongodb"},
+                     # #{'plugin_name':'sql','url':'sqlite://','echo':'debug'},
+                     # {'plugin_name': 'sql',
+                     #     'url': 'sqlite:////tmp/reportdb.sql',
+                     #     'echo': False},
+                     # {'plugin_name': 'sql',
+                     #     #'url': 'mysql+mysqldb://root@localhost/poulet', (mySQL-Python not supporting python3)
+                     #     'url': 'mysql+pymysql://root@localhost/poulet',
+                     #     'echo': False},
                      #Walrus
                      ###{'plugin_name': 's3',
                      ###    'aws_access_key_id': 'UU72FLVJCAYRATLXI70YH',
