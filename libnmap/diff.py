@@ -40,7 +40,7 @@ class NmapDiff(DictDiffer):
         - what has been removed
         - what was kept unchanged
 
-        NmapDiff inherit from DictDiffer which makes the actual comparaison.
+        NmapDiff inherit from DictDiffer which makes the actual comparison.
         The different methods from DictDiffer used by NmapDiff are the
         following:
 
