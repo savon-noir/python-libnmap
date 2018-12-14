@@ -84,16 +84,16 @@ class NmapReport(object):
         return rval
 
 	@property
-	def startedstr(self):
-		"""
-			Accessor returning a human readable string of when the 
-			scan was started
+    def startedstr(self):
+        """
+            Accessor returning a human readable string of when the 
+            scan was started
 
-			:return: string
-		"""
-		rval = ''
-		try:
-			rval = self.['_nmaprun']['startstr']
+            :return: string
+        """
+        rval = ''
+        try:
+            rval = self._nmaprun['startstr']
 		except(KeyError, TypeError, ValueError):
 			pass
 		return rval
@@ -118,14 +118,14 @@ class NmapReport(object):
         return self._nmaprun['version']
 
 	@property
-	def xmlversion(self):
-		"""
-			Accessor returning the XML output
-			version of the nmap report.
-		
-			:return: string
-		"""
-		return self._nmaprun['xmloutputversion']
+    def xmlversion(self):
+        """
+            Accessor returning the XML output
+            version of the nmap report.
+
+            :return: string
+        """
+        return self._nmaprun['xmloutputversion']
 
     @property
     def scan_type(self):
@@ -138,20 +138,20 @@ class NmapReport(object):
         return self._scaninfo.get('type')
 
 	@property
-	def numservices(self):
-		"""
-			Accessor returning the number of services the 
-			scan attempted to enumerate.
+    def numservices(self):
+        """
+            Accessor returning the number of services the 
+            scan attempted to enumerate.
 
-			:return: integer
-		"""
-		rval = -1
-		try:
-			s_numsvcs = self._scaninfo.get('numservices')
-			rval = int(s_numsvcs)
-		except(KeyError, TypeError, ValueError):
-			pass
-		return rval
+            :return: integer
+        """
+        rval = -1
+        try:
+            s_numsvcs = self._scaninfo.get('numservices')
+            rval = int(s_numsvcs)
+        except(KeyError, TypeError, ValueError):
+            pass
+        return rval
 
     @property
     def hosts(self):
