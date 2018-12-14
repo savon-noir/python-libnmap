@@ -83,7 +83,7 @@ class NmapReport(object):
             pass
         return rval
 
-	@property
+    @property
     def startedstr(self):
         """
             Accessor returning a human readable string of when the 
@@ -117,7 +117,7 @@ class NmapReport(object):
         """
         return self._nmaprun['version']
 
-	@property
+    @property
     def xmlversion(self):
         """
             Accessor returning the XML output
@@ -137,7 +137,7 @@ class NmapReport(object):
         """
         return self._scaninfo.get('type')
 
-	@property
+    @property
     def numservices(self):
         """
             Accessor returning the number of services the 
