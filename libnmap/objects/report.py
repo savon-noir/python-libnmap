@@ -94,9 +94,9 @@ class NmapReport(object):
         rval = ''
         try:
             rval = self._nmaprun['startstr']
-		except(KeyError, TypeError, ValueError):
-			pass
-		return rval
+	except(KeyError, TypeError, ValueError):
+	    pass
+	return rval
 			
     @property
     def commandline(self):
