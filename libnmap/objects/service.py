@@ -252,6 +252,28 @@ class NmapService(object):
         return b.rstrip()
 
     @property
+    def banner_dict(self):
+        """
+            Accessor for the service's banner. Only available
+            if the nmap option -sV or similar was used.
+
+            :return: dictionary
+        """
+        notrelevant = ['name', 'method', 'conf', 'cpelist',
+                       'servicefp', 'tunnel']
+        relevant = ['product', 'version', 'extrainfo']
+        b = {}
+        skeys = self._service.keys()
+        if 'method' in self._service and self._service['method'] == "probed":
+            for relk in relevant:
+                if relk in skeys:
+                    b[relk] = self._service[relk]
+            for mkey in skeys:
+                if mkey not in notrelevant and mkey not in relevant:
+                    b[mkey] = self._service[mkey]
+        return b
+
+    @property
     def cpelist(self):
         """
         Accessor for list of CPE for this particular service
