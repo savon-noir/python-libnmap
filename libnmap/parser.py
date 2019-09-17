@@ -273,6 +273,7 @@ class NmapParser(object):
         _status = {}
         _addresses = []
         _host_extras = {}
+        _traceroute = {}
         extra_tags = ['uptime', 'distance', 'tcpsequence',
                       'ipidsequence', 'tcptssequence', 'times']
         for xh in xelement:
@@ -296,6 +297,8 @@ class NmapParser(object):
                 _host_extras.update({'hostscript': _host_scripts})
             elif xh.tag in extra_tags:
                 _host_extras[xh.tag] = cls.__format_attributes(xh)
+            elif xh.tag == 'trace':
+                _traceroute = cls.__parse_traceroute(xh)
             # else:
             #    print "struct host unknown attr: %s value: %s" %
             #           (h.tag, h.get(h.tag))
@@ -311,6 +314,7 @@ class NmapParser(object):
                          _status,
                          _hostnames,
                          _services,
+                         _traceroute,
                          _host_extras)
         return nhost
 
@@ -625,6 +629,28 @@ class NmapParser(object):
             else:
                 exmsg = "Unexcepted node in <runstats>: {0}".format(xmltag.tag)
                 raise NmapParserException(exmsg)
+
+        return rdict
+
+    @classmethod
+    def __parse_traceroute(cls, route_data):
+        """
+            Method for parsing the traceroute data from a nmap scan.
+            Receives a <trace> XML tag.
+
+            :param route_data: <trace> XML tag from a nmap scan
+            :type route_data: xml.ElementTree.Element or a string
+
+            :return python dict representing the XML trace tag
+        """
+
+        xmlroute = cls.__format_element(route_data)
+        rdict = {}
+        rdict['port'] = cls.__format_attributes(xmlroute)
+        rdict['hops'] = []
+        for xmltag in xmlroute:
+            tagdata = cls.__format_attributes(xmltag)
+            rdict['hops'].append(tagdata)
 
         return rdict
 

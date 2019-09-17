@@ -9,7 +9,7 @@ class NmapHost(object):
         NmapHost is a class representing a host object of NmapReport
     """
     def __init__(self, starttime='', endtime='', address=None, status=None,
-                 hostnames=None, services=None, extras=None):
+                 hostnames=None, services=None, traceroute=None, extras=None):
         """
             NmapHost constructor
             :param starttime: unix timestamp of when the scan against
@@ -28,6 +28,7 @@ class NmapHost(object):
         self._hostnames = hostnames if hostnames is not None else []
         self._status = status if status is not None else {}
         self._services = services if services is not None else []
+        self._traceroute = traceroute if traceroute is not None else {}
         self._extras = extras if extras is not None else {}
         self._osfingerprinted = False
         self.os = None
@@ -503,3 +504,14 @@ class NmapHost(object):
             :return: NmapDiff object
         """
         return NmapDiff(self, other)
+
+    @property
+    def traceroute(self):
+        """
+            dictionary object of the traceroute data. Does not show
+            localhost (or its ip) as the first entry, it is assumed
+
+            :return: dict
+        """
+
+        return self._traceroute
