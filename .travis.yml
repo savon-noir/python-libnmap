@@ -19,7 +19,7 @@ install:
   - "pip install pyflakes"
 #  - "pip install boto" # disabled: since boto not supporting py3
 #  - "pip install pymongo sqlalchemy MySQL-python" # disabled MySQL-python (not py3 compatible)
-  - "pip install pymongo sqlalchemy pymysql"
+  - "pip install pymongo sqlalchemy pymysql defusedxml"
   - "pip install coveralls"
   - "python setup.py install"
 before_script:
