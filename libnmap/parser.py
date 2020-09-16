@@ -453,6 +453,40 @@ class NmapParser(object):
                 rdict['reasons'].append(extrareasons_dict)
         return rdict
 
+
+    @classmethod
+    def __parse_script_table(cls, script_table):
+        """
+           Private method parsing a table from NSE scripts output
+
+           :param sccript_table: poertion of XML containing the table
+           :type script_table: xml.ElementTree.Element
+
+           :return: python dict of table structure
+        """
+        tdict = {}
+        for telem in script_table:
+            tkey = telem.get('key')
+            if telem.tag == 'elem':
+                if tkey in tdict:
+                    if not instance(tdict[tkey], list):
+                        tdict[tkey] = [tdict[tkey], ]
+                    tdict[tkey].append(telem.text)
+                else:
+                    tdict[tkey] = telem.text
+            elif telem.tag == 'table':
+                stdict = cls.__parse_script_table(telem)
+                
+                # Handle duplicate table keys
+                if tkey in tdict:
+                    if not isinstance(tdict[tkey], list):
+                       tdict[tkey] = [tdict[tkey], ]
+                    tdict[tkey].append(stdict)
+                else:
+                    tdict[tkey] = stdict
+        return tdict
+
+
     @classmethod
     def __parse_script(cls, script_data):
         """
@@ -471,16 +505,7 @@ class NmapParser(object):
             if script_elem.tag == 'elem':
                 _elt_dict.update({script_elem.get('key'): script_elem.text})
             elif script_elem.tag == 'table':
-                tdict = {}
-                for telem in script_elem:
-                    # Handle duplicate element keys
-                    tkey = telem.get('key')
-                    if tkey in tdict:
-                        if not isinstance(tdict[tkey], list):
-                            tdict[tkey] = [tdict[tkey], ]
-                        tdict[tkey].append(telem.text)
-                    else:
-                        tdict[tkey] = telem.text
+                tdict = cls.__parse_script_table(script_elem)
                 # Handle duplicate table keys
                 skey = script_elem.get('key')
                 if skey in _elt_dict:
