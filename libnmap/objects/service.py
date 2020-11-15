@@ -281,9 +281,20 @@ class NmapService(object):
 
             This is used for diff()ing NmapService object via NmapDiff.
 
-            :return: tuple
+            :return: string
         """
         return "{0}.{1}".format(self.protocol, self.port)
+
+    @property
+    def report_format(self):
+        """
+            Accessor for the report representation of NmapService.
+
+            Used in csv fieldnames.
+
+            :return: string
+        """
+        return "{0.port}.{0.service}/{0.protocol}".format(self)
 
     def get_dict(self):
         """

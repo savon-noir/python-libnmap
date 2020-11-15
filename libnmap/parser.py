@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-
+import os
+from collections import defaultdict
 
 try:
     import xml.etree.cElementTree as ET
@@ -10,7 +11,8 @@ from libnmap.objects import NmapHost, NmapService, NmapReport
 
 class NmapParser(object):
     @classmethod
-    def parse(cls, nmap_data=None, data_type='XML', incomplete=False):
+    def parse(cls, nmap_data=None, data_type='XML',
+              incomplete=False, source_filename=None):
         """
             Generic class method of NmapParser class.
 
@@ -31,6 +33,10 @@ class NmapParser(object):
             the end of the scan.
             :type incomplete: boolean
 
+            :param source_filename: if parsing from nmap report file \
+            this will hold the file name of the source report.
+            :type source_filename: string
+
             As of today, only XML parsing is supported.
 
             :return: NmapObject (NmapHost, NmapService or NmapReport)
@@ -38,7 +44,7 @@ class NmapParser(object):
 
         nmapobj = None
         if data_type == "XML":
-            nmapobj = cls._parse_xml(nmap_data, incomplete)
+            nmapobj = cls._parse_xml(nmap_data, incomplete, source_filename)
         else:
             raise NmapParserException("Unknown data type provided. "
                                       "Please check documentation for "
@@ -46,7 +52,7 @@ class NmapParser(object):
         return nmapobj
 
     @classmethod
-    def _parse_xml(cls, nmap_data=None, incomplete=False):
+    def _parse_xml(cls, nmap_data=None, incomplete=False, source_filename=None):
         """
             Protected class method used to process a specific data type.
             In this case: XML. This method is called by cls.parse class
@@ -72,6 +78,10 @@ class NmapParser(object):
             the end of the scan.
             :type incomplete: boolean
 
+            :param source_filename: if parsing from nmap report file \
+            this will hold the file name of the source report.
+            :type source_filename: string
+
             :return: NmapObject (NmapHost, NmapService or NmapReport) \
                     or a list of NmapObject
         """
@@ -93,7 +103,7 @@ class NmapParser(object):
 
         nmapobj = None
         if root.tag == 'nmaprun':
-            nmapobj = cls._parse_xml_report(root)
+            nmapobj = cls._parse_xml_report(root, source_filename)
         elif root.tag == 'host':
             nmapobj = cls._parse_xml_host(root)
         elif root.tag == 'ports':
@@ -106,7 +116,7 @@ class NmapParser(object):
         return nmapobj
 
     @classmethod
-    def _parse_xml_report(cls, root=None):
+    def _parse_xml_report(cls, root=None, source_filename=None):
         """
             This method parses out a full nmap scan report from its XML root
             node: <nmaprun>.
@@ -114,11 +124,16 @@ class NmapParser(object):
             :param root: Element from xml.ElementTree (top of XML the document)
             :type root: Element
 
+            :param source_filename: if parsing from nmap report file \
+            this will hold the file name of the source report.
+            :type source_filename: string
+
             :return: NmapReport object
         """
 
         nmap_scan = {'_nmaprun': {}, '_scaninfo': {},
-                     '_hosts': [], '_runstats': {}}
+                     '_hosts': [], '_runstats': {},
+                     '_services': defaultdict(list)}
 
         if root is None:
             raise NmapParserException("No root node provided to parse XML "
@@ -129,14 +144,15 @@ class NmapParser(object):
             if el.tag == 'scaninfo':
                 nmap_scan['_scaninfo'] = cls.__parse_scaninfo(el)
             elif el.tag == 'host':
-                nmap_scan['_hosts'].append(cls._parse_xml_host(el))
+                nmap_scan['_hosts'].append(cls._parse_xml_host(el,
+                                           nmap_scan['_services']))
             elif el.tag == 'runstats':
                 nmap_scan['_runstats'] = cls.__parse_runstats(el)
             # else:
             #    print "struct pparse unknown attr: {0} value: {1}".format(
             #        el.tag,
             #        el.get(el.tag))
-        return NmapReport(nmap_scan)
+        return NmapReport(nmap_scan, source_filename)
 
     @classmethod
     def parse_fromstring(cls, nmap_data, data_type="XML", incomplete=False):
@@ -188,9 +204,12 @@ class NmapParser(object):
         """
 
         try:
+            filename = os.path.basename(nmap_report_path)
+            filename = os.path.splitext(filename)[0]
             with open(nmap_report_path, 'r') as fileobj:
                 fdata = fileobj.read()
-                rval = cls.parse(fdata, data_type, incomplete)
+                rval = cls.parse(fdata, data_type, incomplete,
+                                 filename)
         except IOError:
             raise
         return rval
@@ -254,7 +273,7 @@ class NmapParser(object):
         return cls.__format_attributes(xelement)
 
     @classmethod
-    def _parse_xml_host(cls, scanhost_data):
+    def _parse_xml_host(cls, scanhost_data, report_services_dict):
         """
             Protected method parsing a portion of a nmap scan result.
             Receives a <host> XML tag representing a scanned host with
@@ -283,6 +302,7 @@ class NmapParser(object):
                 ports_dict = cls._parse_xml_ports(xh)
                 for port in ports_dict['ports']:
                     _services.append(port)
+                    report_services_dict[port.report_format].append(_addresses)
                 _host_extras['extraports'] = ports_dict['extraports']
             elif xh.tag == 'status':
                 _status = cls.__format_attributes(xh)
@@ -329,7 +349,9 @@ class NmapParser(object):
         hostnames = []
         for hname in xelement:
             if hname.tag == 'hostname':
-                hostnames.append(hname.get('name'))
+                name = hname.get('name')
+                if name not in hostnames:
+                    hostnames.append(name)
         return hostnames
 
     @classmethod
