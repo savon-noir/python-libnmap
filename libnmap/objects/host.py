@@ -8,8 +8,17 @@ class NmapHost(object):
     """
         NmapHost is a class representing a host object of NmapReport
     """
-    def __init__(self, starttime='', endtime='', address=None, status=None,
-                 hostnames=None, services=None, extras=None):
+
+    def __init__(
+        self,
+        starttime="",
+        endtime="",
+        address=None,
+        status=None,
+        hostnames=None,
+        services=None,
+        extras=None,
+    ):
         """
             NmapHost constructor
             :param starttime: unix timestamp of when the scan against
@@ -31,8 +40,8 @@ class NmapHost(object):
         self._extras = extras if extras is not None else {}
         self._osfingerprinted = False
         self.os = None
-        if 'os' in self._extras:
-            self.os = NmapOSFingerprint(self._extras['os'])
+        if "os" in self._extras:
+            self.os = NmapOSFingerprint(self._extras["os"])
             self._osfingerprinted = True
         else:
             self.os = NmapOSFingerprint({})
@@ -42,16 +51,16 @@ class NmapHost(object):
         self._mac_addr = None
         self._vendor = None
         for addr in address:
-            if addr['addrtype'] == "ipv4":
-                self._ipv4_addr = addr['addr']
-            elif addr['addrtype'] == 'ipv6':
-                self._ipv6_addr = addr['addr']
-            elif addr['addrtype'] == 'mac':
-                self._mac_addr = addr['addr']
-            if 'vendor' in addr:
-                self._vendor = addr['vendor']
+            if addr["addrtype"] == "ipv4":
+                self._ipv4_addr = addr["addr"]
+            elif addr["addrtype"] == "ipv6":
+                self._ipv6_addr = addr["addr"]
+            elif addr["addrtype"] == "mac":
+                self._mac_addr = addr["addr"]
+            if "vendor" in addr:
+                self._vendor = addr["vendor"]
 
-        self._main_address = self._ipv4_addr or self._ipv6_addr or ''
+        self._main_address = self._ipv4_addr or self._ipv6_addr or ""
         self._address = address
 
     def __eq__(self, other):
@@ -65,8 +74,8 @@ class NmapHost(object):
             :return: boolean
         """
         rval = False
-        if(self.__class__ == other.__class__ and self.id == other.id):
-            rval = (self.changed(other) == 0)
+        if self.__class__ == other.__class__ and self.id == other.id:
+            rval = self.changed(other) == 0
         return rval
 
     def __ne__(self, other):
@@ -80,8 +89,8 @@ class NmapHost(object):
             :return: boolean
         """
         rval = True
-        if(self.__class__ == other.__class__ and self.id == other.id):
-            rval = (self.changed(other) > 0)
+        if self.__class__ == other.__class__ and self.id == other.id:
+            rval = self.changed(other) > 0
         return rval
 
     def __repr__(self):
@@ -89,19 +98,24 @@ class NmapHost(object):
             String representing the object
             :return: string
         """
-        return "{0}: [{1} ({2}) - {3}]".format(self.__class__.__name__,
-                                               self.address,
-                                               " ".join(self._hostnames),
-                                               self.status)
+        return "{0}: [{1} ({2}) - {3}]".format(
+            self.__class__.__name__,
+            self.address,
+            " ".join(self._hostnames),
+            self.status,
+        )
 
     def __hash__(self):
         """
             Hash is needed to be able to use our object in sets
             :return: hash
         """
-        return (hash(self.status) ^ hash(self.address) ^
-                hash(frozenset(self._services)) ^
-                hash(frozenset(" ".join(self._hostnames))))
+        return (
+            hash(self.status)
+            ^ hash(self.address)
+            ^ hash(frozenset(self._services))
+            ^ hash(frozenset(" ".join(self._hostnames)))
+        )
 
     def changed(self, other):
         """
@@ -146,16 +160,16 @@ class NmapHost(object):
             :param addrdict: valid dict is {'addr': '1.1.1.1',
                                             'addrtype': 'ipv4'}
         """
-        if addrdict['addrtype'] == 'ipv4':
-            self._ipv4_addr = addrdict['addr']
-        elif addrdict['addrtype'] == 'ipv6':
-            self._ipv6_addr = addrdict['addr']
-        elif addrdict['addrtype'] == 'mac':
-            self._mac_addr = addrdict['addr']
-        if 'vendor' in addrdict:
-            self._vendor = addrdict['vendor']
+        if addrdict["addrtype"] == "ipv4":
+            self._ipv4_addr = addrdict["addr"]
+        elif addrdict["addrtype"] == "ipv6":
+            self._ipv6_addr = addrdict["addr"]
+        elif addrdict["addrtype"] == "mac":
+            self._mac_addr = addrdict["addr"]
+        if "vendor" in addrdict:
+            self._vendor = addrdict["vendor"]
 
-        self._main_address = self._ipv4_addr or self._ipv6_addr or ''
+        self._main_address = self._ipv4_addr or self._ipv6_addr or ""
         self._address = addrdict
 
     @property
@@ -165,7 +179,7 @@ class NmapHost(object):
 
             :return: IPv4 address as a string
         """
-        return self._ipv4_addr or ''
+        return self._ipv4_addr or ""
 
     @property
     def mac(self):
@@ -174,7 +188,7 @@ class NmapHost(object):
 
             :return: MAC address as a string
         """
-        return self._mac_addr or ''
+        return self._mac_addr or ""
 
     @property
     def vendor(self):
@@ -183,7 +197,7 @@ class NmapHost(object):
 
             :return: string (vendor) of empty string if no vendor defined
         """
-        return self._vendor or ''
+        return self._vendor or ""
 
     @property
     def ipv6(self):
@@ -192,7 +206,7 @@ class NmapHost(object):
 
             :return: IPv6 address as a string
         """
-        return self._ipv6_addr or ''
+        return self._ipv6_addr or ""
 
     @property
     def status(self):
@@ -201,7 +215,7 @@ class NmapHost(object):
 
             :return: string
         """
-        return self._status['state']
+        return self._status["state"]
 
     @status.setter
     def status(self, statusdict):
@@ -222,7 +236,7 @@ class NmapHost(object):
             :return: bool
         """
         rval = False
-        if self.status == 'up':
+        if self.status == "up":
             rval = True
         return rval
 
@@ -260,18 +274,21 @@ class NmapHost(object):
 
             :return: list: of tuples (port,'proto') ie:[(22,'tcp'),(25, 'tcp')]
         """
-        return ([(p.port, p.protocol)
-                for p in self._services if p.state == 'open'])
+        return ([
+            (p.port, p.protocol) for p in self._services if p.state == "open"
+        ])
 
-    def get_service(self, portno, protocol='tcp'):
+    def get_service(self, portno, protocol="tcp"):
         """
             :param portno: int the portnumber
             :param protocol='tcp': string ('tcp','udp')
 
             :return: NmapService or None
         """
-        plist = [p for p in self._services if
-                 p.port == portno and p.protocol == protocol]
+        plist = [
+            p for p in self._services if(p.port == portno and
+                                         p.protocol == protocol)
+        ]
         if len(plist) > 1:
             raise Exception("Duplicate services found in NmapHost object")
         return plist.pop() if len(plist) else None
@@ -328,7 +345,7 @@ class NmapHost(object):
 
             :return: string
         """
-        rval = ''
+        rval = ""
         if self.os is not None:
             rval = "\n".join(self.os.fingerprints)
         return rval
@@ -343,7 +360,7 @@ class NmapHost(object):
         """
         rval = []
         try:
-            rval = self._extras['os']['ports_used']
+            rval = self._extras["os"]["ports_used"]
         except (KeyError, TypeError):
             pass
         return rval
@@ -356,9 +373,9 @@ class NmapHost(object):
 
             return: string
         """
-        rval = ''
+        rval = ""
         try:
-            rval = self._extras['tcpsequence']['difficulty']
+            rval = self._extras["tcpsequence"]["difficulty"]
         except (KeyError, TypeError):
             pass
         return rval
@@ -370,9 +387,9 @@ class NmapHost(object):
 
             :return: string
         """
-        rval = ''
+        rval = ""
         try:
-            rval = self._extras['ipidsequence']['class']
+            rval = self._extras["ipidsequence"]["class"]
         except (KeyError, TypeError):
             pass
         return rval
@@ -386,7 +403,7 @@ class NmapHost(object):
         """
         rval = 0
         try:
-            rval = int(self._extras['uptime']['seconds'])
+            rval = int(self._extras["uptime"]["seconds"])
         except (KeyError, TypeError):
             pass
         return rval
@@ -398,9 +415,9 @@ class NmapHost(object):
 
             :return: string
         """
-        rval = ''
+        rval = ""
         try:
-            rval = self._extras['uptime']['lastboot']
+            rval = self._extras["uptime"]["lastboot"]
         except (KeyError, TypeError):
             pass
         return rval
@@ -414,7 +431,7 @@ class NmapHost(object):
         """
         rval = 0
         try:
-            rval = int(self._extras['distance']['value'])
+            rval = int(self._extras["distance"]["value"])
         except (KeyError, TypeError):
             pass
         return rval
@@ -428,7 +445,7 @@ class NmapHost(object):
         """
         rval = {}
         try:
-            rval = self._extras['hostscript']
+            rval = self._extras["hostscript"]
         except (KeyError, TypeError):
             pass
         return rval
@@ -450,12 +467,12 @@ class NmapHost(object):
 
             :return: dict with keys 'state' and 'count' or None
         """
-        _xtrports = self._extras.get('extraports', None)
+        _xtrports = self._extras.get("extraports", None)
 
         if _xtrports is None:
             return None
 
-        return {'state': _xtrports['state'], 'count': _xtrports['count']}
+        return {"state": _xtrports["state"], "count": _xtrports["count"]}
 
     @property
     def extraports_reasons(self):
@@ -465,12 +482,12 @@ class NmapHost(object):
 
             :return: array of dict containing keys 'state' and 'count' or None
         """
-        r = self._extras.get('extraports', {})
+        r = self._extras.get("extraports", {})
 
         if r is None:
             return None
 
-        return r.get('reasons', None)
+        return r.get("reasons", None)
 
     def get_dict(self):
         """
@@ -480,12 +497,20 @@ class NmapHost(object):
 
             :return dict
         """
-        d = dict([("{0}::{1}".format(s.__class__.__name__, str(s.id)),
-                   hash(s))
-                 for s in self.services])
+        d = dict(
+            [
+                ("{0}::{1}".format(s.__class__.__name__, str(s.id)), hash(s))
+                for s in self.services
+            ]
+        )
 
-        d.update({'address': self.address, 'status': self.status,
-                  'hostnames': " ".join(self._hostnames)})
+        d.update(
+            {
+                "address": self.address,
+                "status": self.status,
+                "hostnames": " ".join(self._hostnames),
+            }
+        )
         return d
 
     def diff(self, other):

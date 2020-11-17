@@ -10,16 +10,18 @@ from libnmap.parser import NmapParser
 
 class ReportEncoder(json.JSONEncoder):
     def default(self, obj):
-        otype = {'NmapHost': NmapHost,
-                 'NmapOSFingerprint': NmapOSFingerprint,
-                 'NmapOSMatch': NmapOSMatch,
-                 'NmapOSClass': NmapOSClass,
-                 'CPE': CPE,
-                 'OSFPPortUsed': OSFPPortUsed,
-                 'NmapService': NmapService,
-                 'NmapReport': NmapReport}
+        otype = {
+            "NmapHost": NmapHost,
+            "NmapOSFingerprint": NmapOSFingerprint,
+            "NmapOSMatch": NmapOSMatch,
+            "NmapOSClass": NmapOSClass,
+            "CPE": CPE,
+            "OSFPPortUsed": OSFPPortUsed,
+            "NmapService": NmapService,
+            "NmapReport": NmapReport,
+        }
         if isinstance(obj, tuple(otype.values())):
-            key = ('__{0}__').format(obj.__class__.__name__)
+            key = ("__{0}__").format(obj.__class__.__name__)
             return {key: obj.__dict__}
         return json.JSONEncoder.default(self, obj)
 

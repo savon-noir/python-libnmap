@@ -10,28 +10,22 @@ class TestNmapParser(unittest.TestCase):
     def setUp(self):
         fdir = os.path.dirname(os.path.realpath(__file__))
         self.flist_full = [
-            {'file': "%s/%s" % (fdir,
-                                'files/2_hosts.xml'), 'hosts': 2},
-            {'file': "%s/%s" % (fdir,
-                                'files/1_hosts.xml'), 'hosts': 1},
-            {'file': "%s/%s" % (fdir,
-                                'files/1_hosts_banner_ports_notsyn.xml'),
-             'hosts': 1},
+            {"file": "%s/%s" % (fdir, "files/2_hosts.xml"), "hosts": 2},
+            {"file": "%s/%s" % (fdir, "files/1_hosts.xml"), "hosts": 1},
+            {
+                "file": "%s/%s" % (fdir, "files/1_hosts_banner_ports_notsyn.xml"),
+                "hosts": 1,
+            },
             # {'file': "%s/%s" % (fdir,
             #                      'files/1_hosts_banner_ports_xmas.xml'),
             #                      'hosts': 1},
-            {'file': "%s/%s" % (fdir,
-                                'files/1_hosts_banner_ports.xml'), 'hosts': 1},
-            {'file': "%s/%s" % (fdir,
-                                'files/1_hosts_banner.xml'), 'hosts': 1},
-            {'file': "%s/%s" % (fdir,
-                                'files/2_hosts_version.xml'), 'hosts': 2},
+            {"file": "%s/%s" % (fdir, "files/1_hosts_banner_ports.xml"), "hosts": 1},
+            {"file": "%s/%s" % (fdir, "files/1_hosts_banner.xml"), "hosts": 1},
+            {"file": "%s/%s" % (fdir, "files/2_hosts_version.xml"), "hosts": 2},
             # {'file': "%s/%s" % (fdir,
             #                      'files/2_null_hosts.xml'), 'hosts': 2},
-            {'file': "%s/%s" % (fdir,
-                                'files/2_tcp_hosts.xml'), 'hosts': 2},
-            {'file': "%s/%s" % (fdir,
-                                'files/1_hosts_nohostname.xml'), 'hosts': 1},
+            {"file": "%s/%s" % (fdir, "files/2_tcp_hosts.xml"), "hosts": 2},
+            {"file": "%s/%s" % (fdir, "files/1_hosts_nohostname.xml"), "hosts": 1},
         ]
         self.flist = self.flist_full
 
@@ -92,9 +86,9 @@ class TestNmapParser(unittest.TestCase):
             <service name="smtp" method="table" conf="3"/>
         </port>"""
 
-        self.port_string3 = '<port></port>'
-        self.port_string4 = ''
-        self.port_string5 = 'GINGERBREADMAN'
+        self.port_string3 = "<port></port>"
+        self.port_string4 = ""
+        self.port_string5 = "GINGERBREADMAN"
         self.port_string6 = """
         <port protocol="tcp" portid="FOOL">
         <state state="filtered" reason="admin-prohibited"
@@ -120,53 +114,36 @@ class TestNmapParser(unittest.TestCase):
 
     def test_class_parser(self):
         for testfile in self.flist:
-            fd = open(testfile['file'], 'r')
+            fd = open(testfile["file"], "r")
             s = fd.read()
             fd.close()
             NmapParser.parse(s)
 
     def test_class_ports_parser(self):
         pdict = NmapParser.parse(self.ports_string)
-        plist = pdict['ports']
+        plist = pdict["ports"]
         self.assertEqual(len(plist), 4)
-        self.assertEqual(sorted([p.port for p in plist]),
-                         sorted([22, 25, 9929, 80]))
-        self.assertRaises(ValueError,
-                              NmapParser.parse,
-                              self.ports_string2)
+        self.assertEqual(sorted([p.port for p in plist]), sorted([22, 25, 9929, 80]))
+        self.assertRaises(ValueError, NmapParser.parse, self.ports_string2)
 
     def test_class_port_parser(self):
-            p = NmapParser.parse(self.port_string)
-            self.assertEqual(p.port, 25)
-            self.assertNotEqual(p.state, "open")
-            self.assertEqual(p.state, "filtered")
-            self.assertEqual(p.service, "smtp")
-            self.assertEqual(p.reason, "admin-prohibited")
-            self.assertEqual(p.reason_ttl, "253")
-            self.assertEqual(p.reason_ip, "109.133.192.1")
+        p = NmapParser.parse(self.port_string)
+        self.assertEqual(p.port, 25)
+        self.assertNotEqual(p.state, "open")
+        self.assertEqual(p.state, "filtered")
+        self.assertEqual(p.service, "smtp")
+        self.assertEqual(p.reason, "admin-prohibited")
+        self.assertEqual(p.reason_ttl, "253")
+        self.assertEqual(p.reason_ip, "109.133.192.1")
 
     def test_port_except(self):
-        self.assertRaises(ValueError,
-                          NmapParser.parse,
-                          self.port_string2)
-        self.assertRaises(NmapParserException,
-                          NmapParser.parse,
-                          self.port_string3)
-        self.assertRaises(NmapParserException,
-                          NmapParser.parse,
-                          self.port_string4)
-        self.assertRaises(NmapParserException,
-                          NmapParser.parse,
-                          self.port_string5)
-        self.assertRaises(ValueError,
-                          NmapParser.parse,
-                          self.port_string6)
-        self.assertRaises(NmapParserException,
-                          NmapParser.parse,
-                          self.port_string7)
-        self.assertRaises(NmapParserException,
-                          NmapParser.parse,
-                          self.port_string8)
+        self.assertRaises(ValueError, NmapParser.parse, self.port_string2)
+        self.assertRaises(NmapParserException, NmapParser.parse, self.port_string3)
+        self.assertRaises(NmapParserException, NmapParser.parse, self.port_string4)
+        self.assertRaises(NmapParserException, NmapParser.parse, self.port_string5)
+        self.assertRaises(ValueError, NmapParser.parse, self.port_string6)
+        self.assertRaises(NmapParserException, NmapParser.parse, self.port_string7)
+        self.assertRaises(NmapParserException, NmapParser.parse, self.port_string8)
         serv = NmapParser.parse(self.port_string9)
         self.assertEqual(serv.state, None)
 
@@ -175,9 +152,14 @@ class TestNmapParser(unittest.TestCase):
         for p in plist:
             print(p)
 
-if __name__ == '__main__':
-    test_suite = ['test_class_parser', 'test_class_ports_parser',
-                  'test_class_port_parser', 'test_port_except',
-                  'test_parser_generic']
+
+if __name__ == "__main__":
+    test_suite = [
+        "test_class_parser",
+        "test_class_ports_parser",
+        "test_class_port_parser",
+        "test_port_except",
+        "test_parser_generic",
+    ]
     suite = unittest.TestSuite(map(TestNmapParser, test_suite))
     test_result = unittest.TextTestRunner(verbosity=2).run(suite)

@@ -26,6 +26,7 @@ class NmapS3Plugin(NmapBackendPlugin):
     """
         This plugin save the reports on S3 and compatible.
     """
+
     def __init__(self, **kwargs):
         """
             - create the conn object
@@ -56,20 +57,20 @@ class NmapS3Plugin(NmapBackendPlugin):
         NmapBackendPlugin.__init__(self)
         try:
             calling_format = OrdinaryCallingFormat()
-            if 'bucket' not in kwargs:
-                self.bucket_name = ''.join(
-                    [kwargs['aws_access_key_id'].lower(),
-                     "_nmapreport"])
+            if "bucket" not in kwargs:
+                self.bucket_name = "".join(
+                    [kwargs["aws_access_key_id"].lower(), "_nmapreport"]
+                )
             else:
-                self.bucket_name = kwargs['bucket']
-                del kwargs['bucket']
-            kwargs['calling_format'] = calling_format
+                self.bucket_name = kwargs["bucket"]
+                del kwargs["bucket"]
+            kwargs["calling_format"] = calling_format
             self.conn = S3Connection(**kwargs)
             self.bucket = self.conn.lookup(self.bucket_name)
             if self.bucket is None:
                 self.bucket = self.conn.create_bucket(self.bucket_name)
-        except:
-            raise
+        except Exception as e:
+            raise Exception(e)
 
     def insert(self, report):
         """
@@ -87,8 +88,9 @@ class NmapS3Plugin(NmapBackendPlugin):
             mykey.key = str(oid)
             strjsonnmapreport = json.dumps(report, cls=ReportEncoder)
             mykey.set_contents_from_string(strjsonnmapreport)
-        except:
-            raise Exception("Failed to add nmap object in s3 bucket")
+        except Exception as e:
+            em = "Failed to add nmap object in s3 bucket: {0}".format(e)
+            raise Exception(em)
         return str(oid)
 
     def get(self, str_report_id=None):

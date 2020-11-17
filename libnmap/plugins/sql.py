@@ -44,27 +44,27 @@ class NmapSqlPlugin(NmapBackendPlugin):
          mybackend.getall()
          mybackend.get(1)
     """
+
     class Reports(Base):
         """
             Embeded class for ORM map NmapReport to a
             simple three column table
         """
-        __tablename__ = 'reports'
 
-        id = Column('report_id', Integer, primary_key=True)
-        inserted = Column('inserted', DateTime(), default='now')
-        report_json = Column('report_json', LargeBinary())
+        __tablename__ = "reports"
+
+        id = Column("report_id", Integer, primary_key=True)
+        inserted = Column("inserted", DateTime(), default="now")
+        report_json = Column("report_json", LargeBinary())
 
         def __init__(self, obj_NmapReport):
             self.inserted = datetime.fromtimestamp(obj_NmapReport.endtime)
-            dumped_json = json.dumps(obj_NmapReport,
-                                     cls=ReportEncoder)
-            self.report_json = bytes(dumped_json.encode('UTF-8'))
+            dumped_json = json.dumps(obj_NmapReport, cls=ReportEncoder)
+            self.report_json = bytes(dumped_json.encode("UTF-8"))
 
         def decode(self):
-            json_decoded = self.report_json.decode('utf-8')
-            nmap_report_obj = json.loads(json_decoded,
-                                         cls=ReportDecoder)
+            json_decoded = self.report_json.decode("utf-8")
+            nmap_report_obj = json.loads(json_decoded, cls=ReportDecoder)
             return nmap_report_obj
 
     def __init__(self, **kwargs):
@@ -91,16 +91,16 @@ class NmapSqlPlugin(NmapBackendPlugin):
         self.url = None
         self.Session = sessionmaker()
 
-        if 'url' not in kwargs:
+        if "url" not in kwargs:
             raise ValueError
-        self.url = kwargs['url']
-        del kwargs['url']
+        self.url = kwargs["url"]
+        del kwargs["url"]
         try:
             self.engine = create_engine(self.url, **kwargs)
             Base.metadata.create_all(bind=self.engine, checkfirst=True)
             self.Session.configure(bind=self.engine)
-        except:
-            raise
+        except Exception as e:
+            raise(e)
 
     def insert(self, nmap_report):
         """
@@ -130,8 +130,8 @@ class NmapSqlPlugin(NmapBackendPlugin):
         if report_id is None:
             raise ValueError
         sess = self.Session()
-        our_report = (
-            sess.query(NmapSqlPlugin.Reports).filter_by(id=report_id).first())
+        orp = sess.query(NmapSqlPlugin.Reports).filter_by(id=report_id)
+        our_report = orp.first()
         sess.close()
         return our_report.decode() if our_report else None
 
@@ -143,9 +143,9 @@ class NmapSqlPlugin(NmapBackendPlugin):
         """
         sess = self.Session()
         nmapreportList = []
-        for report in (
-                sess.query(NmapSqlPlugin.Reports).
-                order_by(NmapSqlPlugin.Reports.inserted)):
+        for report in sess.query(NmapSqlPlugin.Reports).order_by(
+            NmapSqlPlugin.Reports.inserted
+        ):
             nmapreportList.append((report.id, report.decode()))
         sess.close()
         return nmapreportList
@@ -162,8 +162,8 @@ class NmapSqlPlugin(NmapBackendPlugin):
             raise ValueError
         nb_line = 0
         sess = self.Session()
-        nb_line = sess.query(NmapSqlPlugin.Reports).\
-            filter_by(id=report_id).delete()
+        rpt = sess.query(NmapSqlPlugin.Reports).filter_by(id=report_id)
+        nb_line = rpt.delete()
         sess.commit()
         sess.close()
         return nb_line

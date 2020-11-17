@@ -17,15 +17,15 @@ before_install:
 install:
   - "pip install pep8"
   - "pip install pyflakes"
-#  - "pip install boto" # disabled: since boto not supporting py3
-#  - "pip install pymongo sqlalchemy MySQL-python" # disabled MySQL-python (not py3 compatible)
-  - "pip install pymongo sqlalchemy pymysql"
+  # - "pip install boto" # disabled: since boto not supporting py3
+  # - "pip install pymongo sqlalchemy MySQL-python" # disabled MySQL-python (not py3 compatible)
+  # - "pip install pymongo sqlalchemy pymysql"
   - "pip install coveralls"
-  - "python setup.py install"
+  - "pip install ."
 before_script:
   - "pep8 . --exclude test,docs,examples"
   - "pyflakes ."
-  - mysql -e 'create database poulet;'
+  # - mysql -e 'create database poulet;'
 script: nosetests --with-coverage --cover-package=libnmap
 after_success:
   coveralls

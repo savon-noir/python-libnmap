@@ -10,7 +10,7 @@ from libnmap.objects import NmapHost, NmapService, NmapReport
 
 class NmapParser(object):
     @classmethod
-    def parse(cls, nmap_data=None, data_type='XML', incomplete=False):
+    def parse(cls, nmap_data=None, data_type="XML", incomplete=False):
         """
             Generic class method of NmapParser class.
 
@@ -40,9 +40,11 @@ class NmapParser(object):
         if data_type == "XML":
             nmapobj = cls._parse_xml(nmap_data, incomplete)
         else:
-            raise NmapParserException("Unknown data type provided. "
-                                      "Please check documentation for "
-                                      "supported data types.")
+            raise NmapParserException(
+                "Unknown data type provided. "
+                "Please check documentation for "
+                "supported data types."
+            )
         return nmapobj
 
     @classmethod
@@ -77,28 +79,33 @@ class NmapParser(object):
         """
 
         if not nmap_data:
-            raise NmapParserException("No report data to parse: please "
-                                      "provide a valid XML nmap report")
+            raise NmapParserException(
+                "No report data to parse: please "
+                "provide a valid XML nmap report"
+            )
         elif not isinstance(nmap_data, str):
-            raise NmapParserException("wrong nmap_data type given as "
-                                      "argument: cannot parse data")
+            raise NmapParserException(
+                "wrong nmap_data type given as "
+                "argument: cannot parse data"
+            )
 
         if incomplete is True:
             nmap_data += "</nmaprun>"
 
         try:
             root = ET.fromstring(nmap_data)
-        except:
-            raise NmapParserException("Wrong XML structure: cannot parse data")
+        except Exception as e:
+            emsg = "Wrong XML structure: cannot parse data: {0}".format(e)
+            raise NmapParserException(emsg)
 
         nmapobj = None
-        if root.tag == 'nmaprun':
+        if root.tag == "nmaprun":
             nmapobj = cls._parse_xml_report(root)
-        elif root.tag == 'host':
+        elif root.tag == "host":
             nmapobj = cls._parse_xml_host(root)
-        elif root.tag == 'ports':
+        elif root.tag == "ports":
             nmapobj = cls._parse_xml_ports(root)
-        elif root.tag == 'port':
+        elif root.tag == "port":
             nmapobj = cls._parse_xml_port(root)
         else:
             raise NmapParserException("Unpexpected data structure for XML "
@@ -117,21 +124,25 @@ class NmapParser(object):
             :return: NmapReport object
         """
 
-        nmap_scan = {'_nmaprun': {}, '_scaninfo': {},
-                     '_hosts': [], '_runstats': {}}
+        nmap_scan = {
+            "_nmaprun": {},
+            "_scaninfo": {},
+            "_hosts": [],
+            "_runstats": {}
+        }
 
         if root is None:
             raise NmapParserException("No root node provided to parse XML "
                                       "report")
 
-        nmap_scan['_nmaprun'] = cls.__format_attributes(root)
+        nmap_scan["_nmaprun"] = cls.__format_attributes(root)
         for el in root:
-            if el.tag == 'scaninfo':
-                nmap_scan['_scaninfo'] = cls.__parse_scaninfo(el)
-            elif el.tag == 'host':
-                nmap_scan['_hosts'].append(cls._parse_xml_host(el))
-            elif el.tag == 'runstats':
-                nmap_scan['_runstats'] = cls.__parse_runstats(el)
+            if el.tag == "scaninfo":
+                nmap_scan["_scaninfo"] = cls.__parse_scaninfo(el)
+            elif el.tag == "host":
+                nmap_scan["_hosts"].append(cls._parse_xml_host(el))
+            elif el.tag == "runstats":
+                nmap_scan["_runstats"] = cls.__parse_runstats(el)
             # else:
             #    print "struct pparse unknown attr: {0} value: {1}".format(
             #        el.tag,
@@ -160,14 +171,18 @@ class NmapParser(object):
         """
 
         if not isinstance(nmap_data, str):
-            raise NmapParserException("bad argument type for "
-                                      "xarse_fromstring(): should be a string")
+            raise NmapParserException(
+                "bad argument type for "
+                "xarse_fromstring(): should be a string"
+            )
         return cls.parse(nmap_data, data_type, incomplete)
 
     @classmethod
-    def parse_fromfile(cls, nmap_report_path,
-                       data_type="XML",
-                       incomplete=False):
+    def parse_fromfile(
+        cls, nmap_report_path,
+        data_type="XML",
+        incomplete=False
+    ):
         """
             Call generic cls.parse() method and ensure that a correct file \
             path is given as argument. If not, an exception is raised.
@@ -188,7 +203,7 @@ class NmapParser(object):
         """
 
         try:
-            with open(nmap_report_path, 'r') as fileobj:
+            with open(nmap_report_path, "r") as fileobj:
                 fdata = fileobj.read()
                 rval = cls.parse(fdata, data_type, incomplete)
         except IOError:
@@ -210,31 +225,37 @@ class NmapParser(object):
         """
 
         nreport = {}
-        if list(rdict.keys())[0] == '__NmapReport__':
-            r = rdict['__NmapReport__']
-            nreport['_runstats'] = r['_runstats']
-            nreport['_scaninfo'] = r['_scaninfo']
-            nreport['_nmaprun'] = r['_nmaprun']
+        if list(rdict.keys())[0] == "__NmapReport__":
+            r = rdict["__NmapReport__"]
+            nreport["_runstats"] = r["_runstats"]
+            nreport["_scaninfo"] = r["_scaninfo"]
+            nreport["_nmaprun"] = r["_nmaprun"]
             hlist = []
-            for h in r['_hosts']:
+            for h in r["_hosts"]:
                 slist = []
-                for s in h['__NmapHost__']['_services']:
-                    cname = '__NmapService__'
-                    slist.append(NmapService(portid=s[cname]['_portid'],
-                                             protocol=s[cname]['_protocol'],
-                                             state=s[cname]['_state'],
-                                             owner=s[cname]['_owner'],
-                                             service=s[cname]['_service']))
+                for s in h["__NmapHost__"]["_services"]:
+                    cname = "__NmapService__"
+                    slist.append(
+                        NmapService(
+                            portid=s[cname]["_portid"],
+                            protocol=s[cname]["_protocol"],
+                            state=s[cname]["_state"],
+                            owner=s[cname]["_owner"],
+                            service=s[cname]["_service"],
+                        )
+                    )
 
-                nh = NmapHost(starttime=h['__NmapHost__']['_starttime'],
-                              endtime=h['__NmapHost__']['_endtime'],
-                              address=h['__NmapHost__']['_address'],
-                              status=h['__NmapHost__']['_status'],
-                              hostnames=h['__NmapHost__']['_hostnames'],
-                              extras=h['__NmapHost__']['_extras'],
-                              services=slist)
+                nh = NmapHost(
+                    starttime=h["__NmapHost__"]["_starttime"],
+                    endtime=h["__NmapHost__"]["_endtime"],
+                    address=h["__NmapHost__"]["_address"],
+                    status=h["__NmapHost__"]["_status"],
+                    hostnames=h["__NmapHost__"]["_hostnames"],
+                    extras=h["__NmapHost__"]["_extras"],
+                    services=slist,
+                )
                 hlist.append(nh)
-            nreport['_hosts'] = hlist
+            nreport["_hosts"] = hlist
             nmapobj = NmapReport(nreport)
         return nmapobj
 
@@ -273,45 +294,53 @@ class NmapParser(object):
         _status = {}
         _addresses = []
         _host_extras = {}
-        extra_tags = ['uptime', 'distance', 'tcpsequence',
-                      'ipidsequence', 'tcptssequence', 'times']
+        extra_tags = [
+            "uptime",
+            "distance",
+            "tcpsequence",
+            "ipidsequence",
+            "tcptssequence",
+            "times",
+        ]
         for xh in xelement:
-            if xh.tag == 'hostnames':
+            if xh.tag == "hostnames":
                 for hostname in cls.__parse_hostnames(xh):
                     _hostnames.append(hostname)
-            elif xh.tag == 'ports':
+            elif xh.tag == "ports":
                 ports_dict = cls._parse_xml_ports(xh)
-                for port in ports_dict['ports']:
+                for port in ports_dict["ports"]:
                     _services.append(port)
-                _host_extras['extraports'] = ports_dict['extraports']
-            elif xh.tag == 'status':
+                _host_extras["extraports"] = ports_dict["extraports"]
+            elif xh.tag == "status":
                 _status = cls.__format_attributes(xh)
-            elif xh.tag == 'address':
+            elif xh.tag == "address":
                 _addresses.append(cls.__format_attributes(xh))
-            elif xh.tag == 'os':
+            elif xh.tag == "os":
                 _os_extra = cls.__parse_os_fingerprint(xh)
-                _host_extras.update({'os': _os_extra})
-            elif xh.tag == 'hostscript':
+                _host_extras.update({"os": _os_extra})
+            elif xh.tag == "hostscript":
                 _host_scripts = cls.__parse_host_scripts(xh)
-                _host_extras.update({'hostscript': _host_scripts})
+                _host_extras.update({"hostscript": _host_scripts})
             elif xh.tag in extra_tags:
                 _host_extras[xh.tag] = cls.__format_attributes(xh)
             # else:
             #    print "struct host unknown attr: %s value: %s" %
             #           (h.tag, h.get(h.tag))
-        _stime = ''
-        _etime = ''
-        if 'starttime' in _host_header:
-            _stime = _host_header['starttime']
-        if 'endtime' in _host_header:
-            _etime = _host_header['endtime']
-        nhost = NmapHost(_stime,
-                         _etime,
-                         _addresses,
-                         _status,
-                         _hostnames,
-                         _services,
-                         _host_extras)
+        _stime = ""
+        _etime = ""
+        if "starttime" in _host_header:
+            _stime = _host_header["starttime"]
+        if "endtime" in _host_header:
+            _etime = _host_header["endtime"]
+        nhost = NmapHost(
+            _stime,
+            _etime,
+            _addresses,
+            _status,
+            _hostnames,
+            _services,
+            _host_extras
+        )
         return nhost
 
     @classmethod
@@ -328,8 +357,8 @@ class NmapParser(object):
         xelement = cls.__format_element(scanhostnames_data)
         hostnames = []
         for hname in xelement:
-            if hname.tag == 'hostname':
-                hostnames.append(hname.get('name'))
+            if hname.tag == "hostname":
+                hostnames.append(hname.get("name"))
         return hostnames
 
     @classmethod
@@ -349,14 +378,14 @@ class NmapParser(object):
 
         xelement = cls.__format_element(scanports_data)
 
-        rdict = {'ports': [], 'extraports': None}
+        rdict = {"ports": [], "extraports": None}
         for xservice in xelement:
-            if xservice.tag == 'port':
+            if xservice.tag == "port":
                 nport = cls._parse_xml_port(xservice)
-                rdict['ports'].append(nport)
-            elif xservice.tag == 'extraports':
+                rdict["ports"].append(nport)
+            elif xservice.tag == "extraports":
                 extraports = cls.__parse_extraports(xservice)
-                rdict['extraports'] = extraports
+                rdict["extraports"] = extraports
             # else:
             #    print "struct port unknown attr: %s value: %s" %
             #           (h.tag, h.get(h.tag))
@@ -380,8 +409,8 @@ class NmapParser(object):
         xelement = cls.__format_element(scanport_data)
 
         _port = cls.__format_attributes(xelement)
-        _portid = _port['portid'] if 'portid' in _port else None
-        _protocol = _port['protocol'] if 'protocol' in _port else None
+        _portid = _port["portid"] if "portid" in _port else None
+        _protocol = _port["protocol"] if "protocol" in _port else None
 
         _state = None
         _service = None
@@ -389,28 +418,27 @@ class NmapParser(object):
         _service_scripts = []
         _service_extras = {}
         for xport in xelement:
-            if xport.tag == 'state':
+            if xport.tag == "state":
                 _state = cls.__format_attributes(xport)
-            elif xport.tag == 'service':
+            elif xport.tag == "service":
                 _service = cls.__parse_service(xport)
-            elif xport.tag == 'owner':
+            elif xport.tag == "owner":
                 _owner = cls.__format_attributes(xport)
-            elif xport.tag == 'script':
+            elif xport.tag == "script":
                 _script_dict = cls.__parse_script(xport)
                 _service_scripts.append(_script_dict)
-        _service_extras['scripts'] = _service_scripts
+        _service_extras["scripts"] = _service_scripts
 
-        if(_portid is None or _protocol is None or _state is None):
-            raise NmapParserException("XML <port> tag is incomplete. One "
-                                      "of the following tags is missing: "
-                                      "portid, protocol or state or tag.")
+        if _portid is None or _protocol is None or _state is None:
+            raise NmapParserException(
+                "XML <port> tag is incomplete. One "
+                "of the following tags is missing: "
+                "portid, protocol or state or tag."
+            )
 
-        nport = NmapService(_portid,
-                            _protocol,
-                            _state,
-                            _service,
-                            _owner,
-                            _service_extras)
+        nport = NmapService(
+            _portid, _protocol, _state, _service, _owner, _service_extras
+        )
         return nport
 
     @classmethod
@@ -421,10 +449,10 @@ class NmapParser(object):
         _service = cls.__format_attributes(xserv)
         _cpelist = []
         for _servnode in xserv:
-            if _servnode.tag == 'cpe':
+            if _servnode.tag == "cpe":
                 _cpe_string = _servnode.text
                 _cpelist.append(_cpe_string)
-        _service['cpelist'] = _cpelist
+        _service["cpelist"] = _cpelist
         return _service
 
     @classmethod
@@ -439,20 +467,19 @@ class NmapParser(object):
 
             :return: python dict with following keys: state, count, reason
         """
-        rdict = {'state': '', 'count': '', 'reasons': []}
+        rdict = {"state": "", "count": "", "reasons": []}
         xelement = cls.__format_element(extraports_data)
         extraports_dict = cls.__format_attributes(xelement)
 
-        if 'state' in extraports_dict:
-            rdict['state'] = extraports_dict
-        if 'count' in extraports_dict:
-            rdict['count'] = extraports_dict
+        if "state" in extraports_dict:
+            rdict["state"] = extraports_dict
+        if "count" in extraports_dict:
+            rdict["count"] = extraports_dict
         for xelt in xelement:
-            if xelt.tag == 'extrareasons':
+            if xelt.tag == "extrareasons":
                 extrareasons_dict = cls.__format_attributes(xelt)
-                rdict['reasons'].append(extrareasons_dict)
+                rdict["reasons"].append(extrareasons_dict)
         return rdict
-
 
     @classmethod
     def __parse_script_table(cls, script_table):
@@ -466,26 +493,25 @@ class NmapParser(object):
         """
         tdict = {}
         for telem in script_table:
-            tkey = telem.get('key')
-            if telem.tag == 'elem':
+            tkey = telem.get("key")
+            if telem.tag == "elem":
                 if tkey in tdict:
-                    if not instance(tdict[tkey], list):
-                        tdict[tkey] = [tdict[tkey], ]
+                    if not isinstance(tdict[tkey], list):
+                        tdict[tkey] = [tdict[tkey]]
                     tdict[tkey].append(telem.text)
                 else:
                     tdict[tkey] = telem.text
-            elif telem.tag == 'table':
+            elif telem.tag == "table":
                 stdict = cls.__parse_script_table(telem)
-                
+
                 # Handle duplicate table keys
                 if tkey in tdict:
                     if not isinstance(tdict[tkey], list):
-                       tdict[tkey] = [tdict[tkey], ]
+                        tdict[tkey] = [tdict[tkey]]
                     tdict[tkey].append(stdict)
                 else:
                     tdict[tkey] = stdict
         return tdict
-
 
     @classmethod
     def __parse_script(cls, script_data):
@@ -502,19 +528,19 @@ class NmapParser(object):
 
         _elt_dict = {}
         for script_elem in script_data:
-            if script_elem.tag == 'elem':
-                _elt_dict.update({script_elem.get('key'): script_elem.text})
-            elif script_elem.tag == 'table':
+            if script_elem.tag == "elem":
+                _elt_dict.update({script_elem.get("key"): script_elem.text})
+            elif script_elem.tag == "table":
                 tdict = cls.__parse_script_table(script_elem)
                 # Handle duplicate table keys
-                skey = script_elem.get('key')
+                skey = script_elem.get("key")
                 if skey in _elt_dict:
                     if not isinstance(_elt_dict[skey], list):
-                        _elt_dict[skey] = [_elt_dict[skey], ]
+                        _elt_dict[skey] = [_elt_dict[skey]]
                     _elt_dict[skey].append(tdict)
                 else:
                     _elt_dict[skey] = tdict
-        _script_dict['elements'] = _elt_dict
+        _script_dict["elements"] = _elt_dict
         return _script_dict
 
     @classmethod
@@ -532,7 +558,7 @@ class NmapParser(object):
         """
         _host_scripts = []
         for xscript in scripts_data:
-            if xscript.tag == 'script':
+            if xscript.tag == "script":
                 _script_dict = cls.__parse_script(xscript)
             _host_scripts.append(_script_dict)
         return _host_scripts
@@ -559,23 +585,23 @@ class NmapParser(object):
         for xos in xelement:
             # for nmap xml version < 1.04, osclass is not
             # embedded in osmatch
-            if xos.tag == 'osclass':
+            if xos.tag == "osclass":
                 os_class_proba = cls.__parse_osclass(xos)
                 os_class_probability.append(os_class_proba)
-            elif xos.tag == 'osmatch':
+            elif xos.tag == "osmatch":
                 os_match_proba = cls.__parse_osmatch(xos)
                 os_match_probability.append(os_match_proba)
-            elif xos.tag == 'portused':
+            elif xos.tag == "portused":
                 os_portused = cls.__format_attributes(xos)
                 os_ports_used.append(os_portused)
-            elif xos.tag == 'osfingerprint':
+            elif xos.tag == "osfingerprint":
                 os_fp_dict = cls.__format_attributes(xos)
                 os_fingerprints.append(os_fp_dict)
 
-        rdict['osmatches'] = os_match_probability
-        rdict['osclasses'] = os_class_probability
-        rdict['ports_used'] = os_ports_used
-        rdict['osfingerprints'] = os_fingerprints
+        rdict["osmatches"] = os_match_probability
+        rdict["osclasses"] = os_class_probability
+        rdict["ports_used"] = os_ports_used
+        rdict["osfingerprints"] = os_fingerprints
 
         return rdict
 
@@ -593,12 +619,12 @@ class NmapParser(object):
         """
         rdict = {}
         xelement = cls.__format_element(osmatch_data)
-        rdict['osmatch'] = cls.__format_attributes(xelement)
-        rdict['osclasses'] = []
+        rdict["osmatch"] = cls.__format_attributes(xelement)
+        rdict["osclasses"] = []
         for xmltag in xelement:
-            if xmltag.tag == 'osclass':
+            if xmltag.tag == "osclass":
                 _osclass_dict = cls.__parse_osclass(xmltag)
-                rdict['osclasses'].append(_osclass_dict)
+                rdict["osclasses"].append(_osclass_dict)
             else:
                 exmsg = "Unexcepted node in <osmatch>: {0}".format(xmltag.tag)
                 raise NmapParserException(exmsg)
@@ -618,12 +644,12 @@ class NmapParser(object):
         """
         rdict = {}
         xelement = cls.__format_element(osclass_data)
-        rdict['osclass'] = cls.__format_attributes(xelement)
-        rdict['cpe'] = []
+        rdict["osclass"] = cls.__format_attributes(xelement)
+        rdict["cpe"] = []
         for xmltag in xelement:
-            if xmltag.tag == 'cpe':
+            if xmltag.tag == "cpe":
                 _cpe_string = xmltag.text
-                rdict['cpe'].append(_cpe_string)
+                rdict["cpe"].append(_cpe_string)
             else:
                 exmsg = "Unexcepted node in <osclass>: {0}".format(xmltag.tag)
                 raise NmapParserException(exmsg)
@@ -645,7 +671,7 @@ class NmapParser(object):
 
         rdict = {}
         for xmltag in xelement:
-            if xmltag.tag in ['finished', 'hosts']:
+            if xmltag.tag in ["finished", "hosts"]:
                 rdict[xmltag.tag] = cls.__format_attributes(xmltag)
             else:
                 exmsg = "Unexcepted node in <runstats>: {0}".format(xmltag.tag)
@@ -669,15 +695,19 @@ class NmapParser(object):
         if isinstance(elt_data, str):
             try:
                 xelement = ET.fromstring(elt_data)
-            except:
-                raise NmapParserException("Error while trying "
-                                          "to instanciate XML Element from "
-                                          "string {0}".format(elt_data))
+            except Exception as e:
+                raise NmapParserException(
+                    "Error while trying "
+                    "to instanciate XML Element from "
+                    "string {0} - {1}".format(elt_data, e)
+                )
         elif ET.iselement(elt_data):
             xelement = elt_data
         else:
-            raise NmapParserException("Error while trying to parse supplied "
-                                      "data: unsupported format")
+            raise NmapParserException(
+                "Error while trying to parse supplied "
+                "data: unsupported format"
+            )
         return xelement
 
     @staticmethod
@@ -695,17 +725,21 @@ class NmapParser(object):
 
         rval = {}
         if not ET.iselement(elt_data):
-            raise NmapParserException("Error while trying to parse supplied "
-                                      "data attributes: format is not XML or "
-                                      "XML tag is empty")
+            raise NmapParserException(
+                "Error while trying to parse supplied "
+                "data attributes: format is not XML or "
+                "XML tag is empty"
+            )
         try:
             for dkey in elt_data.keys():
                 rval[dkey] = elt_data.get(dkey)
                 if rval[dkey] is None:
-                    raise NmapParserException("Error while trying to build-up "
-                                              "element attributes: empty "
-                                              "attribute {0}".format(dkey))
-        except:
+                    raise NmapParserException(
+                        "Error while trying to build-up "
+                        "element attributes: empty "
+                        "attribute {0}".format(dkey)
+                    )
+        except Exception:
             raise
         return rval
 

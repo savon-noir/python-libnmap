@@ -3,7 +3,7 @@
 
 from libnmap.parser import NmapParser
 
-rep = NmapParser.parse_fromfile('libnmap/test/files/full_sudo6.xml')
+rep = NmapParser.parse_fromfile("libnmap/test/files/full_sudo6.xml")
 
 print("Nmap scan discovered {0}/{1} hosts up".format(rep.hosts_up,
                                                      rep.hosts_total))

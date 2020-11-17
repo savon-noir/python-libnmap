@@ -20,6 +20,7 @@ class NmapReport(object):
         end user of the lib. NmapReport is certainly the output interface for
         the end user of the lib.
     """
+
     def __init__(self, raw_data=None):
         """
             Constructor for NmapReport object.
@@ -77,24 +78,24 @@ class NmapReport(object):
         """
         rval = -1
         try:
-            s_start = self._nmaprun['start']
+            s_start = self._nmaprun["start"]
             rval = int(s_start)
-        except(KeyError, TypeError, ValueError):
+        except (KeyError, TypeError, ValueError):
             pass
         return rval
 
     @property
     def startedstr(self):
         """
-            Accessor returning a human readable string of when the 
+            Accessor returning a human readable string of when the
             scan was started
 
             :return: string
         """
-        rval = ''
+        rval = ""
         try:
-            rval = self._nmaprun['startstr']
-        except(KeyError, TypeError, ValueError):
+            rval = self._nmaprun["startstr"]
+        except (KeyError, TypeError, ValueError):
             pass
         return rval
 
@@ -105,7 +106,7 @@ class NmapReport(object):
 
             :return: string
         """
-        return self._nmaprun['args']
+        return self._nmaprun["args"]
 
     @property
     def version(self):
@@ -115,7 +116,7 @@ class NmapReport(object):
 
             :return: string
         """
-        return self._nmaprun['version']
+        return self._nmaprun["version"]
 
     @property
     def xmlversion(self):
@@ -125,7 +126,7 @@ class NmapReport(object):
 
             :return: string
         """
-        return self._nmaprun['xmloutputversion']
+        return self._nmaprun["xmloutputversion"]
 
     @property
     def scan_type(self):
@@ -135,21 +136,21 @@ class NmapReport(object):
 
             :return: string
         """
-        return self._scaninfo.get('type')
+        return self._scaninfo.get("type")
 
     @property
     def numservices(self):
         """
-            Accessor returning the number of services the 
+            Accessor returning the number of services the
             scan attempted to enumerate.
 
             :return: integer
         """
         rval = -1
         try:
-            s_numsvcs = self._scaninfo.get('numservices')
+            s_numsvcs = self._scaninfo.get("numservices")
             rval = int(s_numsvcs)
-        except(KeyError, TypeError, ValueError):
+        except (KeyError, TypeError, ValueError):
             pass
         return rval
 
@@ -189,8 +190,8 @@ class NmapReport(object):
         """
         rval = -1
         try:
-            rval = int(self._runstats['finished']['time'])
-        except(KeyError, TypeError, ValueError):
+            rval = int(self._runstats["finished"]["time"])
+        except (KeyError, TypeError, ValueError):
             pass
         return rval
 
@@ -202,10 +203,10 @@ class NmapReport(object):
 
             :return: string
         """
-        rval = ''
+        rval = ""
         try:
-            rval = self._runstats['finished']['timestr']
-        except(KeyError, TypeError, ValueError):
+            rval = self._runstats["finished"]["timestr"]
+        except (KeyError, TypeError, ValueError):
             pass
         return rval
 
@@ -217,18 +218,22 @@ class NmapReport(object):
 
             :return: string
         """
-        rval = ''
+        rval = ""
         try:
-            rval = self._runstats['finished']['summary']
-        except(KeyError, TypeError):
+            rval = self._runstats["finished"]["summary"]
+        except (KeyError, TypeError):
             pass
 
         if len(rval) == 0:
-            rval = ("Nmap ended at {0} ; {1} IP addresses ({2} hosts up)"
-                    " scanned in {3} seconds".format(self.endtimestr,
-                                                     self.hosts_total,
-                                                     self.hosts_up,
-                                                     self.elapsed))
+            rval = (
+                "Nmap ended at {0} ; {1} IP addresses ({2} hosts up)"
+                " scanned in {3} seconds".format(
+                    self.endtimestr,
+                    self.hosts_total,
+                    self.hosts_up,
+                    self.elapsed
+                )
+            )
         return rval
 
     @property
@@ -240,7 +245,7 @@ class NmapReport(object):
         """
         rval = -1
         try:
-            s_elapsed = self._runstats['finished']['elapsed']
+            s_elapsed = self._runstats["finished"]["elapsed"]
             rval = float(s_elapsed)
         except (KeyError, TypeError, ValueError):
             rval = -1
@@ -256,7 +261,7 @@ class NmapReport(object):
         """
         rval = -1
         try:
-            s_up = self._runstats['hosts']['up']
+            s_up = self._runstats["hosts"]["up"]
             rval = int(s_up)
         except (KeyError, TypeError, ValueError):
             rval = -1
@@ -272,7 +277,7 @@ class NmapReport(object):
         """
         rval = -1
         try:
-            s_down = self._runstats['hosts']['down']
+            s_down = self._runstats["hosts"]["down"]
             rval = int(s_down)
         except (KeyError, TypeError, ValueError):
             rval = -1
@@ -287,7 +292,7 @@ class NmapReport(object):
         """
         rval = -1
         try:
-            s_total = self._runstats['hosts']['total']
+            s_total = self._runstats["hosts"]["total"]
             rval = int(s_total)
         except (KeyError, TypeError, ValueError):
             rval = -1
@@ -300,17 +305,19 @@ class NmapReport(object):
             :return: dict
             :todo: deprecate. get rid of this uglyness.
         """
-        raw_data = {'_nmaprun': self._nmaprun,
-                    '_scaninfo': self._scaninfo,
-                    '_hosts': self._hosts,
-                    '_runstats': self._runstats}
+        raw_data = {
+            "_nmaprun": self._nmaprun,
+            "_scaninfo": self._scaninfo,
+            "_hosts": self._hosts,
+            "_runstats": self._runstats,
+        }
         return raw_data
 
     def __set_raw_data(self, raw_data):
-        self._nmaprun = raw_data['_nmaprun']
-        self._scaninfo = raw_data['_scaninfo']
-        self._hosts = raw_data['_hosts']
-        self._runstats = raw_data['_runstats']
+        self._nmaprun = raw_data["_nmaprun"]
+        self._scaninfo = raw_data["_scaninfo"]
+        self._hosts = raw_data["_hosts"]
+        self._runstats = raw_data["_runstats"]
 
     def is_consistent(self):
         """
@@ -322,9 +329,11 @@ class NmapReport(object):
         """
         rval = False
         rdata = self.get_raw_data()
-        _consistent_keys = ['_nmaprun', '_scaninfo', '_hosts', '_runstats']
-        if(set(_consistent_keys) == set(rdata.keys()) and
-           len([dky for dky in rdata.keys() if rdata[dky] is not None]) == 4):
+        _consistent_keys = ["_nmaprun", "_scaninfo", "_hosts", "_runstats"]
+        if (
+            set(_consistent_keys) == set(rdata.keys()) and
+            len([dky for dky in rdata.keys() if rdata[dky] is not None]) == 4
+        ):
             rval = True
         return rval
 
@@ -335,16 +344,26 @@ class NmapReport(object):
 
             :return: dict
         """
-        rdict = dict([("{0}::{1}".format(_host.__class__.__name__,
-                                         str(_host.id)),
-                     hash(_host)) for _host in self.hosts])
-        rdict.update({'commandline': self.commandline,
-                      'version': self.version,
-                      'scan_type': self.scan_type,
-                      'elapsed': self.elapsed,
-                      'hosts_up': self.hosts_up,
-                      'hosts_down': self.hosts_down,
-                      'hosts_total': self.hosts_total})
+        rdict = dict(
+            [
+                (
+                    "{0}::{1}".format(_host.__class__.__name__, str(_host.id)),
+                    hash(_host),
+                )
+                for _host in self.hosts
+            ]
+        )
+        rdict.update(
+            {
+                "commandline": self.commandline,
+                "version": self.version,
+                "scan_type": self.scan_type,
+                "elapsed": self.elapsed,
+                "hosts_up": self.hosts_up,
+                "hosts_down": self.hosts_down,
+                "hosts_total": self.hosts_total,
+            }
+        )
         return rdict
 
     @property
@@ -364,12 +383,13 @@ class NmapReport(object):
             :return: boolean
         """
         rval = False
-        if(self.__class__ == other.__class__ and self.id == other.id):
+        if self.__class__ == other.__class__ and self.id == other.id:
             diffobj = self.diff(other)
-            rval = (len(diffobj.changed()) == 0 and
-                    len(diffobj.added()) == 0 and
-                    len(diffobj.removed()) == 0
-                    )
+            rval = (
+                len(diffobj.changed()) == 0
+                and len(diffobj.added()) == 0
+                and len(diffobj.removed()) == 0
+            )
         return rval
 
     def __ne__(self, other):
@@ -382,17 +402,19 @@ class NmapReport(object):
             :return: boolean
         """
         rval = True
-        if(self.__class__ == other.__class__ and self.id == other.id):
+        if self.__class__ == other.__class__ and self.id == other.id:
             diffobj = self.diff(other)
-            rval = (len(diffobj.changed()) != 0 or
-                    len(diffobj.added()) != 0 or
-                    len(diffobj.removed()) != 0
-                    )
+            rval = (
+                len(diffobj.changed()) != 0
+                or len(diffobj.added()) != 0
+                or len(diffobj.removed()) != 0
+            )
         return rval
 
     def __repr__(self):
         return "{0}: started at {1} hosts up {2}/{3}".format(
-               self.__class__.__name__,
-               self.started,
-               self.hosts_up,
-               self.hosts_total)
+            self.__class__.__name__,
+            self.started,
+            self.hosts_up,
+            self.hosts_total
+        )

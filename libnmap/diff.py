@@ -9,6 +9,7 @@ class DictDiffer(object):
         (3) keys same in both but changed values
         (4) keys same in both and unchanged values
     """
+
     def __init__(self, current_dict, past_dict):
         self.current_dict = current_dict
         self.past_dict = past_dict
@@ -23,12 +24,20 @@ class DictDiffer(object):
         return self.set_past - self.intersect
 
     def changed(self):
-        return (set(o for o in self.intersect
-                if self.past_dict[o] != self.current_dict[o]))
+        return (
+            set(
+                o for o in self.intersect
+                if self.past_dict[o] != self.current_dict[o]
+            )
+        )
 
     def unchanged(self):
-        return (set(o for o in self.intersect
-                if self.past_dict[o] == self.current_dict[o]))
+        return (
+            set(
+                o for o in self.intersect
+                if self.past_dict[o] == self.current_dict[o]
+            )
+        )
 
 
 class NmapDiff(DictDiffer):
@@ -54,6 +63,7 @@ class NmapDiff(DictDiffer):
         refer to the get_dict() method of the objects you which to
         compare (i.e: libnmap.objects.NmapHost, NmapService,...).
     """
+
     def __init__(self, nmap_obj1, nmap_obj2):
         """
             Constructor of NmapDiff:
@@ -72,11 +82,12 @@ class NmapDiff(DictDiffer):
         DictDiffer.__init__(self, self.object1, self.object2)
 
     def __repr__(self):
-        return ("added: [{0}] -- changed: [{1}] -- "
-                "unchanged: [{2}] -- removed [{3}]".format(self.added(),
-                                                           self.changed(),
-                                                           self.unchanged(),
-                                                           self.removed()))
+        return (
+            "added: [{0}] -- changed: [{1}] -- "
+            "unchanged: [{2}] -- removed [{3}]".format(
+                self.added(), self.changed(), self.unchanged(), self.removed()
+            )
+        )
 
 
 class NmapDiffException(Exception):
