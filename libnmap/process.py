@@ -354,9 +354,9 @@ class NmapProcess(Thread):
         :return: True if nmap process is not running anymore.
         """
         return (
-            self.state == self.DONE
-            or self.state == self.FAILED
-            or self.state == self.CANCELLED
+            self.state == self.DONE or
+            self.state == self.FAILED or
+            self.state == self.CANCELLED
         )
 
     def has_failed(self):
@@ -675,15 +675,17 @@ def main():
     )
     rc = nm.run()
     if rc == 0:
-        print("Scan started at {0} nmap version: {1}").format(nm.starttime,
-                                                              nm.version)
-        print("state: {0} (rc: {1})").format(nm.state, nm.rc)
-        print("results size: {0}").format(len(nm.stdout))
-        print("Scan ended {0}: {1}").format(nm.endtime, nm.summary)
+        print("Scan started at {0} nmap version: {1}".format(
+            nm.starttime, nm.version
+            )
+        )
+        print("state: {0} (rc: {1})".format(nm.state, nm.rc))
+        print("results size: {0}".format(len(nm.stdout)))
+        print("Scan ended {0}: {1}".format(nm.endtime, nm.summary))
     else:
-        print("state: {0} (rc: {1})").format(nm.state, nm.rc)
-        print("Error: {stderr}").format(stderr=nm.stderr)
-        print("Result: {0}").format(nm.stdout)
+        print("state: {0} (rc: {1})".format(nm.state, nm.rc))
+        print("Error: {stderr}".format(stderr=nm.stderr))
+        print("Result: {0}".format(nm.stdout))
 
 
 if __name__ == "__main__":
