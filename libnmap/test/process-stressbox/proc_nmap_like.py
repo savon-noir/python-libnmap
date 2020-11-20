@@ -20,9 +20,11 @@ def do_scan(targets, options):
 
 # print scan results from a nmap report
 def print_scan(nmap_report):
-    print("Starting Nmap {0} ( http://nmap.org ) at {1}".format(
-        nmap_report._nmaprun['version'],
-        nmap_report._nmaprun['startstr']))
+    print(
+        "Starting Nmap {0} ( http://nmap.org ) at {1}".format(
+            nmap_report._nmaprun["version"], nmap_report._nmaprun["startstr"]
+        )
+    )
 
     for host in nmap_report.hosts:
         if len(host.hostnames):
@@ -30,18 +32,14 @@ def print_scan(nmap_report):
         else:
             tmp_host = host.address
 
-        print("Nmap scan report for {0} ({1})".format(
-            tmp_host,
-            host.address))
+        print("Nmap scan report for {0} ({1})".format(tmp_host, host.address))
         print("Host is {0}.".format(host.status))
         print("  PORT     STATE         SERVICE")
 
         for serv in host.services:
             pserv = "{0:>5s}/{1:3s}  {2:12s}  {3}".format(
-                    str(serv.port),
-                    serv.protocol,
-                    serv.state,
-                    serv.service)
+                str(serv.port), serv.protocol, serv.state, serv.service
+            )
             if len(serv.banner):
                 pserv += " ({0})".format(serv.banner)
             print(pserv)

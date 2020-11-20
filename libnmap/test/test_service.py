@@ -166,6 +166,7 @@ port_tunnel = """
     <service name="https" method="probed" tunnel="ssl" conf="10"/>
 </port>"""
 
+
 class TestNmapService(unittest.TestCase):
     def setUp(self):
         self.s1 = NmapParser.parse(service1)
@@ -182,22 +183,23 @@ class TestNmapService(unittest.TestCase):
         nservice3 = NmapParser.parse(port_string_other3)
         nservice4 = NmapParser.parse(port_string_other4)
 
-        self.assertEqual(nservice1.diff(nservice2).changed(), set(['state']))
+        self.assertEqual(nservice1.diff(nservice2).changed(), set(["state"]))
         self.assertRaises(NmapDiffException, nservice1.diff, nservice3)
         self.assertRaises(NmapDiffException, nservice1.diff, nservice4)
-#
+        #
         self.assertRaises(NmapDiffException, nservice2.diff, nservice3)
-        self.assertEqual(nservice3.diff(nservice4).changed(),
-                         set(['state', 'service']))
+        self.assertEqual(nservice3.diff(nservice4).changed(), set(["state", "service"]))
 
     def test_port_state_unchanged(self):
         nservice1 = NmapParser.parse(port_string)
         nservice2 = NmapParser.parse(port_string_other2)
-        #nservice3 = NmapParser.parse(port_string_other3)
-        #nservice4 = NmapParser.parse(port_string_other4)
+        # nservice3 = NmapParser.parse(port_string_other3)
+        # nservice4 = NmapParser.parse(port_string_other4)
 
-        self.assertEqual(nservice1.diff(nservice2).unchanged(),
-                         set(['banner', 'protocol', 'port', 'service', 'id', 'reason']))
+        self.assertEqual(
+            nservice1.diff(nservice2).unchanged(),
+            set(["banner", "protocol", "port", "service", "id", "reason"]),
+        )
 
     def test_port_service_changed(self):
         nservice1 = NmapParser.parse(port_string)
@@ -207,13 +209,10 @@ class TestNmapService(unittest.TestCase):
         nservice8 = NmapParser.parse(port_string_other8)
         nservice9 = NmapParser.parse(port_string_other9)
 
-        self.assertEqual(nservice1.diff(nservice2).changed(),
-                         set(['state']))
-        self.assertEqual(nservice5.diff(nservice4).changed(),
-                         set(['service']))
+        self.assertEqual(nservice1.diff(nservice2).changed(), set(["state"]))
+        self.assertEqual(nservice5.diff(nservice4).changed(), set(["service"]))
         # banner changed
-        self.assertEqual(nservice8.diff(nservice9).changed(),
-                         set(['banner']))
+        self.assertEqual(nservice8.diff(nservice9).changed(), set(["banner"]))
 
     def test_eq_service(self):
         self.assertNotEqual(NmapDiffException, self.s1, self.s2)
@@ -226,19 +225,20 @@ class TestNmapService(unittest.TestCase):
     def test_diff_service(self):
         self.assertRaises(NmapDiffException, self.s1.diff, self.s2)
         self.assertRaises(NmapDiffException, self.s1.diff, self.s3)
-        self.assertEqual(self.s1.diff(self.s4).changed(), set(['state']))
-        self.assertEqual(self.s1.diff(self.s4).unchanged(),
-                         set(['banner', 'protocol', 'port', 'service',
-                              'id', 'reason']))
+        self.assertEqual(self.s1.diff(self.s4).changed(), set(["state"]))
+        self.assertEqual(
+            self.s1.diff(self.s4).unchanged(),
+            set(["banner", "protocol", "port", "service", "id", "reason"]),
+        )
 
-        self.assertEqual(self.s5.diff(self.s6).changed(), set(['banner']))
+        self.assertEqual(self.s5.diff(self.s6).changed(), set(["banner"]))
         self.assertEqual(self.s6.diff(self.s6).changed(), set([]))
 
     def test_diff_reason(self):
         nservice12 = NmapParser.parse(port_string_other12)
         nservice13 = NmapParser.parse(port_string_other13)
         ddict = nservice12.diff(nservice13)
-        self.assertEqual(ddict.changed(), set(['reason']))
+        self.assertEqual(ddict.changed(), set(["reason"]))
 
     def test_noservice(self):
         noservice = NmapParser.parse(port_noservice)
@@ -253,9 +253,13 @@ class TestNmapService(unittest.TestCase):
         self.assertEqual(servicetunnel.tunnel, "ssl")
 
 
-if __name__ == '__main__':
-    test_suite = ['test_port_state_changed', 'test_port_state_unchanged',
-                  'test_port_service_changed', 'test_eq_service',
-                  'test_diff_service']
+if __name__ == "__main__":
+    test_suite = [
+        "test_port_state_changed",
+        "test_port_state_unchanged",
+        "test_port_service_changed",
+        "test_eq_service",
+        "test_diff_service",
+    ]
     suite = unittest.TestSuite(map(TestNmapService, test_suite))
     test_result = unittest.TextTestRunner(verbosity=2).run(suite)

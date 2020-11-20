@@ -11,8 +11,16 @@ class NmapService(object):
         Depending on the scanning options, some additional details might be
         available or not. Like banner or extra datas from NSE (nmap scripts).
     """
-    def __init__(self, portid, protocol='tcp', state=None,
-                 service=None, owner=None, service_extras=None):
+
+    def __init__(
+        self,
+        portid,
+        protocol="tcp",
+        state=None,
+        service=None,
+        owner=None,
+        service_extras=None,
+    ):
         """
             Constructor
 
@@ -39,32 +47,32 @@ class NmapService(object):
         self._service = service if service is not None else {}
 
         self._cpelist = []
-        if 'cpelist' in self._service:
-            for _cpe in self._service['cpelist']:
+        if "cpelist" in self._service:
+            for _cpe in self._service["cpelist"]:
                 _cpeobj = CPE(_cpe)
                 self._cpelist.append(_cpeobj)
 
-        self._owner = ''
-        if owner is not None and 'name' in owner:
-            self._owner = owner['name']
+        self._owner = ""
+        if owner is not None and "name" in owner:
+            self._owner = owner["name"]
 
-        self._reason = ''
-        self._reason_ip = ''
-        self._reason_ttl = ''
-        self._servicefp = ''
-        self._tunnel = ''
+        self._reason = ""
+        self._reason_ip = ""
+        self._reason_ttl = ""
+        self._servicefp = ""
+        self._tunnel = ""
 
-        if 'reason' in self._state:
-            self._reason = self._state['reason']
-        if 'reason_ttl' in self._state:
-            self._reason_ttl = self._state['reason_ttl']
-        if 'reason_ip' in self._state:
-            self._reason_ip = self._state['reason_ip']
+        if "reason" in self._state:
+            self._reason = self._state["reason"]
+        if "reason_ttl" in self._state:
+            self._reason_ttl = self._state["reason_ttl"]
+        if "reason_ip" in self._state:
+            self._reason_ip = self._state["reason_ip"]
 
-        if 'servicefp' in self._service:
-            self._servicefp = self._service['servicefp']
-        if 'tunnel' in self._service:
-            self._tunnel = self._service['tunnel']
+        if "servicefp" in self._service:
+            self._servicefp = self._service["servicefp"]
+        if "tunnel" in self._service:
+            self._tunnel = self._service["tunnel"]
 
         self._service_extras = []
         if service_extras is not None:
@@ -80,8 +88,8 @@ class NmapService(object):
             :return: boolean
         """
         rval = False
-        if(self.__class__ == other.__class__ and self.id == other.id):
-            rval = (self.changed(other) == 0)
+        if self.__class__ == other.__class__ and self.id == other.id:
+            rval = self.changed(other) == 0
         return rval
 
     def __ne__(self, other):
@@ -94,21 +102,29 @@ class NmapService(object):
             :return: boolean
         """
         rval = True
-        if(self.__class__ == other.__class__ and self.id == other.id):
-            rval = (self.changed(other) > 0)
+        if self.__class__ == other.__class__ and self.id == other.id:
+            rval = self.changed(other) > 0
         return rval
 
     def __repr__(self):
-        return "{0}: [{1} {2}/{3} {4} ({5})]".format(self.__class__.__name__,
-                                                     self.state,
-                                                     str(self.port),
-                                                     self.protocol,
-                                                     self.service,
-                                                     self.banner)
+        return "{0}: [{1} {2}/{3} {4} ({5})]".format(
+            self.__class__.__name__,
+            self.state,
+            str(self.port),
+            self.protocol,
+            self.service,
+            self.banner,
+        )
 
     def __hash__(self):
-        return (hash(self.port) ^ hash(self.protocol) ^ hash(self.state) ^
-                hash(self.reason) ^ hash(self.service) ^ hash(self.banner))
+        return (
+            hash(self.port)
+            ^ hash(self.protocol)
+            ^ hash(self.state)
+            ^ hash(self.reason)
+            ^ hash(self.service)
+            ^ hash(self.banner)
+        )
 
     def changed(self, other):
         """
@@ -145,7 +161,7 @@ class NmapService(object):
 
             :return: string
         """
-        return self._state['state'] if 'state' in self._state else None
+        return self._state["state"] if "state" in self._state else None
 
     @property
     def reason(self):
@@ -181,7 +197,7 @@ class NmapService(object):
 
             :return: string or empty
         """
-        return self._service['name'] if 'name' in self._service else ''
+        return self._service["name"] if "name" in self._service else ""
 
     @property
     def service_dict(self):
@@ -198,7 +214,7 @@ class NmapService(object):
 
             :return: boolean
         """
-        return 'state' in self._state and self._state['state'] == 'open'
+        return "state" in self._state and self._state["state"] == "open"
 
     @property
     def owner(self):
@@ -215,18 +231,24 @@ class NmapService(object):
 
             :return: string
         """
-        notrelevant = ['name', 'method', 'conf', 'cpelist',
-                       'servicefp', 'tunnel']
-        relevant = ['product', 'version', 'extrainfo']
-        b = ''
+        notrelevant = [
+            "name",
+            "method",
+            "conf",
+            "cpelist",
+            "servicefp",
+            "tunnel"
+        ]
+        relevant = ["product", "version", "extrainfo"]
+        b = ""
         skeys = self._service.keys()
-        if 'method' in self._service and self._service['method'] == "probed":
+        if "method" in self._service and self._service["method"] == "probed":
             for relk in relevant:
                 if relk in skeys:
-                    b += '{0}: {1} '.format(relk, self._service[relk])
+                    b += "{0}: {1} ".format(relk, self._service[relk])
             for mkey in skeys:
                 if mkey not in notrelevant and mkey not in relevant:
-                    b += '{0}: {1} '.format(mkey, self._service[mkey])
+                    b += "{0}: {1} ".format(mkey, self._service[mkey])
         return b.rstrip()
 
     @property
@@ -248,7 +270,7 @@ class NmapService(object):
         """
         scripts_dict = None
         try:
-            scripts_dict = self._service_extras['scripts']
+            scripts_dict = self._service_extras["scripts"]
         except (KeyError, TypeError):
             pass
         return scripts_dict
@@ -293,10 +315,15 @@ class NmapService(object):
 
             :return: dict
         """
-        return ({'id': str(self.id), 'port': str(self.port),
-                 'protocol': self.protocol, 'banner': self.banner,
-                 'service': self.service, 'state': self.state,
-                 'reason': self.reason})
+        return {
+            "id": str(self.id),
+            "port": str(self.port),
+            "protocol": self.protocol,
+            "banner": self.banner,
+            "service": self.service,
+            "state": self.state,
+            "reason": self.reason,
+        }
 
     def diff(self, other):
         """

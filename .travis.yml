@@ -6,26 +6,24 @@ python:
   - "3.6"
   - "3.7"
 # command to install dependencies
-env:
-  - MONGO_VERSION=2.4.3
+# env:
+#   - MONGO_VERSION=2.4.3
 
-services: mongodb
+# services: mongodb
 
 before_install:
   - "sudo apt-get update -qq"
   - "sudo apt-get install nmap -qq"
 install:
-  - "pip install pep8"
-  - "pip install pyflakes"
-#  - "pip install boto" # disabled: since boto not supporting py3
-#  - "pip install pymongo sqlalchemy MySQL-python" # disabled MySQL-python (not py3 compatible)
-  - "pip install pymongo sqlalchemy pymysql"
+  - "pip install flake8"
+  # - "pip install boto" # disabled: since boto not supporting py3
+  # - "pip install pymongo sqlalchemy MySQL-python" # disabled MySQL-python (not py3 compatible)
+  # - "pip install pymongo sqlalchemy pymysql"
   - "pip install coveralls"
-  - "python setup.py install"
+  - "pip install ."
 before_script:
-  - "pep8 . --exclude test,docs,examples"
-  - "pyflakes ."
-  - mysql -e 'create database poulet;'
+  - "flake8 . --exclude test,docs,examples"
+  # - mysql -e 'create database poulet;'
 script: nosetests --with-coverage --cover-package=libnmap
 after_success:
   coveralls

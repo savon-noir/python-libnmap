@@ -6,9 +6,10 @@ class NmapBackendPlugin(object):
         Abstract class showing to the minimal implementation for a plugin
         All subclass MUST at least implement the following methods
     """
+
     def __init__(self):
-        self.dbname = 'nmapdb'
-        self.store = 'reports'
+        self.dbname = "nmapdb"
+        self.store = "reports"
 
     def insert(self, NmapReport):
         """

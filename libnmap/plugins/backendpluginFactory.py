@@ -9,6 +9,7 @@ class BackendPluginFactory(object):
         created via the static method create()
         ie : mybackend = BackendPluginFactory.create()
     """
+
     @classmethod
     def create(cls, plugin_name="mongodb", **kwargs):
         """Import the needed lib and return an object NmapBackendPlugin
