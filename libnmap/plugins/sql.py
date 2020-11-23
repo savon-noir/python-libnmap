@@ -100,7 +100,7 @@ class NmapSqlPlugin(NmapBackendPlugin):
             Base.metadata.create_all(bind=self.engine, checkfirst=True)
             self.Session.configure(bind=self.engine)
         except Exception as e:
-            raise(e)
+            raise (e)
 
     def insert(self, nmap_report):
         """

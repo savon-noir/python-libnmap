@@ -231,7 +231,7 @@ class NmapReport(object):
                     self.endtimestr,
                     self.hosts_total,
                     self.hosts_up,
-                    self.elapsed
+                    self.elapsed,
                 )
             )
         return rval
@@ -303,7 +303,7 @@ class NmapReport(object):
             Returns a dict representing the NmapReport object.
 
             :return: dict
-            :todo: deprecate. get rid of this uglyness.
+            :todo: deprecate. get rid of this ugliness.
         """
         raw_data = {
             "_nmaprun": self._nmaprun,
@@ -327,14 +327,13 @@ class NmapReport(object):
 
             :return: boolean
         """
-        rval = False
+        rval = True
         rdata = self.get_raw_data()
         _consistent_keys = ["_nmaprun", "_scaninfo", "_hosts", "_runstats"]
-        if (
-            set(_consistent_keys) == set(rdata.keys()) and
-            len([dky for dky in rdata.keys() if rdata[dky] is not None]) == 4
-        ):
-            rval = True
+        if set(_consistent_keys) != set(rdata):
+            rval = False
+        if None in rdata.values():
+            rval = False
         return rval
 
     def get_dict(self):
@@ -416,5 +415,5 @@ class NmapReport(object):
             self.__class__.__name__,
             self.started,
             self.hosts_up,
-            self.hosts_total
+            self.hosts_total,
         )

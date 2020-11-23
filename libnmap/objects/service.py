@@ -237,7 +237,7 @@ class NmapService(object):
             "conf",
             "cpelist",
             "servicefp",
-            "tunnel"
+            "tunnel",
         ]
         relevant = ["product", "version", "extrainfo"]
         b = ""

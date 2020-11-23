@@ -20,84 +20,63 @@ class TestNmapBackendPlugin(unittest.TestCase):
     with the necessary parameter in the urls table define in setUp
     All testcase must loop thru theses urls to validate a plugins
     """
+
     def setUp(self):
         fdir = os.path.dirname(os.path.realpath(__file__))
         self.flist_full = [
+            {"file": "{0}/{1}".format(fdir, "files/2_hosts.xml"), "hosts": 2},
+            {"file": "{0}/{1}".format(fdir, "files/1_hosts.xml"), "hosts": 1},
             {
-                'file': "{0}/{1}".format(fdir, "files/2_hosts.xml"),
-                'hosts': 2
+                "file": "{0}/{1}".format(
+                    fdir, "files/1_hosts_banner_ports_notsyn.xml"
+                ),
+                "hosts": 1,
             },
             {
-                'file': "{0}/{1}".format(fdir, "files/1_hosts.xml"),
-                'hosts': 1
+                "file": "{0}/{1}".format(
+                    fdir, "files/1_hosts_banner_ports.xml"
+                ),
+                "hosts": 1,
             },
             {
-                'file': "{0}/{1}".format(
-                                    fdir,
-                                    "files/1_hosts_banner_ports_notsyn.xml"
-                                ),
-                'hosts': 1
+                "file": "{0}/{1}".format(fdir, "files/1_hosts_banner.xml"),
+                "hosts": 1,
             },
             {
-                'file': "{0}/{1}".format(
-                                    fdir,
-                                    'files/1_hosts_banner_ports.xml'
-                                ),
-                'hosts': 1
+                "file": "{0}/{1}".format(fdir, "files/2_hosts_version.xml"),
+                "hosts": 2,
             },
             {
-                'file': "{0}/{1}".format(
-                                    fdir,
-                                    'files/1_hosts_banner.xml'
-                                ),
-                'hosts': 1
+                "file": "{0}/{1}".format(fdir, "files/2_tcp_hosts.xml"),
+                "hosts": 2,
             },
             {
-                'file': "{0}/{1}".format(
-                                    fdir,
-                                    'files/2_hosts_version.xml'
-                                ),
-                'hosts': 2
+                "file": "{0}/{1}".format(fdir, "files/1_hosts_nohostname.xml"),
+                "hosts": 1,
             },
-            {
-                'file': "{0}/{1}".format(
-                                    fdir,
-                                    'files/2_tcp_hosts.xml'
-                                ),
-                'hosts': 2
-            },
-            {
-                'file': "{0}/{1}".format(
-                                    fdir,
-                                    'files/1_hosts_nohostname.xml'
-                                ),
-                'hosts': 1
-            }
         ]
         self.flist = self.flist_full
         # build a list of NmapReport
         self.reportList = []
         for testfile in self.flist:
-            fd = open(testfile['file'], 'r')
+            fd = open(testfile["file"], "r")
             s = fd.read()
             fd.close()
             nrp = NmapParser.parse(s)
             self.reportList.append(nrp)
 
         self.urls = [
+            {"plugin_name": "mongodb"},
             {
-                'plugin_name': "mongodb"
+                "plugin_name": "sql",
+                "url": "sqlite:////tmp/reportdb.sql",
+                "echo": False,
             },
             {
-                'plugin_name': 'sql',
-                'url': 'sqlite:////tmp/reportdb.sql',
-                'echo': False
+                "plugin_name": "sql",
+                "url": "mysql+pymysql://root@localhost/poulet",
+                "echo": False,
             },
-            {
-                'plugin_name': 'sql',
-                'url': 'mysql+pymysql://root@localhost/poulet',
-                'echo': False
-            }
         ]
 
     def test_backend_factory(self):
@@ -107,7 +86,7 @@ class TestNmapBackendPlugin(unittest.TestCase):
         for url in self.urls:
             backend = BackendPluginFactory.create(**url)
             self.assertEqual(isinstance(backend, NmapBackendPlugin), True)
-            className = "Nmap%sPlugin" % url['plugin_name'].title()
+            className = "Nmap%sPlugin" % url["plugin_name"].title()
             self.assertEqual(backend.__class__.__name__, className, True)
 
     def test_backend_insert(self):
@@ -163,13 +142,13 @@ class TestNmapBackendPlugin(unittest.TestCase):
             result_list = []
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_suite = [
-        'test_backend_factory',
-        'test_backend_insert',
-        'test_backend_get',
-        'test_backend_getall',
-        'test_backend_delete'
+        "test_backend_factory",
+        "test_backend_insert",
+        "test_backend_get",
+        "test_backend_getall",
+        "test_backend_delete",
     ]
     suite = unittest.TestSuite(map(TestNmapBackendPlugin, test_suite))
     test_result = unittest.TextTestRunner(verbosity=5).run(suite)

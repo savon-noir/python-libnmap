@@ -24,19 +24,17 @@ class DictDiffer(object):
         return self.set_past - self.intersect
 
     def changed(self):
-        return (
-            set(
-                o for o in self.intersect
-                if self.past_dict[o] != self.current_dict[o]
-            )
+        return set(
+            o
+            for o in self.intersect
+            if self.past_dict[o] != self.current_dict[o]
         )
 
     def unchanged(self):
-        return (
-            set(
-                o for o in self.intersect
-                if self.past_dict[o] == self.current_dict[o]
-            )
+        return set(
+            o
+            for o in self.intersect
+            if self.past_dict[o] == self.current_dict[o]
         )
 
 
@@ -72,8 +70,10 @@ class NmapDiff(DictDiffer):
             - Checks if the objects are "comparable" via a call to id() (dirty)
             - Inherits from DictDiffer and
         """
-        if(nmap_obj1.__class__ != nmap_obj2.__class__ or
-           nmap_obj1.id != nmap_obj2.id):
+        if (
+            nmap_obj1.__class__ != nmap_obj2.__class__
+            or nmap_obj1.id != nmap_obj2.id
+        ):
             raise NmapDiffException("Comparing objects with non-matching id")
 
         self.object1 = nmap_obj1.get_dict()

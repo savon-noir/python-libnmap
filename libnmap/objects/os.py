@@ -331,7 +331,7 @@ class NmapOSFingerprint(object):
             "osmatch": {
                 "name": _dname,
                 "accuracy": osclass_obj.accuracy,
-                "line": -1
+                "line": -1,
             },
             "osclasses": [],
         }

@@ -274,9 +274,9 @@ class NmapHost(object):
 
             :return: list: of tuples (port,'proto') ie:[(22,'tcp'),(25, 'tcp')]
         """
-        return ([
+        return [
             (p.port, p.protocol) for p in self._services if p.state == "open"
-        ])
+        ]
 
     def get_service(self, portno, protocol="tcp"):
         """
@@ -286,8 +286,9 @@ class NmapHost(object):
             :return: NmapService or None
         """
         plist = [
-            p for p in self._services if(p.port == portno and
-                                         p.protocol == protocol)
+            p
+            for p in self._services
+            if (p.port == portno and p.protocol == protocol)
         ]
         if len(plist) > 1:
             raise Exception("Duplicate services found in NmapHost object")

@@ -89,8 +89,7 @@ class NmapParser(object):
             )
         elif not isinstance(nmap_data, str):
             raise NmapParserException(
-                "wrong nmap_data type given as "
-                "argument: cannot parse data"
+                "wrong nmap_data type given as argument: cannot parse data"
             )
 
         if incomplete is True:
@@ -112,8 +111,9 @@ class NmapParser(object):
         elif root.tag == "port":
             nmapobj = cls._parse_xml_port(root)
         else:
-            raise NmapParserException("Unpexpected data structure for XML "
-                                      "root node")
+            raise NmapParserException(
+                "Unpexpected data structure for XML " "root node"
+            )
         return nmapobj
 
     @classmethod
@@ -132,12 +132,13 @@ class NmapParser(object):
             "_nmaprun": {},
             "_scaninfo": {},
             "_hosts": [],
-            "_runstats": {}
+            "_runstats": {},
         }
 
         if root is None:
-            raise NmapParserException("No root node provided to parse XML "
-                                      "report")
+            raise NmapParserException(
+                "No root node provided to parse XML " "report"
+            )
 
         nmap_scan["_nmaprun"] = cls.__format_attributes(root)
         for el in root:
@@ -183,9 +184,7 @@ class NmapParser(object):
 
     @classmethod
     def parse_fromfile(
-        cls, nmap_report_path,
-        data_type="XML",
-        incomplete=False
+        cls, nmap_report_path, data_type="XML", incomplete=False
     ):
         """
             Call generic cls.parse() method and ensure that a correct file \
@@ -330,12 +329,8 @@ class NmapParser(object):
             # else:
             #    print "struct host unknown attr: %s value: %s" %
             #           (h.tag, h.get(h.tag))
-        _stime = ""
-        _etime = ""
-        if "starttime" in _host_header:
-            _stime = _host_header["starttime"]
-        if "endtime" in _host_header:
-            _etime = _host_header["endtime"]
+        _stime = _host_header.get("starttime", "")
+        _etime = _host_header.get("endtime", "")
         nhost = NmapHost(
             _stime,
             _etime,
@@ -343,7 +338,7 @@ class NmapParser(object):
             _status,
             _hostnames,
             _services,
-            _host_extras
+            _host_extras,
         )
         return nhost
 

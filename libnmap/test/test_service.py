@@ -188,7 +188,9 @@ class TestNmapService(unittest.TestCase):
         self.assertRaises(NmapDiffException, nservice1.diff, nservice4)
         #
         self.assertRaises(NmapDiffException, nservice2.diff, nservice3)
-        self.assertEqual(nservice3.diff(nservice4).changed(), set(["state", "service"]))
+        self.assertEqual(
+            nservice3.diff(nservice4).changed(), set(["state", "service"])
+        )
 
     def test_port_state_unchanged(self):
         nservice1 = NmapParser.parse(port_string)
