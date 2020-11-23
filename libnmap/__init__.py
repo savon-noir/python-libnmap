@@ -4,5 +4,5 @@ __author__ = "Ronald Bister, Mike Boutillier"
 __credits__ = ["Ronald Bister", "Mike Boutillier"]
 __maintainer__ = "Ronald Bister"
 __email__ = "mini.pelle@gmail.com"
-__license__ = "CC-BY"
-__version__ = "0.6.1"
+__license__ = "Apache 2.0"
+__version__ = "0.7.1"
