@@ -2,9 +2,13 @@
 
 
 try:
-    import xml.etree.cElementTree as ET
+    import defusedxml.ElementTree as ET
 except ImportError:
-    import xml.etree.ElementTree as ET
+    try:
+        import xml.etree.cElementTree as ET
+    except ImportError:
+        import xml.etree.ElementTree as ET
+from xml.etree.ElementTree import iselement as et_iselement
 from libnmap.objects import NmapHost, NmapService, NmapReport
 
 
@@ -701,7 +705,7 @@ class NmapParser(object):
                     "to instanciate XML Element from "
                     "string {0} - {1}".format(elt_data, e)
                 )
-        elif ET.iselement(elt_data):
+        elif et_iselement(elt_data):
             xelement = elt_data
         else:
             raise NmapParserException(
@@ -724,7 +728,7 @@ class NmapParser(object):
         """
 
         rval = {}
-        if not ET.iselement(elt_data):
+        if not et_iselement(elt_data):
             raise NmapParserException(
                 "Error while trying to parse supplied "
                 "data attributes: format is not XML or "

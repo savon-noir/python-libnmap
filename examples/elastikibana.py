@@ -27,10 +27,9 @@ def get_os(nmap_host):
         cpelist = nmap_host.os.os_cpelist()
         if len(cpelist):
             mcpe = cpelist.pop()
-            rval.update({
-                    "vendor": mcpe.get_vendor(),
-                    "product": mcpe.get_product()
-            })
+            rval.update(
+                {"vendor": mcpe.get_vendor(), "product": mcpe.get_product()}
+            )
     return rval
 
 

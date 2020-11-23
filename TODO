@@ -1,3 +1,8 @@
+0.7.1: - clean-up blacked code and pylint it 
+0.7.1: - add unittest for defusedxml
+           - billionlaugh and external entities
+0.7.1: - add CSV backend support
+0.7.1: - Change License
 - improve API for NSE scripts
 - add support for post,pre and host scripts
 - complete unit tests with coverall support

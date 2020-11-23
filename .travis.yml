@@ -16,6 +16,7 @@ before_install:
   - "sudo apt-get install nmap -qq"
 install:
   - "pip install flake8"
+  - "pip install defusedxml"
   # - "pip install boto" # disabled: since boto not supporting py3
   # - "pip install pymongo sqlalchemy MySQL-python" # disabled MySQL-python (not py3 compatible)
   # - "pip install pymongo sqlalchemy pymysql"
