@@ -4,10 +4,15 @@
 from libnmap.parser import NmapParser, NmapParserException
 import unittest
 import os
-
+import sys
 
 class TestDefusedXML(unittest.TestCase):
     def setUp(self):
+        if int(sys.version[0]) == 3:
+            self._assertRaisesRegex = self.assertRaisesRegex
+        else:
+            self._assertRaisesRegex = self.assertRaisesRegexp
+
         self.billionlaugh = """<?xml version="1.0"?>
 <!DOCTYPE lolz [
 <!ENTITY lol "lol">
@@ -32,8 +37,8 @@ class TestDefusedXML(unittest.TestCase):
             self.fdir, "defused_et_local_includer.xml"
         )
 
-    def test_billion_laugh(self):
-        self.assertRaisesRegex(
+    def test_billion_laugh(self):       
+        self._assertRaisesRegex(
             NmapParserException,
             ".*EntitiesForbidden",
             NmapParser.parse_fromstring,
@@ -41,7 +46,7 @@ class TestDefusedXML(unittest.TestCase):
         )
 
     def test_external_entities(self):
-        self.assertRaisesRegex(
+        self._assertRaisesRegex(
             NmapParserException,
             ".*EntitiesForbidden",
             NmapParser.parse_fromfile,
