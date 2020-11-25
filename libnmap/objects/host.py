@@ -6,7 +6,7 @@ from libnmap.objects.os import NmapOSFingerprint
 
 class NmapHost(object):
     """
-        NmapHost is a class representing a host object of NmapReport
+    NmapHost is a class representing a host object of NmapReport
     """
 
     def __init__(
@@ -20,17 +20,17 @@ class NmapHost(object):
         extras=None,
     ):
         """
-            NmapHost constructor
-            :param starttime: unix timestamp of when the scan against
-            that host started
-            :type starttime: string
-            :param endtime: unix timestamp of when the scan against
-            that host ended
-            :type endtime: string
-            :param address: dict ie :{'addr': '127.0.0.1', 'addrtype': 'ipv4'}
-            :param status: dict ie:{'reason': 'localhost-response',
-                                    'state': 'up'}
-            :return: NmapHost:
+        NmapHost constructor
+        :param starttime: unix timestamp of when the scan against
+        that host started
+        :type starttime: string
+        :param endtime: unix timestamp of when the scan against
+        that host ended
+        :type endtime: string
+        :param address: dict ie :{'addr': '127.0.0.1', 'addrtype': 'ipv4'}
+        :param status: dict ie:{'reason': 'localhost-response',
+                                'state': 'up'}
+        :return: NmapHost:
         """
         self._starttime = starttime
         self._endtime = endtime
@@ -65,13 +65,13 @@ class NmapHost(object):
 
     def __eq__(self, other):
         """
-            Compare eq NmapHost based on :
+        Compare eq NmapHost based on :
 
-                - hostnames
-                - address
-                - if an associated services has changed
+            - hostnames
+            - address
+            - if an associated services has changed
 
-            :return: boolean
+        :return: boolean
         """
         rval = False
         if self.__class__ == other.__class__ and self.id == other.id:
@@ -80,13 +80,13 @@ class NmapHost(object):
 
     def __ne__(self, other):
         """
-            Compare ne NmapHost based on:
+        Compare ne NmapHost based on:
 
-                - hostnames
-                - address
-                - if an associated services has changed
+            - hostnames
+            - address
+            - if an associated services has changed
 
-            :return: boolean
+        :return: boolean
         """
         rval = True
         if self.__class__ == other.__class__ and self.id == other.id:
@@ -95,8 +95,8 @@ class NmapHost(object):
 
     def __repr__(self):
         """
-            String representing the object
-            :return: string
+        String representing the object
+        :return: string
         """
         return "{0}: [{1} ({2}) - {3}]".format(
             self.__class__.__name__,
@@ -107,8 +107,8 @@ class NmapHost(object):
 
     def __hash__(self):
         """
-            Hash is needed to be able to use our object in sets
-            :return: hash
+        Hash is needed to be able to use our object in sets
+        :return: hash
         """
         return (
             hash(self.status)
@@ -119,46 +119,46 @@ class NmapHost(object):
 
     def changed(self, other):
         """
-            return the number of attribute who have changed
-            :param other: NmapHost object to compare
-            :return int
+        return the number of attribute who have changed
+        :param other: NmapHost object to compare
+        :return int
         """
         return len(self.diff(other).changed())
 
     @property
     def starttime(self):
         """
-            Accessor for the unix timestamp of when the scan was started
+        Accessor for the unix timestamp of when the scan was started
 
-            :return: string
+        :return: string
         """
         return self._starttime
 
     @property
     def endtime(self):
         """
-            Accessor for the unix timestamp of when the scan ended
+        Accessor for the unix timestamp of when the scan ended
 
-            :return: string
+        :return: string
         """
         return self._endtime
 
     @property
     def address(self):
         """
-            Accessor for the IP address of the scanned host
+        Accessor for the IP address of the scanned host
 
-            :return: IP address as a string
+        :return: IP address as a string
         """
         return self._main_address
 
     @address.setter
     def address(self, addrdict):
         """
-            Setter for the address dictionnary.
+        Setter for the address dictionnary.
 
-            :param addrdict: valid dict is {'addr': '1.1.1.1',
-                                            'addrtype': 'ipv4'}
+        :param addrdict: valid dict is {'addr': '1.1.1.1',
+                                        'addrtype': 'ipv4'}
         """
         if addrdict["addrtype"] == "ipv4":
             self._ipv4_addr = addrdict["addr"]
@@ -175,65 +175,65 @@ class NmapHost(object):
     @property
     def ipv4(self):
         """
-            Accessor for the IPv4 address of the scanned host
+        Accessor for the IPv4 address of the scanned host
 
-            :return: IPv4 address as a string
+        :return: IPv4 address as a string
         """
         return self._ipv4_addr or ""
 
     @property
     def mac(self):
         """
-            Accessor for the MAC address of the scanned host
+        Accessor for the MAC address of the scanned host
 
-            :return: MAC address as a string
+        :return: MAC address as a string
         """
         return self._mac_addr or ""
 
     @property
     def vendor(self):
         """
-            Accessor for the vendor attribute of the scanned host
+        Accessor for the vendor attribute of the scanned host
 
-            :return: string (vendor) of empty string if no vendor defined
+        :return: string (vendor) of empty string if no vendor defined
         """
         return self._vendor or ""
 
     @property
     def ipv6(self):
         """
-            Accessor for the IPv6 address of the scanned host
+        Accessor for the IPv6 address of the scanned host
 
-            :return: IPv6 address as a string
+        :return: IPv6 address as a string
         """
         return self._ipv6_addr or ""
 
     @property
     def status(self):
         """
-            Accessor for the host's status (up, down, unknown...)
+        Accessor for the host's status (up, down, unknown...)
 
-            :return: string
+        :return: string
         """
         return self._status["state"]
 
     @status.setter
     def status(self, statusdict):
         """
-            Setter for the status dictionnary.
+        Setter for the status dictionnary.
 
-            :param statusdict: valid dict is {"state": "open",
-                                              "reason": "syn-ack",
-                                              "reason_ttl": "0"}
-                                'state' is the only mandatory key.
+        :param statusdict: valid dict is {"state": "open",
+                                          "reason": "syn-ack",
+                                          "reason_ttl": "0"}
+                            'state' is the only mandatory key.
         """
         self._status = statusdict
 
     def is_up(self):
         """
-            method to determine if host is up or not
+        method to determine if host is up or not
 
-            :return: bool
+        :return: bool
         """
         rval = False
         if self.status == "up":
@@ -243,36 +243,36 @@ class NmapHost(object):
     @property
     def hostnames(self):
         """
-            Accessor returning the list of hostnames (array of strings).
+        Accessor returning the list of hostnames (array of strings).
 
-            :return: array of string
+        :return: array of string
         """
         return self._hostnames
 
     @property
     def services(self):
         """
-            Accessor for the array of scanned services for that host.
+        Accessor for the array of scanned services for that host.
 
-            An array of NmapService objects is returned.
+        An array of NmapService objects is returned.
 
-            :return: array of NmapService
+        :return: array of NmapService
         """
         return self._services
 
     def get_ports(self):
         """
-            Retrieve a list of the port used by each service of the NmapHost
+        Retrieve a list of the port used by each service of the NmapHost
 
-            :return: list: of tuples (port,'proto') ie:[(22,'tcp'),(25, 'tcp')]
+        :return: list: of tuples (port,'proto') ie:[(22,'tcp'),(25, 'tcp')]
         """
         return [(p.port, p.protocol) for p in self._services]
 
     def get_open_ports(self):
         """
-            Same as get_ports() but only for open ports
+        Same as get_ports() but only for open ports
 
-            :return: list: of tuples (port,'proto') ie:[(22,'tcp'),(25, 'tcp')]
+        :return: list: of tuples (port,'proto') ie:[(22,'tcp'),(25, 'tcp')]
         """
         return [
             (p.port, p.protocol) for p in self._services if p.state == "open"
@@ -280,10 +280,10 @@ class NmapHost(object):
 
     def get_service(self, portno, protocol="tcp"):
         """
-            :param portno: int the portnumber
-            :param protocol='tcp': string ('tcp','udp')
+        :param portno: int the portnumber
+        :param protocol='tcp': string ('tcp','udp')
 
-            :return: NmapService or None
+        :return: NmapService or None
         """
         plist = [
             p
@@ -296,9 +296,9 @@ class NmapHost(object):
 
     def get_service_byid(self, service_id):
         """
-            Returns a NmapService by providing its id.
+        Returns a NmapService by providing its id.
 
-            The id of a nmap service is a python tupl made of (protocol, port)
+        The id of a nmap service is a python tupl made of (protocol, port)
         """
         rval = None
         for _tmpservice in self._services:
@@ -308,10 +308,10 @@ class NmapHost(object):
 
     def os_class_probabilities(self):
         """
-            Returns an array of possible OS class detected during
-            the OS fingerprinting.
+        Returns an array of possible OS class detected during
+        the OS fingerprinting.
 
-            :return: Array of NmapOSClass objects
+        :return: Array of NmapOSClass objects
         """
         rval = []
         if self.os is not None:
@@ -320,10 +320,10 @@ class NmapHost(object):
 
     def os_match_probabilities(self):
         """
-            Returns an array of possible OS match detected during
-            the OS fingerprinting
+        Returns an array of possible OS match detected during
+        the OS fingerprinting
 
-            :return: array of NmapOSMatches objects
+        :return: array of NmapOSMatches objects
         """
         rval = []
         if self.os is not None:
@@ -333,18 +333,18 @@ class NmapHost(object):
     @property
     def os_fingerprinted(self):
         """
-            Specify if the host has OS fingerprint data available
+        Specify if the host has OS fingerprint data available
 
-            :return: Boolean
+        :return: Boolean
         """
         return self._osfingerprinted
 
     @property
     def os_fingerprint(self):
         """
-            Returns the fingerprint of the scanned system.
+        Returns the fingerprint of the scanned system.
 
-            :return: string
+        :return: string
         """
         rval = ""
         if self.os is not None:
@@ -353,11 +353,11 @@ class NmapHost(object):
 
     def os_ports_used(self):
         """
-            Returns an array of the ports used for OS fingerprinting
+        Returns an array of the ports used for OS fingerprinting
 
-            :return: array of ports used: [{'portid': '22',
-                                            'proto': 'tcp',
-                                            'state': 'open'},]
+        :return: array of ports used: [{'portid': '22',
+                                        'proto': 'tcp',
+                                        'state': 'open'},]
         """
         rval = []
         try:
@@ -369,10 +369,10 @@ class NmapHost(object):
     @property
     def tcpsequence(self):
         """
-            Returns the difficulty to determine remotely predict
-            the tcp sequencing.
+        Returns the difficulty to determine remotely predict
+        the tcp sequencing.
 
-            return: string
+        return: string
         """
         rval = ""
         try:
@@ -384,9 +384,9 @@ class NmapHost(object):
     @property
     def ipsequence(self):
         """
-            Return the class of ip sequence of the remote hosts.
+        Return the class of ip sequence of the remote hosts.
 
-            :return: string
+        :return: string
         """
         rval = ""
         try:
@@ -398,9 +398,9 @@ class NmapHost(object):
     @property
     def uptime(self):
         """
-            uptime of the remote host (if nmap was able to determine it)
+        uptime of the remote host (if nmap was able to determine it)
 
-            :return: string (in seconds)
+        :return: string (in seconds)
         """
         rval = 0
         try:
@@ -412,9 +412,9 @@ class NmapHost(object):
     @property
     def lastboot(self):
         """
-            Since when the host was booted.
+        Since when the host was booted.
 
-            :return: string
+        :return: string
         """
         rval = ""
         try:
@@ -426,9 +426,9 @@ class NmapHost(object):
     @property
     def distance(self):
         """
-            Number of hops to host
+        Number of hops to host
 
-            :return: int
+        :return: int
         """
         rval = 0
         try:
@@ -440,9 +440,9 @@ class NmapHost(object):
     @property
     def scripts_results(self):
         """
-            Scripts results specific to the scanned host
+        Scripts results specific to the scanned host
 
-            :return: array of <script> dictionary
+        :return: array of <script> dictionary
         """
         rval = {}
         try:
@@ -454,19 +454,19 @@ class NmapHost(object):
     @property
     def id(self):
         """
-            id of the host. Used for diff()ing NmapObjects
+        id of the host. Used for diff()ing NmapObjects
 
-            :return: string
+        :return: string
         """
         return self.address
 
     @property
     def extraports_state(self):
         """
-            dictionnary containing state and amount of extra ports scanned
-            for which a common state, usually, closed was discovered.
+        dictionnary containing state and amount of extra ports scanned
+        for which a common state, usually, closed was discovered.
 
-            :return: dict with keys 'state' and 'count' or None
+        :return: dict with keys 'state' and 'count' or None
         """
         _xtrports = self._extras.get("extraports", None)
 
@@ -478,10 +478,10 @@ class NmapHost(object):
     @property
     def extraports_reasons(self):
         """
-            dictionnary containing reasons why extra ports scanned
-            for which a common state, usually, closed was discovered.
+        dictionnary containing reasons why extra ports scanned
+        for which a common state, usually, closed was discovered.
 
-            :return: array of dict containing keys 'state' and 'count' or None
+        :return: array of dict containing keys 'state' and 'count' or None
         """
         r = self._extras.get("extraports", {})
 
@@ -492,11 +492,11 @@ class NmapHost(object):
 
     def get_dict(self):
         """
-            Return a dict representation of the object.
+        Return a dict representation of the object.
 
-            This is needed by NmapDiff to allow comparaison
+        This is needed by NmapDiff to allow comparaison
 
-            :return dict
+        :return dict
         """
         d = dict(
             [
@@ -516,16 +516,16 @@ class NmapHost(object):
 
     def diff(self, other):
         """
-            Calls NmapDiff to check the difference between self and
-            another NmapHost object.
+        Calls NmapDiff to check the difference between self and
+        another NmapHost object.
 
-            Will return a NmapDiff object.
+        Will return a NmapDiff object.
 
-            This objects return python set() of keys describing the elements
-            which have changed, were added, removed or kept unchanged.
+        This objects return python set() of keys describing the elements
+        which have changed, were added, removed or kept unchanged.
 
-            :param other: NmapHost to diff with
+        :param other: NmapHost to diff with
 
-            :return: NmapDiff object
+        :return: NmapDiff object
         """
         return NmapDiff(self, other)

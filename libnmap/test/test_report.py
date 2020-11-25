@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import unittest
 import os
+import unittest
+
+from libnmap.diff import NmapDiffException
 
 # sys.path.append("".join([os.path.dirname(__file__), "/../"]))
 from libnmap.parser import NmapParser
-from libnmap.diff import NmapDiffException
 
 
 class TestNmapParser(unittest.TestCase):

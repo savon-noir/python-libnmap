@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from libnmap.process import NmapProcess
 from libnmap.parser import NmapParser, NmapParserException
+from libnmap.process import NmapProcess
 
 
 # start a new nmap scan on localhost with some specific options

@@ -12,7 +12,7 @@ setup(
     packages=["libnmap", "libnmap.plugins", "libnmap.objects"],
     url="http://pypi.python.org/pypi/python-libnmap/",
     extras_require={
-        'defusedxml': ['defusedxml>=0.6.0'],
+        "defusedxml": ["defusedxml>=0.6.0"],
     },
     license="Apache 2.0",
     description=(

@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-from libnmap.parser import NmapParser
+
 from libnmap.diff import NmapDiffException
+from libnmap.parser import NmapParser
 
 service1 = """
 <port protocol="tcp" portid="22">

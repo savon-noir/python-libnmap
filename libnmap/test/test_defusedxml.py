@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from libnmap.parser import NmapParser, NmapParserException
-import unittest
 import os
 import sys
+import unittest
+
+from libnmap.parser import NmapParser, NmapParserException
+
 
 class TestDefusedXML(unittest.TestCase):
     def setUp(self):
@@ -37,7 +39,7 @@ class TestDefusedXML(unittest.TestCase):
             self.fdir, "defused_et_local_includer.xml"
         )
 
-    def test_billion_laugh(self):       
+    def test_billion_laugh(self):
         self._assertRaisesRegex(
             NmapParserException,
             ".*EntitiesForbidden",

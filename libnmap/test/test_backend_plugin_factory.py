@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import unittest
 import os
+import unittest
+
 from libnmap.parser import NmapParser
 from libnmap.plugins.backendplugin import NmapBackendPlugin
 from libnmap.plugins.backendpluginFactory import BackendPluginFactory
@@ -80,8 +81,8 @@ class TestNmapBackendPlugin(unittest.TestCase):
         ]
 
     def test_backend_factory(self):
-        """ test_factory BackendPluginFactory.create(**url)
-            Invoke factory and test that the object is of the right classes
+        """test_factory BackendPluginFactory.create(**url)
+        Invoke factory and test that the object is of the right classes
         """
         for url in self.urls:
             backend = BackendPluginFactory.create(**url)
@@ -90,8 +91,8 @@ class TestNmapBackendPlugin(unittest.TestCase):
             self.assertEqual(backend.__class__.__name__, className, True)
 
     def test_backend_insert(self):
-        """ test_insert
-            best way to insert is to call save() of nmapreport :P
+        """test_insert
+        best way to insert is to call save() of nmapreport :P
         """
         for nrp in self.reportList:
             for url in self.urls:
@@ -103,10 +104,10 @@ class TestNmapBackendPlugin(unittest.TestCase):
                 self.assertNotEqual(returncode, None)
 
     def test_backend_get(self):
-        """ test_backend_get
-            inset all report and save the returned id in a list
-            then get each id and create a new list of report
-            compare each report (assume eq)
+        """test_backend_get
+        inset all report and save the returned id in a list
+        then get each id and create a new list of report
+        compare each report (assume eq)
         """
         id_list = []
         result_list = []
@@ -125,9 +126,9 @@ class TestNmapBackendPlugin(unittest.TestCase):
         pass
 
     def test_backend_delete(self):
-        """ test_backend_delete
-            inset all report and save the returned id in a list
-            for each id remove the item and test if not present
+        """test_backend_delete
+        inset all report and save the returned id in a list
+        for each id remove the item and test if not present
         """
         id_list = []
         result_list = []

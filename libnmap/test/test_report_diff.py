@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import unittest
 import os
+import unittest
+
 from libnmap.parser import NmapParser
 
 

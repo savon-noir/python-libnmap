@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from libnmap.parser import NmapParser
-from elasticsearch import Elasticsearch
 from datetime import datetime
+
 import pygeoip
+from elasticsearch import Elasticsearch
+
+from libnmap.parser import NmapParser
 
 
 def store_report(nmap_report, database, index):

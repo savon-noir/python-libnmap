@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 
 import os
+import platform
 import shlex
 import subprocess
+import warnings
 from threading import Thread
 from xml.dom import pulldom
-import warnings
-import platform
 
 try:
     import pwd

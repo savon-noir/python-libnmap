@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import json
-from libnmap.reportjson import ReportEncoder
-from libnmap.plugins.backendplugin import NmapBackendPlugin
-from elasticsearch import Elasticsearch
 from datetime import datetime
+
+from elasticsearch import Elasticsearch
+
+from libnmap.plugins.backendplugin import NmapBackendPlugin
+from libnmap.reportjson import ReportEncoder
 
 
 class NmapElasticsearchPlugin(NmapBackendPlugin):
@@ -22,11 +24,11 @@ class NmapElasticsearchPlugin(NmapBackendPlugin):
 
     def insert(self, report, doc_type=None):
         """
-            insert NmapReport in the backend
-            :param NmapReport:
-            :return: str the ident of the object in the backend for
-            future usage
-            or None
+        insert NmapReport in the backend
+        :param NmapReport:
+        :return: str the ident of the object in the backend for
+        future usage
+        or None
         """
         if doc_type is None:
             doc_type = "NmapReport"
@@ -39,16 +41,16 @@ class NmapElasticsearchPlugin(NmapBackendPlugin):
 
     def delete(self, id):
         """
-            delete NmapReport if the backend
-            :param id: str
+        delete NmapReport if the backend
+        :param id: str
         """
         raise NotImplementedError
 
     def get(self, id):
         """
-            retreive a NmapReport from the backend
-            :param id: str
-            :return: NmapReport
+        retreive a NmapReport from the backend
+        :param id: str
+        :return: NmapReport
         """
         res = self._esapi.get(index=self.index, doc_type="NmapReport", id=id)
         rc = res["_source"]
@@ -56,8 +58,8 @@ class NmapElasticsearchPlugin(NmapBackendPlugin):
 
     def getall(self, filter=None):
         """
-            :return: collection of tuple (id,NmapReport)
-            :param filter: Nice to have implement a filter capability
+        :return: collection of tuple (id,NmapReport)
+        :param filter: Nice to have implement a filter capability
         """
         rsearch = self._esapi.search(
             index=self.index, body={"query": {"match_all": {}}}
