@@ -98,8 +98,8 @@ Contributors
 
 Mike @bmx0r Boutillier for S3 and SQL-Alechemy plugins and for the constructive critics. Thanks!
 
-.. |Build Status| image:: https://travis-ci.org/savon-noir/python-libnmap.png?branch=master
-   :target: https://travis-ci.org/savon-noir/python-libnmap
+.. |Build Status| image:: https://github.com/savon-noir/python-libnmap/workflows/Preflight%20Validation/badge.svg
+   :target: https://github.com/savon-noir/python-libnmap/workflows/Preflight%20Validation/badge.svg
 
 .. _read the docs: https://libnmap.readthedocs.org
 

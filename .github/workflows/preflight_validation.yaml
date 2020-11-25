@@ -1,0 +1,37 @@
+name: Preflight Validation
+
+on:
+  push:
+    branches:
+      - feature/gh-actions
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [2.7, 3.5, 3.6, 3.7, 3.8]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest pytest-cov defusedxml
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Lint with flake8
+      run: |
+        flake8 --exclude test,docs,examples .
+    - name: Check Syntax with PSF/Black
+      run: |
+        black -l 79 --check . --exclude="tests/|venv|.tox"
+    - name: Test with pytest
+      run: |
+        pytest --cov=libnmap/ --ignore=libnmap/test/test_backend_plugin_factory.py
