@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-from libnmap.parser import NmapParser
+
 from libnmap.diff import NmapDiffException
+from libnmap.parser import NmapParser
 
 service1 = """
 <port protocol="tcp" portid="22">
@@ -188,7 +189,9 @@ class TestNmapService(unittest.TestCase):
         self.assertRaises(NmapDiffException, nservice1.diff, nservice4)
         #
         self.assertRaises(NmapDiffException, nservice2.diff, nservice3)
-        self.assertEqual(nservice3.diff(nservice4).changed(), set(["state", "service"]))
+        self.assertEqual(
+            nservice3.diff(nservice4).changed(), set(["state", "service"])
+        )
 
     def test_port_state_unchanged(self):
         nservice1 = NmapParser.parse(port_string)

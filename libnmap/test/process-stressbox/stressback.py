@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
-from libnmap.process import NmapProcess
 from time import sleep
+
+from libnmap.process import NmapProcess
 
 
 def make_nmproc_obj(targets, options):

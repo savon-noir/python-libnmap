@@ -2,9 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import json
-from libnmap.objects import NmapHost, NmapService, NmapReport
-from libnmap.objects.os import NmapOSFingerprint, NmapOSMatch, NmapOSClass
-from libnmap.objects.os import CPE, OSFPPortUsed
+
+from libnmap.objects import NmapHost, NmapReport, NmapService
+from libnmap.objects.os import (
+    CPE,
+    NmapOSClass,
+    NmapOSFingerprint,
+    NmapOSMatch,
+    OSFPPortUsed,
+)
 from libnmap.parser import NmapParser
 
 

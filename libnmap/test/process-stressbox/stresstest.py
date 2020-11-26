@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-from libnmap.process import NmapProcess
 from libnmap.parser import NmapParser, NmapParserException
+from libnmap.process import NmapProcess
 
 nm = NmapProcess("127.0.0.1", "-sP")
 rc = nm.run()

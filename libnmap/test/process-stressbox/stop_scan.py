@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-from libnmap.process import NmapProcess
 from time import sleep
 
+from libnmap.process import NmapProcess
 
 nmap_proc = NmapProcess(targets="scanme.nmap.org", options="-sV")
 nmap_proc.run_background()

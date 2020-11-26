@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from libnmap.objects.os import CPE
 import unittest
+
+from libnmap.objects.os import CPE
 
 
 class TestNmapFP(unittest.TestCase):
