@@ -42,6 +42,8 @@ jobs:
         github-token: ${{ secrets.github_token }}
         flag-name: run-${{ matrix.python-version }}
         parallel: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   finish:
     needs: test
     runs-on: ubuntu-latest
@@ -51,3 +53,5 @@ jobs:
       with:
         github-token: ${{ secrets.github_token }}
         parallel-finished: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
