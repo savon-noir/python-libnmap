@@ -1,9 +1,9 @@
-name: Preflight Validation
+name: Preflight Check
 
 on:
   push:
     branches:
-      - feature/gh-actions
+      - '**'
   pull_request:
     branches:
       - main
@@ -36,3 +36,21 @@ jobs:
     - name: Coveralls metrics push
       run: |
         coveralls
+    - name: Upload Coverage
+      run: coveralls
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        COVERALLS_FLAG_NAME: ${{ matrix.python-version }}
+        COVERALLS_PARALLEL: true
+  coveralls:
+    name: Finish Coveralls
+    needs: test
+    runs-on: ubuntu-latest
+    container: python:3-slim
+    steps:
+    - name: Finished
+      run: |
+        pip3 install --upgrade coveralls
+        coveralls --finish
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
