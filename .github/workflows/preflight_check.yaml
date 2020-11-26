@@ -32,26 +32,23 @@ jobs:
         flake8 --exclude test,docs,examples .
     - name: Test with pytest
       run: |
-        pytest --cov=libnmap/ --ignore=libnmap/test/test_backend_plugin_factory.py
-    - name: Coveralls metrics push
-      run: |
-        coveralls
-    - name: Coveralls Parallel
-      uses: coverallsapp/github-action@master
-      with:
-        github-token: ${{ secrets.github_token }}
-        flag-name: run-${{ matrix.python-version }}
-        parallel: true
+        pytest --ignore=libnmap/test/test_backend_plugin_factory.py
+    - name: Upload Coverage
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  finish:
+        COVERALLS_FLAG_NAME: ${{ matrix.test-name }}
+        COVERALLS_PARALLEL: true
+      run: |
+        coveralls
+  coveralls:
+    name: Finish Coveralls
     needs: test
     runs-on: ubuntu-latest
+    container: python:3-slim
     steps:
-    - name: Coveralls Finished
-      uses: coverallsapp/github-action@master
-      with:
-        github-token: ${{ secrets.github_token }}
-        parallel-finished: true
+    - name: Finished
+      run: |
+        pip3 install --upgrade coveralls
+        coveralls --finish
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
