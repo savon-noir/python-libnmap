@@ -14,7 +14,6 @@ jobs:
     strategy:
       matrix:
         python-version: [2.7, 3.5, 3.6, 3.7, 3.8]
-
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
@@ -32,7 +31,7 @@ jobs:
         flake8 --exclude test,docs,examples .
     - name: Test with pytest
       run: |
-        pytest --ignore=libnmap/test/test_backend_plugin_factory.py
+        pytest --cov=libnmap/ --ignore=libnmap/test/test_backend_plugin_factory.py
     - name: Upload Coverage
       if: matrix.python-version != '2.7'
       env:
