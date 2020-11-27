@@ -66,7 +66,8 @@ class TestNmapFP(unittest.TestCase):
             "edition": ocpe.get_edition(),
         }
         self.assertEqual(objdict, resdict)
-
+        # self.assertEqual(ocpe.cpedict, resdict)
+        self.assertEqual(str(ocpe), cpestr)
 
 if __name__ == "__main__":
     test_suite = ["test_cpe", "test_full_cpe"]
