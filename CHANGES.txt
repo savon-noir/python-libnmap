@@ -1,3 +1,4 @@
+v0.7.1, 22/11/2020 -- code clean-up + fix for CVE-2019-1010017
 v0.7.0, 28/02/2016 -- A few bugfixes
                     - fixe of endless loop in Nmap.Process. Fix provided by @rcarrillo, many thanks!
 v0.6.3, 18/08/2015 -- Merged pull requests for automatic pypi upload, thanks @bmx0r

@@ -41,3 +41,5 @@ nosetests.xml
 .swp
 
 __pycache__
+.vscode/settings.json
+.noseids

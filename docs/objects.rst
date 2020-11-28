@@ -31,7 +31,7 @@ NmapService contains:
     - scan results for this service:
         - service state, service name
         - optional: service banner
-        - optionla: NSE scripts data
+        - optional: NSE scripts data
 
 Each of the above-mentioned objects have a diff() method which enables the user of the lib the compare two different objects
 of the same type.

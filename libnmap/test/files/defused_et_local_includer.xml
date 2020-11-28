@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<!DOCTYPE external [
+<!ENTITY ee SYSTEM "file://./simple.xml">
+]>
+<root>&ee;</root>
