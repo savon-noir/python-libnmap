@@ -15,6 +15,15 @@ from libnmap.parser import NmapParser
 
 
 class ReportEncoder(json.JSONEncoder):
+    """
+    ReportEncoder is a internal class used mostly by plugins to convert
+    NmapReport objects in json format.
+    e.g.:
+        nmapreport_obj = NmapParser.parse_fromfile(
+            "libnmap/test/files/1_hosts.xml"
+        )
+        nmapreport_json = json.dumps(nmapreport_obj, cls=ReportEncoder)
+    """
     def default(self, obj):
         otype = {
             "NmapHost": NmapHost,
@@ -33,6 +42,12 @@ class ReportEncoder(json.JSONEncoder):
 
 
 class ReportDecoder(json.JSONDecoder):
+    """
+    ReportDecoder is a internal class used mostly by plugins to convert
+    json nmap report in to NmapReport objects.
+    e.g.:
+        nmap_report_obj = json.loads(nmap_report_json, cls=ReportDecoder)
+    """
     def decode(self, json_str):
         r = NmapParser.parse_fromdict(json.loads(json_str))
         return r
