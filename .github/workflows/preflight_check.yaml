@@ -23,7 +23,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install black isort
+        pip install black isort flake8
     - name: Format checker with psf/black
       run: black --check -l 79 .
     - name: Format checker with isort
@@ -44,7 +44,7 @@ jobs:
     - name: Setup Environment
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 pytest pytest-cov defusedxml
+        pip install pytest pytest-cov defusedxml
         pip install coveralls
         sudo apt-get install -y nmap
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
