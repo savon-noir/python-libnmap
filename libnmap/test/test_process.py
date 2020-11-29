@@ -6,6 +6,8 @@ import sys
 import unittest
 from time import sleep
 
+from libnmap.objects.report import NmapReport
+from libnmap.parser import NmapParser
 from libnmap.process import NmapProcess
 
 
@@ -24,10 +26,11 @@ class TestNmapProcess(unittest.TestCase):
 
     def test_exec(self):
         nmapobj = NmapProcess(targets="127.0.0.1", options="-sP")
-        rc = nm.run()
-        parsed = NmapParser.parse(nm.stdout)
-        self.assertGreater(len(rc.stdout), 0)
-        self.assertGreater(len(parsed), 0)
+        rc = nmapobj.run()
+        parsed = NmapParser.parse(nmapobj.stdout)
+        self.assertEqual(rc, 0)
+        self.assertGreater(len(nmapobj.stdout), 0)
+        self.assertIsInstance(parsed, NmapReport)
 
     def test_exec_background(self):
         def make_nmproc_obj(targets, options):
@@ -66,6 +69,6 @@ class TestNmapProcess(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    test_suite = ["test_exec_env", "test_exec_background"]
+    test_suite = ["test_exec_env", "test_exec", "test_exec_background"]
     suite = unittest.TestSuite(map(TestNmapProcess, test_suite))
     test_result = unittest.TextTestRunner(verbosity=2).run(suite)
