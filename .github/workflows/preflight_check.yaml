@@ -23,9 +23,18 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 pytest pytest-cov defusedxml
+        pip install flake8 pytest pytest-cov defusedxml isort
         pip install coveralls
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Install Nmap
+      run: |
+        sudo apt-get install -y nmap
+    - name: Format checker with psf/black
+      run: |
+        black --check -l 79 .
+    - name: Format checker with isort
+      run: |
+        isort --check-only -m 3 -l 79 --profile=black .
     - name: Lint with flake8
       run: |
         flake8 --exclude test,docs,examples .

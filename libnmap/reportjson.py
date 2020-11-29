@@ -24,6 +24,7 @@ class ReportEncoder(json.JSONEncoder):
         )
         nmapreport_json = json.dumps(nmapreport_obj, cls=ReportEncoder)
     """
+
     def default(self, obj):
         otype = {
             "NmapHost": NmapHost,
@@ -48,6 +49,7 @@ class ReportDecoder(json.JSONDecoder):
     e.g.:
         nmap_report_obj = json.loads(nmap_report_json, cls=ReportDecoder)
     """
+
     def decode(self, json_str):
         r = NmapParser.parse_fromdict(json.loads(json_str))
         return r
