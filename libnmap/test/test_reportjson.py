@@ -17,17 +17,21 @@ class TestReportJson(unittest.TestCase):
 
     def test_reportencode(self):
         nmap_report_obj = NmapParser.parse_fromfile(self.xml_ref_file)
-        nmap_report_json = json.loads(json.dumps(nmap_report_obj, cls=ReportEncoder))
-        with open(self.json_ref_file, 'r') as fd:
+        nmap_report_json = json.loads(
+            json.dumps(nmap_report_obj, cls=ReportEncoder)
+        )
+        with open(self.json_ref_file, "r") as fd:
             nmap_report_json_ref = json.load(fd)
             self.assertEqual(nmap_report_json_ref, nmap_report_json)
 
     def test_reportdecode(self):
         nmap_report_obj_ref = NmapParser.parse_fromfile(self.xml_ref_file)
 
-        with open(self.json_ref_file, 'r') as fd:
+        with open(self.json_ref_file, "r") as fd:
             nmap_report_json_ref = json.dumps(json.load(fd))
-            nmap_report_obj = json.loads(nmap_report_json_ref, cls=ReportDecoder)
+            nmap_report_obj = json.loads(
+                nmap_report_json_ref, cls=ReportDecoder
+            )
             self.assertEqual(nmap_report_obj_ref, nmap_report_obj)
 
 

@@ -69,6 +69,7 @@ class TestNmapFP(unittest.TestCase):
         # self.assertEqual(ocpe.cpedict, resdict)
         self.assertEqual(str(ocpe), cpestr)
 
+
 if __name__ == "__main__":
     test_suite = ["test_cpe", "test_full_cpe"]
     suite = unittest.TestSuite(map(TestNmapFP, test_suite))

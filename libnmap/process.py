@@ -302,12 +302,12 @@ class NmapProcess(Thread):
                 bufsize=0,
             )
             self.__state = self.RUNNING
-        except OSError:
+        except OSError as emsg:
             self.__state = self.FAILED
             raise EnvironmentError(
                 1,
                 "nmap is not installed or could "
-                "not be found in system path",
+                "not be found in system path: {0}".format(emsg),
             )
 
         while self.__nmap_proc.poll() is None:
