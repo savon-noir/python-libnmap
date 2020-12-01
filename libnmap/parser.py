@@ -139,7 +139,7 @@ class NmapParser(object):
 
         if root is None:
             raise NmapParserException(
-                "No root node provided to parse XML " "report"
+                "No root node provided to parse XML report"
             )
 
         nmap_scan["_nmaprun"] = cls.__format_attributes(root)
@@ -180,7 +180,7 @@ class NmapParser(object):
         if not isinstance(nmap_data, str):
             raise NmapParserException(
                 "bad argument type for "
-                "xarse_fromstring(): should be a string"
+                "parse_fromstring(): should be a string"
             )
         return cls.parse(nmap_data, data_type, incomplete)
 

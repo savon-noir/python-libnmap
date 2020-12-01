@@ -35,6 +35,19 @@ class TestNmapFP(unittest.TestCase):
         self.assertTrue(apa.is_application())
         self.assertFalse(apa.is_hardware())
         self.assertFalse(apa.is_operating_system())
+        self.assertEqual(
+            apa.cpedict,
+            {
+                "cpe": "cpe",
+                "edition": "",
+                "language": "",
+                "part": "/a",
+                "product": "http_server",
+                "update": "",
+                "vendor": "apache",
+                "version": "2.2.22",
+            },
+        )
 
         win = CPE(self.cpelist[12])
         self.assertEqual(win.get_vendor(), "microsoft")

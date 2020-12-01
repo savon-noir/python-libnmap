@@ -30,12 +30,11 @@ The lib currently offers the following modules:
 - **diff**: enables you to see what changed between two scans
 - **common**: contains basic nmap objects like NmapHost and NmapService. It is to note that each object can be "diff()ed" with another similar object.
 - **plugins**: enables you to support datastores for your scan results directly in the "NmapReport" object. from report module:
-
-- mongodb: insert/get/getAll/delete
-- sqlalchemy: insert/get/getAll/delete
-- aws s3: insert/get/getAll/delete (not supported for python3 since boto is not supporting py3)
-- csv: todo (easy to implement)
-- elastic search: todo
+    - mongodb: insert/get/getAll/delete
+    - sqlalchemy: insert/get/getAll/delete
+    - aws s3: insert/get/getAll/delete (not supported for python3 since boto is not supporting py3)
+    - csv: todo (easy to implement)
+    - elastic search: todo
 
 ## Documentation
 

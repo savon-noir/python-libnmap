@@ -126,13 +126,13 @@ class NmapProcess(Thread):
             self.__nmap_targets = targets
         else:
             raise Exception(
-                "Supplied target list should be either a " "string or a list"
+                "Supplied target list should be either a string or a list"
             )
 
         self._nmap_options = set(options.split())
         if safe_mode and not self._nmap_options.isdisjoint(unsafe_opts):
             raise Exception(
-                "unsafe options activated while safe_mode " "is set True"
+                "unsafe options activated while safe_mode is set True"
             )
         self.__nmap_dynamic_options = options
         self.__sudo_run = ""
@@ -202,6 +202,16 @@ class NmapProcess(Thread):
             " ".join(self.__nmap_targets),
         )
 
+    def _ensure_user_exists(self, username=""):
+        try:
+            pwd.getpwnam(username).pw_uid
+        except KeyError as eobj:
+            _exmsg = (
+                "Username {0} does not exists. Please supply"
+                " a valid username: {1}".format(username, eobj)
+            )
+            raise EnvironmentError(_exmsg)
+
     def sudo_run(self, run_as="root"):
         """
         Public method enabling the library's user to run the scan with
@@ -215,14 +225,7 @@ class NmapProcess(Thread):
         :return: return code from nmap execution
         """
         sudo_user = run_as.split().pop()
-        try:
-            pwd.getpwnam(sudo_user).pw_uid
-        except KeyError:
-            _exmsg = (
-                "Username {0} does not exists. Please supply"
-                " a valid username".format(run_as)
-            )
-            raise EnvironmentError(_exmsg)
+        self._ensure_user_exists(sudo_user)
 
         sudo_path = self._whereis("sudo")
         if sudo_path is None:
@@ -253,14 +256,7 @@ class NmapProcess(Thread):
         :return: return code from nmap execution
         """
         sudo_user = run_as.split().pop()
-        try:
-            pwd.getpwnam(sudo_user).pw_uid
-        except KeyError:
-            _exmsg = (
-                "Username {0} does not exists. Please supply"
-                " a valid username".format(run_as)
-            )
-            raise EnvironmentError(_exmsg)
+        self._ensure_user_exists(sudo_user)
 
         sudo_path = self._whereis("sudo")
         if sudo_path is None:
@@ -311,12 +307,8 @@ class NmapProcess(Thread):
             )
 
         while self.__nmap_proc.poll() is None:
-            for streamline in iter(self.__nmap_proc.stdout.readline, ""):
-                self.__stdout += streamline
-                evnt = self.__process_event(streamline)
-                if self.__nmap_event_callback and evnt:
-                    self.__nmap_event_callback(self)
-
+            self.__process_nmap_proc_stdout()
+        self.__process_nmap_proc_stdout()
         self.__stderr += self.__nmap_proc.stderr.read()
 
         self.__nmap_rc = self.__nmap_proc.poll()
@@ -385,6 +377,13 @@ class NmapProcess(Thread):
         self.__state = self.CANCELLED
         if self.__nmap_proc.poll() is None:
             self.__nmap_proc.kill()
+
+    def __process_nmap_proc_stdout(self):
+        for streamline in iter(self.__nmap_proc.stdout.readline, ""):
+            self.__stdout += streamline
+            evnt = self.__process_event(streamline)
+            if self.__nmap_event_callback and evnt:
+                self.__nmap_event_callback(self)
 
     def __process_event(self, eventdata):
         """

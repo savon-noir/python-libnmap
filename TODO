@@ -1,14 +1,18 @@
 0.7.1: - clean-up blacked code and pylint it 
-0.7.1: - add unittest for defusedxml
-           - billionlaugh and external entities
+0.7.1: - add unittest for defusedxml to fix billionlaugh and external entities security issues
 0.7.1: - add CSV backend support
-0.7.1: - Change License to MIT, BSD or Apache
+0.7.1: - Change License from CC-BY to Apache 2.0
 0.7.1: - Update readme file to reflect the xml fixed issue + how to install it
 0.7.1: - add extra_requires for plugins deps and defusedxml
+0.7.1: - Remove code duplication in sudo_run and sudo_run_background from process.py
+0.7.1: - Merge PR79 from Shouren to fix empty nmap outputs
 0.7.2: improve API for NSE scripts
 0.7.2: add support for post,pre and host scripts
 0.7.2: add a Contribution guideline page
+0.7.2: add development environment config and setup
+0.7.2: add pre-commit hooks to enforce black and isort
 0.7.2: automate in github actions the git workflow + doc update + pypi update
+0.7.3: create complete python testing environment based on docker-compose and some examples
 - complete unit tests with coverall support
 - Add new plugins to support import/export from mysql, couchdb, csv
 - add unittest for udp scans, ping sweeping
