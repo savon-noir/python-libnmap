@@ -254,17 +254,23 @@ class NmapService(object):
     @property
     def banner_dict(self):
         """
-            Accessor for the service's banner. Only available
-            if the nmap option -sV or similar was used.
+        Accessor for the service's banner. Only available
+        if the nmap option -sV or similar was used.
 
-            :return: dictionary
+        :return: dictionary
         """
-        notrelevant = ['name', 'method', 'conf', 'cpelist',
-                       'servicefp', 'tunnel']
-        relevant = ['product', 'version', 'extrainfo']
+        notrelevant = [
+            "name",
+            "method",
+            "conf",
+            "cpelist",
+            "servicefp",
+            "tunnel",
+        ]
+        relevant = ["product", "version", "extrainfo"]
         b = {}
         skeys = self._service.keys()
-        if 'method' in self._service and self._service['method'] == "probed":
+        if "method" in self._service and self._service["method"] == "probed":
             for relk in relevant:
                 if relk in skeys:
                     b[relk] = self._service[relk]
