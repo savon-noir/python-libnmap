@@ -126,13 +126,13 @@ class NmapProcess(Thread):
             self.__nmap_targets = targets
         else:
             raise Exception(
-                "Supplied target list should be either a " "string or a list"
+                "Supplied target list should be either a string or a list"
             )
 
         self._nmap_options = set(options.split())
         if safe_mode and not self._nmap_options.isdisjoint(unsafe_opts):
             raise Exception(
-                "unsafe options activated while safe_mode " "is set True"
+                "unsafe options activated while safe_mode is set True"
             )
         self.__nmap_dynamic_options = options
         self.__sudo_run = ""
@@ -383,7 +383,7 @@ class NmapProcess(Thread):
             self.__nmap_proc.kill()
 
     def __process_nmap_proc_stdout(self):
-        for streamline in iter(self.__nmap_proc.stdout.readline, ''):
+        for streamline in iter(self.__nmap_proc.stdout.readline, ""):
             self.__stdout += streamline
             evnt = self.__process_event(streamline)
             if self.__nmap_event_callback and evnt:
