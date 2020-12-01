@@ -81,6 +81,21 @@ class TestNmapProcess(unittest.TestCase):
         self.assertGreater(len(nmapobj.stdout), 0)
         self.assertIsInstance(parsed, NmapReport)
 
+    def test_sudo_exec(self):
+        nmapobj = NmapProcess(targets="127.0.0.1", options="-sP")
+        self._assertRaisesRegex(
+            EnvironmentError,
+            "Username.*does not exists",
+            nmapobj.sudo_run,
+            run_as="non-existing-user",
+        )
+        self._assertRaisesRegex(
+            EnvironmentError,
+            "Username.*does not exists",
+            nmapobj.sudo_run_background,
+            run_as="non-existing-user",
+        )
+
     def test_exec_reportsize(self):
         def make_nmproc_obj(targets, options):
             return NmapProcess(targets=targets, options=options)

@@ -202,6 +202,16 @@ class NmapProcess(Thread):
             " ".join(self.__nmap_targets),
         )
 
+    def _ensure_user_exists(self, username=""):
+        try:
+            pwd.getpwnam(username).pw_uid
+        except KeyError as eobj:
+            _exmsg = (
+                "Username {0} does not exists. Please supply"
+                " a valid username: {1}".format(username, eobj)
+            )
+            raise EnvironmentError(_exmsg)
+
     def sudo_run(self, run_as="root"):
         """
         Public method enabling the library's user to run the scan with
@@ -215,14 +225,7 @@ class NmapProcess(Thread):
         :return: return code from nmap execution
         """
         sudo_user = run_as.split().pop()
-        try:
-            pwd.getpwnam(sudo_user).pw_uid
-        except KeyError:
-            _exmsg = (
-                "Username {0} does not exists. Please supply"
-                " a valid username".format(run_as)
-            )
-            raise EnvironmentError(_exmsg)
+        self._ensure_user_exists(sudo_user)
 
         sudo_path = self._whereis("sudo")
         if sudo_path is None:
@@ -253,14 +256,7 @@ class NmapProcess(Thread):
         :return: return code from nmap execution
         """
         sudo_user = run_as.split().pop()
-        try:
-            pwd.getpwnam(sudo_user).pw_uid
-        except KeyError:
-            _exmsg = (
-                "Username {0} does not exists. Please supply"
-                " a valid username".format(run_as)
-            )
-            raise EnvironmentError(_exmsg)
+        self._ensure_user_exists(sudo_user)
 
         sudo_path = self._whereis("sudo")
         if sudo_path is None:
