@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE nmaprun>
+<?xml-stylesheet href="file:///usr/bin/../share/nmap/nmap.xsl" type="text/xsl"?>
+<!-- Nmap 7.91 scan initiated Sun Nov 22 17:08:27 2020 as: nmap -sV -O -p 1-65535 -&#45;script default,safe -&#45;traceroute -oX /tmp/a.xml dionaea -->
+<nmaprun scanner="nmap" args="nmap -sV -O -p 1-65535 -&#45;script default,safe -&#45;traceroute -oX /tmp/a.xml dionaea" start="1606064907" startstr="Sun Nov 22 17:08:27 2020" version="7.91" xmloutputversion="1.05">
+<scaninfo type="syn" protocol="tcp" numservices="65535" services="1-65535"/>
+<verbose level="0"/>
+<debugging level="0"/>
+<prescript>
+  <script id="broadcast-igmp-discovery" output="&#xa;  172.28.0.1&#xa;    Interface: eth0&#xa;    Version: 2&#xa;    Group: 224.0.0.106&#xa;    Description: All-Snoopers (rfc4286)&#xa;  Use the newtargets script-arg to add the results as targets&#xa;"/>
+  <script id="broadcast-ping" output="&#xa;  IP: 255.255.255.255  MAC: 02:42:ac:1c:01:02&#xa;  Use -&#45;script-args=newtargets to add the results as targets&#xa;"/>
+  <script id="eap-info" output="please specify an interface with -e"/><script id="hostmap-robtex" output="*TEMPORARILY DISABLED* due to changes in Robtex&apos;s API. See https://www.robtex.com/api/"/>
+  <script id="http-robtex-shared-ns" output="*TEMPORARILY DISABLED* due to changes in Robtex&apos;s API. See https://www.robtex.com/api/"/>
+  <script id="targets-asn" output="&#xa;  targets-asn.asn is a mandatory parameter&#xa;"/>
+</prescript>
+<hosthint><status state="up" reason="arp-response" reason_ttl="0"/>
+<address addr="172.28.1.3" addrtype="ipv4"/>
+<address addr="02:42:AC:1C:01:03" addrtype="mac"/>
+<hostnames>
+<hostname name="dionaea" type="user"/>
+</hostnames>
+</hosthint>
+<host starttime="1606064948" endtime="1606065273"><status state="up" reason="arp-response" reason_ttl="0"/>
+<address addr="172.28.1.3" addrtype="ipv4"/>
+<address addr="02:42:AC:1C:01:03" addrtype="mac"/>
+<hostnames>
+<hostname name="dionaea" type="user"/>
+<hostname name="dionaea.libnmap-testing_testing_net" type="PTR"/>
+</hostnames>
+<ports><extraports state="closed" count="65519">
+<extrareasons reason="resets" count="65519"/>
+</extraports>
+<port protocol="tcp" portid="21"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="ftp" product="Synology DiskStation NAS ftpd" devicetype="storage-misc" method="probed" conf="10"/><script id="banner" output="220 DiskStation FTP server ready."/><script id="ftp-anon" output="Anonymous FTP login allowed (FTP code 230)"/></port>
+<port protocol="tcp" portid="23"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="telnet" method="table" conf="3"/></port>
+<port protocol="tcp" portid="42"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="tcpwrapped" method="probed" conf="8"/><script id="unusual-port" output="tcpwrapped unexpected on port tcp/42"/></port>
+<port protocol="tcp" portid="53"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="domain" method="table" conf="3"/></port>
+<port protocol="tcp" portid="80"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="http" product="nginx" method="probed" conf="10"><cpe>cpe:/a:igor_sysoev:nginx</cpe></service><script id="http-comments-displayer" output="Couldn&apos;t find any comments."/><script id="http-fetch" output="Please enter the complete path of the directory to save data in."><elem key="ERROR">Please enter the complete path of the directory to save data in.</elem>
+</script><script id="http-headers" output="&#xa;  Server: nginx&#xa;  Content-Type: text/html; charset=ascii&#xa;  Content-Length: 204&#xa;  Connection: close&#xa;  &#xa;  (Request type: GET)&#xa;"/><script id="http-mobileversion-checker" output="No mobile version detected."/><script id="http-referer-checker" output="Couldn&apos;t find any cross-domain scripts."/><script id="http-security-headers" output="&#xa;"></script><script id="http-title" output="Directory listing for /"><elem key="title">Directory listing for /</elem>
+</script><script id="http-useragent-tester" output="&#xa;  Status for browser useragent: 200&#xa;  Allowed User Agents: &#xa;    Mozilla/5.0 (compatible; Nmap Scripting Engine; https://nmap.org/book/nse.html)&#xa;    libwww&#xa;    lwp-trivial&#xa;    libcurl-agent/1.0&#xa;    PHP/&#xa;    Python-urllib/2.5&#xa;    GT::WWW&#xa;    Snoopy&#xa;    MFC_Tear_Sample&#xa;    HTTP::Lite&#xa;    PHPCrawl&#xa;    URI::Fetch&#xa;    Zend_Http_Client&#xa;    http client&#xa;    PECL::HTTP&#xa;    Wget/1.13.4 (linux-gnu)&#xa;    WWW-Mechanize/1.34"><elem key="Status for browser useragent">200</elem>
+<table key="Allowed User Agents">
+<elem>Mozilla/5.0 (compatible; Nmap Scripting Engine; https://nmap.org/book/nse.html)</elem>
+<elem>libwww</elem>
+<elem>lwp-trivial</elem>
+<elem>libcurl-agent/1.0</elem>
+<elem>PHP/</elem>
+<elem>Python-urllib/2.5</elem>
+<elem>GT::WWW</elem>
+<elem>Snoopy</elem>
+<elem>MFC_Tear_Sample</elem>
+<elem>HTTP::Lite</elem>
+<elem>PHPCrawl</elem>
+<elem>URI::Fetch</elem>
+<elem>Zend_Http_Client</elem>
+<elem>http client</elem>
+<elem>PECL::HTTP</elem>
+<elem>Wget/1.13.4 (linux-gnu)</elem>
+<elem>WWW-Mechanize/1.34</elem>
+</table>
+</script><script id="http-xssed" output="No previously reported XSS vuln."/></port>
+<port protocol="tcp" portid="135"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="msrpc" method="table" conf="3"/></port>
+<port protocol="tcp" portid="443"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="https" tunnel="ssl" method="table" conf="3"/><script id="http-comments-displayer" output="Couldn&apos;t find any comments."/><script id="http-fetch" output="Please enter the complete path of the directory to save data in."><elem key="ERROR">Please enter the complete path of the directory to save data in.</elem>
+</script><script id="http-headers" output="&#xa;  Server: nginx&#xa;  Content-Type: text/html; charset=ascii&#xa;  Content-Length: 204&#xa;  Connection: close&#xa;  &#xa;  (Request type: HEAD)&#xa;"/><script id="http-mobileversion-checker" output="No mobile version detected."/><script id="http-referer-checker" output="Couldn&apos;t find any cross-domain scripts."/><script id="http-security-headers" output="&#xa;  Strict_Transport_Security: &#xa;    HSTS not configured in HTTPS Server"><table key="Strict_Transport_Security">
+<elem>HSTS not configured in HTTPS Server</elem>
+</table>
+</script><script id="http-title" output="Directory listing for /"><elem key="title">Directory listing for /</elem>
+</script><script id="http-useragent-tester" output="&#xa;  Status for browser useragent: 200&#xa;  Allowed User Agents: &#xa;    Mozilla/5.0 (compatible; Nmap Scripting Engine; https://nmap.org/book/nse.html)&#xa;    libwww&#xa;    lwp-trivial&#xa;    libcurl-agent/1.0&#xa;    PHP/&#xa;    Python-urllib/2.5&#xa;    GT::WWW&#xa;    Snoopy&#xa;    MFC_Tear_Sample&#xa;    HTTP::Lite&#xa;    PHPCrawl&#xa;    URI::Fetch&#xa;    Zend_Http_Client&#xa;    http client&#xa;    PECL::HTTP&#xa;    Wget/1.13.4 (linux-gnu)&#xa;    WWW-Mechanize/1.34"><elem key="Status for browser useragent">200</elem>
+<table key="Allowed User Agents">
+<elem>Mozilla/5.0 (compatible; Nmap Scripting Engine; https://nmap.org/book/nse.html)</elem>
+<elem>libwww</elem>
+<elem>lwp-trivial</elem>
+<elem>libcurl-agent/1.0</elem>
+<elem>PHP/</elem>
+<elem>Python-urllib/2.5</elem>
+<elem>GT::WWW</elem>
+<elem>Snoopy</elem>
+<elem>MFC_Tear_Sample</elem>
+<elem>HTTP::Lite</elem>
+<elem>PHPCrawl</elem>
+<elem>URI::Fetch</elem>
+<elem>Zend_Http_Client</elem>
+<elem>http client</elem>
+<elem>PECL::HTTP</elem>
+<elem>Wget/1.13.4 (linux-gnu)</elem>
+<elem>WWW-Mechanize/1.34</elem>
+</table>
+</script><script id="http-xssed" output="No previously reported XSS vuln."/><script id="ssl-cert" output="Subject: commonName=Nepenthes Development Team/organizationName=dionaea.carnivore.it/countryName=DE&#xa;Not valid before: 2020-11-22T17:06:58&#xa;Not valid after:  2021-11-22T17:06:58"><table key="subject">
+<elem key="commonName">Nepenthes Development Team</elem>
+<elem key="countryName">DE</elem>
+<elem key="organizationName">dionaea.carnivore.it</elem>
+<elem key="organizationalUnitName">anv</elem>
+</table>
+<table key="issuer">
+<elem key="commonName">Nepenthes Development Team</elem>
+<elem key="countryName">DE</elem>
+<elem key="organizationName">dionaea.carnivore.it</elem>
+<elem key="organizationalUnitName">anv</elem>
+</table>
+<table key="pubkey">
+<elem key="type">rsa</elem>
+<elem key="bits">2048</elem>
+<elem key="modulus">BCF18B67472C803A6C26C4C59AAC72000EFADEDDDCC0A47F16148548B6C476CD1B8BA21DB480EA8EBB0A0CA93D69523BF3E6936166A12AD1B39E4E33A901FEA77215A7D5773AEDEAD6B94AEC5709C1C6042FB326EE0138F3D2E9B07C973CE3A008F1EF075A720524239882FC3C73DC4F10C3592C6B5EE6EEEBC190AD2237E9B151FEA1D593FE0ED424BC1401D885FCE59953CF69D3C7A606984509E51D546E5629E3199602CE13C7ADEFBFD7B2C8CA90CECB848EF557804A2ED108FC9CBD09C8D1B0965EE3022E2652ED956503B4CDCE191385FF19E0E3E97645E93F9D3BB195E1E5F9D4B73769EA17077B59679C6044F0F9BEE7B71127AB44CCB9DB8BB3A4A7</elem>
+<elem key="exponent">65537</elem>
+</table>
+<table key="extensions">
+<table>
+<elem key="name">Netscape Cert Type</elem>
+<elem key="value">SSL Server</elem>
+</table>
+<table>
+<elem key="name">Netscape SSL Server Name</elem>
+<elem key="value">localhost</elem>
+</table>
+</table>
+<elem key="sig_algo">md5WithRSAEncryption</elem>
+<table key="validity">
+<elem key="notBefore">2020-11-22T17:06:58</elem>
+<elem key="notAfter">2021-11-22T17:06:58</elem>
+</table>
+<elem key="md5">f7db96c59a1e6097757bca2dc988d4e8</elem>
+<elem key="sha1">0822fefe7aae12ec0ea5d94af309a09f29c4e0a4</elem>
+<elem key="pem">-&#45;&#45;&#45;&#45;BEGIN CERTIFICATE-&#45;&#45;&#45;&#45;&#xa;MIIDazCCAlOgAwIBAgIEX7qasjANBgkqhkiG9w0BAQQFADBfMQswCQYDVQQGEwJE&#xa;RTEjMCEGA1UEAwwaTmVwZW50aGVzIERldmVsb3BtZW50IFRlYW0xHTAbBgNVBAoM&#xa;FGRpb25hZWEuY2Fybml2b3JlLml0MQwwCgYDVQQLDANhbnYwHhcNMjAxMTIyMTcw&#xa;NjU4WhcNMjExMTIyMTcwNjU4WjBfMQswCQYDVQQGEwJERTEjMCEGA1UEAwwaTmVw&#xa;ZW50aGVzIERldmVsb3BtZW50IFRlYW0xHTAbBgNVBAoMFGRpb25hZWEuY2Fybml2&#xa;b3JlLml0MQwwCgYDVQQLDANhbnYwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK&#xa;AoIBAQC88YtnRyyAOmwmxMWarHIADvre3dzApH8WFIVItsR2zRuLoh20gOqOuwoM&#xa;qT1pUjvz5pNhZqEq0bOeTjOpAf6nchWn1Xc67erWuUrsVwnBxgQvsybuATjz0umw&#xa;fJc846AI8e8HWnIFJCOYgvw8c9xPEMNZLGte5u7rwZCtIjfpsVH+odWT/g7UJLwU&#xa;AdiF/OWZU89p08emBphFCeUdVG5WKeMZlgLOE8et77/XssjKkM7LhI71V4BKLtEI&#xa;/Jy9CcjRsJZe4wIuJlLtlWUDtM3OGROF/xng4+l2Rek/nTuxleHl+dS3N2nqFwd7&#xa;WWecYETw+b7ntxEnq0TMuduLs6SnAgMBAAGjLzAtMBEGCWCGSAGG+EIBAQQEAwIG&#xa;QDAYBglghkgBhvhCAQwECxYJbG9jYWxob3N0MA0GCSqGSIb3DQEBBAUAA4IBAQAR&#xa;uA9z/3gax6QR+XhpZmnIISCfkk8AqP5VzYcttJoJxFfsoMAZT7UxZg5bkz32ZNk0&#xa;2XE4IJ8YHgIrU/cChVIsyQ6SSvI/ts2Dzamv1R2VxCzL96oGhEMBUYLeUtUaIxao&#xa;GzWVKL4q0l0+ZDq7SQynL9jhJpyVjV77s9ty9eTgU6jievgygHq/A+UZ4nMBLoUm&#xa;Vrkj80KzZoqkBOEIWyGgXgJ2FXo1V/9nsr3mPqESJXTaEn9riys/LUBkoFzoI451&#xa;65c9Mgh43w5GzFjA3Sb5otsTBBJL+bJ0n0llFYKJUo2buv+ETARoMWzOwTb+M/oa&#xa;0/nh8UBSFEdc9+wldsZO&#xa;-&#45;&#45;&#45;&#45;END CERTIFICATE-&#45;&#45;&#45;&#45;&#xa;</elem>
+</script><script id="ssl-date" output="TLS randomness does not represent time"></script></port>
+<port protocol="tcp" portid="445"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="microsoft-ds" product="Windows XP microsoft-ds" method="probed" conf="10"/></port>
+<port protocol="tcp" portid="1433"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="ms-sql-s" product="Microsoft SQL Server 2000" version="8.00.528.00; SP1+" method="probed" conf="10"/><script id="ms-sql-config" output="&#xa;  [172.28.1.3:1433]&#xa;    ERROR: No login credentials&#xa;"/><script id="ms-sql-dump-hashes" output="&#xa;[172.28.1.3:1433]&#xa;  ERROR: No login credentials&#xa;"/><script id="ms-sql-hasdbaccess" output="&#xa;  [172.28.1.3:1433]&#xa;    ERROR: No login credentials.&#xa;"/><script id="ms-sql-query" output="&#xa;  (Use -&#45;script-args=ms-sql-query.query=&apos;&lt;QUERY&gt;&apos; to change query.)&#xa;  [172.28.1.3:1433]&#xa;    ERROR: No login credentials&#xa;"/><script id="ms-sql-tables" output="&#xa;  [172.28.1.3:1433]&#xa;    ERROR: No login credentials.&#xa;"/><script id="ssl-ccs-injection" output="No reply from server (TIMEOUT)"/><script id="tls-ticketbleed" output="ERROR: Script execution failed (use -d to debug)"/></port>
+<port protocol="tcp" portid="1723"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="pptp" product="" version="(Firmware: 1)" hostname="" method="probed" conf="10"/></port>
+<port protocol="tcp" portid="1883"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="mqtt" method="probed" conf="10"/><script id="mqtt-subscribe" output="Every topic filter was rejected."><elem key="ERROR">Every topic filter was rejected.</elem>
+</script></port>
+<port protocol="tcp" portid="3306"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="mysql" product="MySQL" version="5.7.16" method="probed" conf="10"><cpe>cpe:/a:mysql:mysql:5.7.16</cpe></service><script id="banner" output="4\x00\x00\x00\x0A5.7.16\x00\x00\x00\x12gaaaaaaaa\x00,\xA2!\x...&#xa;"/><script id="mysql-info" output="&#xa;  Protocol: 10&#xa;  Version: 5.7.16&#xa;  Thread ID: 1729232896&#xa;  Capabilities flags: 41516&#xa;  Some Capabilities: ConnectWithDatabase, SupportsCompression, LongColumnFlag, Support41Auth, SupportsTransactions, Speaks41ProtocolNew&#xa;  Status: Autocommit&#xa;  Salt: aaaaaaaa            "><elem key="Protocol">10</elem>
+<elem key="Version">5.7.16</elem>
+<elem key="Thread ID">1729232896</elem>
+<elem key="Capabilities flags">41516</elem>
+<table key="Some Capabilities">
+<elem>ConnectWithDatabase</elem>
+<elem>SupportsCompression</elem>
+<elem>LongColumnFlag</elem>
+<elem>Support41Auth</elem>
+<elem>SupportsTransactions</elem>
+<elem>Speaks41ProtocolNew</elem>
+</table>
+<elem key="Status">Autocommit</elem>
+<elem key="Salt">aaaaaaaa            </elem>
+</script></port>
+<port protocol="tcp" portid="5060"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="sip" method="table" conf="3"/></port>
+<port protocol="tcp" portid="9100"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="jetdirect" method="table" conf="3"/></port>
+<port protocol="tcp" portid="11211"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="memcached" product="Memcached" version="1.4.25" extrainfo="uptime 132 seconds" method="probed" conf="10"><cpe>cpe:/a:memcached:memcached:1.4.25</cpe></service><script id="unusual-port" output="memcached unexpected on port tcp/11211"/><script id="vulners" output="&#xa;  cpe:/a:memcached:memcached:1.4.25: &#xa;    &#x9;CVE-2016-8705&#x9;7.5&#x9;https://vulners.com/cve/CVE-2016-8705&#xa;    &#x9;CVE-2016-8704&#x9;7.5&#x9;https://vulners.com/cve/CVE-2016-8704&#xa;    &#x9;CVE-2016-8706&#x9;6.8&#x9;https://vulners.com/cve/CVE-2016-8706&#xa;    &#x9;CVE-2018-1000127&#x9;5.0&#x9;https://vulners.com/cve/CVE-2018-1000127&#xa;    &#x9;CVE-2017-9951&#x9;5.0&#x9;https://vulners.com/cve/CVE-2017-9951&#xa;    &#x9;PACKETSTORM:139572&#x9;0.0&#x9;https://vulners.com/packetstorm/PACKETSTORM:139572&#x9;*EXPLOIT*"><table key="cpe:/a:memcached:memcached:1.4.25">
+<table>
+<elem key="type">cve</elem>
+<elem key="cvss">7.5</elem>
+<elem key="is_exploit">false</elem>
+<elem key="id">CVE-2016-8705</elem>
+</table>
+<table>
+<elem key="type">cve</elem>
+<elem key="cvss">7.5</elem>
+<elem key="is_exploit">false</elem>
+<elem key="id">CVE-2016-8704</elem>
+</table>
+<table>
+<elem key="type">cve</elem>
+<elem key="cvss">6.8</elem>
+<elem key="is_exploit">false</elem>
+<elem key="id">CVE-2016-8706</elem>
+</table>
+<table>
+<elem key="type">cve</elem>
+<elem key="cvss">5.0</elem>
+<elem key="is_exploit">false</elem>
+<elem key="id">CVE-2018-1000127</elem>
+</table>
+<table>
+<elem key="type">cve</elem>
+<elem key="cvss">5.0</elem>
+<elem key="is_exploit">false</elem>
+<elem key="id">CVE-2017-9951</elem>
+</table>
+<table>
+<elem key="type">packetstorm</elem>
+<elem key="cvss">0.0</elem>
+<elem key="is_exploit">true</elem>
+<elem key="id">PACKETSTORM:139572</elem>
+</table>
+</table>
+</script></port>
+<port protocol="tcp" portid="27017"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="mongodb" product="MongoDB" method="probed" conf="10"/><script id="fingerprint-strings" output="&#xa;  mongodb: &#xa;    cursor&#xa;    test&#xa;    firstBatch"><elem key="mongodb">&#xa;    cursor&#xa;    test&#xa;    firstBatch</elem>
+</script><script id="mongodb-databases" output="&#xa;  maxMessageSizeBytes = 48000000&#xa;  maxWireVersion = 5&#xa;  minWireVersion = 0&#xa;  maxWriteBatchSize = 1000&#xa;  readOnly = false&#xa;  localTime = 1606065113247&#xa;  ismaster = true&#xa;  ok = 1&#xa;  maxBsonObjectSize = 16777216&#xa;"/><script id="mongodb-info" output="ERROR: Script execution failed (use -d to debug)"/></port>
+</ports>
+<os><portused state="open" proto="tcp" portid="21"/>
+<portused state="closed" proto="tcp" portid="1"/>
+<portused state="closed" proto="udp" portid="40137"/>
+<osmatch name="Linux 4.15 - 5.6" accuracy="100" line="67241">
+<osclass type="general purpose" vendor="Linux" osfamily="Linux" osgen="4.X" accuracy="100"><cpe>cpe:/o:linux:linux_kernel:4</cpe></osclass>
+<osclass type="general purpose" vendor="Linux" osfamily="Linux" osgen="5.X" accuracy="100"><cpe>cpe:/o:linux:linux_kernel:5</cpe></osclass>
+</osmatch>
+</os>
+<uptime seconds="4190117" lastboot="Mon Oct  5 05:19:16 2020"/>
+<distance value="1"/>
+<tcpsequence index="256" difficulty="Good luck!" values="C90AE511,ECA907F4,3CD0549B,85F3EF,EC38CEF9,349A1573"/>
+<ipidsequence class="All zeros" values="0,0,0,0,0,0"/>
+<tcptssequence class="1000HZ" values="F9BDA77C,F9BDA7E1,F9BDA845,F9BDA8A9,F9BDA90D,F9BDA972"/>
+<hostscript><script id="clock-skew" output="mean: -35m03s, deviation: 42m12s, median: -1h04m54s"><elem key="mean">-2103</elem>
+<elem key="count">2</elem>
+<elem key="median">-3894</elem>
+<elem key="stddev">2532</elem>
+</script><script id="dns-blacklist" output="&#xa;  PROXY&#xa;    tor.dan.me.uk - FAIL&#xa;"/><script id="fcrdns" output="PASS (dionaea.libnmap-testing_testing_net)"><table key="dionaea.libnmap-testing_testing_net">
+<elem key="status">pass</elem>
+<table key="addresses">
+<elem>172.28.1.3</elem>
+</table>
+</table>
+</script><script id="ipidseq" output="All zeros"/><script id="ms-sql-info" output="&#xa;  172.28.1.3:1433: &#xa;    Version: &#xa;      name: Microsoft SQL Server 2000 SP1+&#xa;      number: 8.00.528.00&#xa;      Product: Microsoft SQL Server 2000&#xa;      Service pack level: SP1&#xa;      Post-SP patches applied: true&#xa;    TCP port: 1433"><table key="172.28.1.3:1433">
+<table key="Version">
+<elem key="name">Microsoft SQL Server 2000 SP1+</elem>
+<elem key="number">8.00.528.00</elem>
+<elem key="Product">Microsoft SQL Server 2000</elem>
+<elem key="Service pack level">SP1</elem>
+<elem key="Post-SP patches applied">true</elem>
+</table>
+<elem key="TCP port">1433</elem>
+</table>
+</script><script id="msrpc-enum" output="SMB: Failed to receive bytes: TIMEOUT">false</script><script id="path-mtu" output="PMTU == 1500"/><script id="qscan" output="&#xa;PORT  FAMILY  MEAN (us)  STDDEV  LOSS (%)&#xa;1     0       230.60     15.33   0.0%&#xa;21    0       224.70     54.13   0.0%&#xa;23    0       225.40     47.03   0.0%&#xa;42    1       251.40     17.31   0.0%&#xa;53    1       246.00     18.98   0.0%&#xa;80    1       242.20     14.37   0.0%&#xa;135   0       202.00     70.03   0.0%&#xa;443   0       220.30     68.70   0.0%&#xa;445   0       208.60     75.43   0.0%&#xa;"/><script id="resolveall" output="&#xa;  Host &apos;dionaea&apos; also resolves to:&#xa;  Use the &apos;newtargets&apos; script-arg to add the results as targets&#xa;  Use the -&#45;resolve-all option to scan all resolved addresses without using this script.&#xa;"><elem key="newtargets">0</elem>
+<table key="addresses">
+</table>
+</script><script id="smb-double-pulsar-backdoor" output="&#xa;  VULNERABLE:&#xa;  Double Pulsar SMB Backdoor&#xa;    State: VULNERABLE&#xa;    Risk factor: HIGH  CVSSv2: 10.0 (HIGH) (AV:N/AC:L/Au:N/C:C/I:C/A:C)&#xa;      The Double Pulsar SMB backdoor was detected running on the remote machine.&#xa;      &#xa;    Disclosure date: 2017-04-14&#xa;    References:&#xa;      https://steemit.com/shadowbrokers/@theshadowbrokers/lost-in-translation&#xa;      https://isc.sans.edu/forums/diary/Detecting+SMB+Covert+Channel+Double+Pulsar/22312/&#xa;      https://github.com/countercept/doublepulsar-detection-script&#xa;"><table key="NMAP-3">
+<elem key="title">Double Pulsar SMB Backdoor</elem>
+<elem key="state">VULNERABLE</elem>
+<table key="scores">
+<elem key="CVSSv2">10.0 (HIGH) (AV:N/AC:L/Au:N/C:C/I:C/A:C)</elem>
+</table>
+<table key="description">
+<elem>The Double Pulsar SMB backdoor was detected running on the remote machine.&#xa;</elem>
+</table>
+<table key="dates">
+<table key="disclosure">
+<elem key="month">04</elem>
+<elem key="year">2017</elem>
+<elem key="day">14</elem>
+</table>
+</table>
+<elem key="disclosure">2017-04-14</elem>
+<table key="exploit_results">
+</table>
+<table key="refs">
+<elem>https://steemit.com/shadowbrokers/@theshadowbrokers/lost-in-translation</elem>
+<elem>https://isc.sans.edu/forums/diary/Detecting+SMB+Covert+Channel+Double+Pulsar/22312/</elem>
+<elem>https://github.com/countercept/doublepulsar-detection-script</elem>
+</table>
+</table>
+</script><script id="smb-mbenum" output="&#xa;  ERROR: MSRPC: NetServerEnum2 call failed"/><script id="smb-os-discovery" output="&#xa;  OS: Windows XP (Windows 2000 LAN Manager)&#xa;  OS CPE: cpe:/o:microsoft:windows_xp::-&#xa;  NetBIOS computer name: HOMEUSER-3AF6FE\x00&#xa;  Workgroup: WORKGROUP\x00&#xa;  System time: 2020-11-22T18:06:58+01:00&#xa;"><elem key="os">Windows 5.1</elem>
+<elem key="lanmanager">Windows 2000 LAN Manager</elem>
+<elem key="domain">WORKGROUP\x00</elem>
+<elem key="server">HOMEUSER-3AF6FE\x00</elem>
+<elem key="date">2020-11-22T18:06:58+01:00</elem>
+<elem key="cpe">cpe:/o:microsoft:windows_xp::-</elem>
+</script><script id="smb-protocols" output="&#xa;  dialects: &#xa;    NT LM 0.12 (SMBv1) [dangerous, but default]"><table key="dialects">
+<elem>NT LM 0.12 (SMBv1) [dangerous, but default]</elem>
+</table>
+</script><script id="smb-security-mode" output="&#xa;  account_used: guest&#xa;  authentication_level: user&#xa;  challenge_response: supported&#xa;  message_signing: disabled (dangerous, but default)"><elem key="account_used">guest</elem>
+<elem key="authentication_level">user</elem>
+<elem key="challenge_response">supported</elem>
+<elem key="message_signing">disabled</elem>
+</script><script id="smb-vuln-ms17-010" output="&#xa;  VULNERABLE:&#xa;  Remote Code Execution vulnerability in Microsoft SMBv1 servers (ms17-010)&#xa;    State: VULNERABLE&#xa;    IDs:  CVE:CVE-2017-0143&#xa;    Risk factor: HIGH&#xa;      A critical remote code execution vulnerability exists in Microsoft SMBv1&#xa;       servers (ms17-010).&#xa;          &#xa;    Disclosure date: 2017-03-14&#xa;    References:&#xa;      https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-0143&#xa;      https://technet.microsoft.com/en-us/library/security/ms17-010.aspx&#xa;      https://blogs.technet.microsoft.com/msrc/2017/05/12/customer-guidance-for-wannacrypt-attacks/&#xa;"><table key="CVE-2017-0143">
+<elem key="title">Remote Code Execution vulnerability in Microsoft SMBv1 servers (ms17-010)</elem>
+<elem key="state">VULNERABLE</elem>
+<table key="ids">
+<elem>CVE:CVE-2017-0143</elem>
+</table>
+<table key="description">
+<elem>A critical remote code execution vulnerability exists in Microsoft SMBv1&#xa; servers (ms17-010).&#xa;    </elem>
+</table>
+<table key="dates">
+<table key="disclosure">
+<elem key="month">03</elem>
+<elem key="year">2017</elem>
+<elem key="day">14</elem>
+</table>
+</table>
+<elem key="disclosure">2017-03-14</elem>
+<table key="refs">
+<elem>https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-0143</elem>
+<elem>https://technet.microsoft.com/en-us/library/security/ms17-010.aspx</elem>
+<elem>https://blogs.technet.microsoft.com/msrc/2017/05/12/customer-guidance-for-wannacrypt-attacks/</elem>
+</table>
+</table>
+</script><script id="smb2-time" output="Protocol negotiation failed (SMB2)"/><script id="traceroute-geolocation" output="&#xa;  HOP  RTT   ADDRESS                                           GEOLOCATION&#xa;  1    0.21  dionaea.libnmap-testing_testing_net (172.28.1.3)  - ,- &#xa;"><table>
+<elem key="rtt">0.21</elem>
+<elem key="hop">1</elem>
+<elem key="ip">172.28.1.3</elem>
+<elem key="hostname">dionaea.libnmap-testing_testing_net</elem>
+</table>
+</script></hostscript><trace>
+<hop ttl="1" ipaddr="172.28.1.3" rtt="0.21" host="dionaea.libnmap-testing_testing_net"/>
+</trace>
+<times srtt="210" rttvar="70" to="100000"/>
+</host>
+<postscript><script id="reverse-index" output="&#xa;  21/tcp: 172.28.1.3&#xa;  23/tcp: 172.28.1.3&#xa;  42/tcp: 172.28.1.3&#xa;  53/tcp: 172.28.1.3&#xa;  80/tcp: 172.28.1.3&#xa;  135/tcp: 172.28.1.3&#xa;  443/tcp: 172.28.1.3&#xa;  445/tcp: 172.28.1.3&#xa;  1433/tcp: 172.28.1.3&#xa;  1723/tcp: 172.28.1.3&#xa;  1883/tcp: 172.28.1.3&#xa;  3306/tcp: 172.28.1.3&#xa;  5060/tcp: 172.28.1.3&#xa;  9100/tcp: 172.28.1.3&#xa;  11211/tcp: 172.28.1.3&#xa;  27017/tcp: 172.28.1.3"><table key="21/tcp">
+<elem>172.28.1.3</elem>
+</table>
+<table key="23/tcp">
+<elem>172.28.1.3</elem>
+</table>
+<table key="42/tcp">
+<elem>172.28.1.3</elem>
+</table>
+<table key="53/tcp">
+<elem>172.28.1.3</elem>
+</table>
+<table key="80/tcp">
+<elem>172.28.1.3</elem>
+</table>
+<table key="135/tcp">
+<elem>172.28.1.3</elem>
+</table>
+<table key="443/tcp">
+<elem>172.28.1.3</elem>
+</table>
+<table key="445/tcp">
+<elem>172.28.1.3</elem>
+</table>
+<table key="1433/tcp">
+<elem>172.28.1.3</elem>
+</table>
+<table key="1723/tcp">
+<elem>172.28.1.3</elem>
+</table>
+<table key="1883/tcp">
+<elem>172.28.1.3</elem>
+</table>
+<table key="3306/tcp">
+<elem>172.28.1.3</elem>
+</table>
+<table key="5060/tcp">
+<elem>172.28.1.3</elem>
+</table>
+<table key="9100/tcp">
+<elem>172.28.1.3</elem>
+</table>
+<table key="11211/tcp">
+<elem>172.28.1.3</elem>
+</table>
+<table key="27017/tcp">
+<elem>172.28.1.3</elem>
+</table>
+</script></postscript><runstats><finished time="1606065273" timestr="Sun Nov 22 17:14:33 2020" summary="Nmap done at Sun Nov 22 17:14:33 2020; 1 IP address (1 host up) scanned in 365.60 seconds" elapsed="365.60" exit="success"/><hosts up="1" down="0" total="1"/>
+</runstats>
+</nmaprun>

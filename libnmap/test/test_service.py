@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
 import unittest
 
 from libnmap.diff import NmapDiffException
@@ -170,6 +171,7 @@ port_tunnel = """
 
 class TestNmapService(unittest.TestCase):
     def setUp(self):
+        self.fdir = os.path.dirname(os.path.realpath(__file__))
         self.s1 = NmapParser.parse(service1)
         self.s2 = NmapParser.parse(service2)
         self.s3 = NmapParser.parse(service3)
@@ -254,6 +256,21 @@ class TestNmapService(unittest.TestCase):
     def test_tunnel(self):
         servicetunnel = NmapParser.parse(port_tunnel)
         self.assertEqual(servicetunnel.tunnel, "ssl")
+
+    def test_bannerdict(self):
+        nmapreport = NmapParser.parse_fromfile(
+            "{0}/files/dionaea_scan.xml".format(self.fdir)
+        )
+        dhttp = nmapreport.hosts[0].get_service(80)
+        dftp = nmapreport.hosts[0].get_service(21)
+        self.assertEqual(dhttp.banner_dict, {"product": "nginx"})
+        self.assertEqual(
+            dftp.banner_dict,
+            {
+                "product": "Synology DiskStation NAS ftpd",
+                "devicetype": "storage-misc",
+            },
+        )
 
 
 if __name__ == "__main__":
