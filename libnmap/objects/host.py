@@ -113,6 +113,7 @@ class NmapHost(object):
         return (
             hash(self.status)
             ^ hash(self.address)
+            ^ hash(self._mac_addr)
             ^ hash(frozenset(self._services))
             ^ hash(frozenset(" ".join(self._hostnames)))
         )
@@ -510,8 +511,10 @@ class NmapHost(object):
                 "address": self.address,
                 "status": self.status,
                 "hostnames": " ".join(self._hostnames),
+                "mac_addr": self._mac_addr,
             }
         )
+
         return d
 
     def diff(self, other):

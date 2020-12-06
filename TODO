@@ -1,11 +1,12 @@
 0.7.1: - clean-up blacked code and pylint it 
 0.7.1: - add unittest for defusedxml to fix billionlaugh and external entities security issues
-0.7.1: - add CSV backend support
 0.7.1: - Change License from CC-BY to Apache 2.0
-0.7.1: - Update readme file to reflect the xml fixed issue + how to install it
+0.7.1: - Enabled defusedxml support as preferred option for parsing ()
 0.7.1: - add extra_requires for plugins deps and defusedxml
 0.7.1: - Remove code duplication in sudo_run and sudo_run_background from process.py
-0.7.1: - Merge PR79 from Shouren to fix empty nmap outputs
+0.7.1: - Fix empty nmap outputs due to subprocess race condition (Merge PR79 from @Shouren)
+0.7.1: - Added banner_dict support + unittest (Merge edited PR from @cfoulds)
+0.7.2: - add CSV backend support
 0.7.2: improve API for NSE scripts
 0.7.2: add support for post,pre and host scripts
 0.7.2: add a Contribution guideline page

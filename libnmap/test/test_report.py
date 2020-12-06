@@ -249,9 +249,27 @@ class TestNmapParser(unittest.TestCase):
                     "NmapService::tcp.3306",
                     "address",
                     "NmapService::tcp.25",
+                    "mac_addr",
                 ]
             ),
         )
+
+    def test_diff_mac(self):
+        fdir = os.path.dirname(os.path.realpath(__file__))
+        host_ping = "{0}/files/1_host_ping.xml".format(fdir)
+        host_ping_mac_changed = (
+            "{0}/files/diff_1_host_ping_mac_changed.xml".format(fdir)
+        )
+
+        report_mac_original = NmapParser.parse_fromfile(host_ping)
+        report_mac_changed = NmapParser.parse_fromfile(host_ping_mac_changed)
+
+        report_diff = report_mac_original.diff(report_mac_changed)
+        self.assertEqual(report_diff.changed(), set(["NmapHost::172.28.1.3"]))
+        host_original = report_mac_original.hosts[0]
+        host_mac_changed = report_mac_changed.hosts[0]
+        host_diff = host_original.diff(host_mac_changed)
+        self.assertEqual(host_diff.changed(), set(["mac_addr"]))
 
 
 if __name__ == "__main__":
