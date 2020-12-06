@@ -113,6 +113,7 @@ class NmapHost(object):
         return (
             hash(self.status)
             ^ hash(self.address)
+            ^ hash(self._mac_addr)
             ^ hash(frozenset(self._services))
             ^ hash(frozenset(" ".join(self._hostnames)))
         )

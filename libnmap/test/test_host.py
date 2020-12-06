@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
 import unittest
 
 from libnmap.parser import NmapParser
@@ -111,6 +112,7 @@ host3 = """<host starttime="13617" endtime="13617">
 <times srtt="2100" rttvar="688" to="100000"/>
 </host>
 """
+
 host4 = """
 <host starttime="77" endtime="13">
 <status state="up" reason="locaonse"/>
@@ -151,7 +153,7 @@ host4 = """
 class TestNmapHost(unittest.TestCase):
     def setUp(self):
         self.fdir = os.path.dirname(os.path.realpath(__file__))
-        self.dionaea_path = "{0}/files/dionaea_scan.xml"
+        self.dionaea_path = "{0}/files/dionaea_scan.xml".format(self.fdir)
 
     def test_eq_host(self):
         h1 = NmapParser.parse(host1)
