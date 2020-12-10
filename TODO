@@ -1,20 +1,20 @@
-0.7.1: - clean-up blacked code and pylint it 
-0.7.1: - add unittest for defusedxml to fix billionlaugh and external entities security issues
-0.7.1: - Change License from CC-BY to Apache 2.0
-0.7.1: - Enabled defusedxml support as preferred option for parsing ()
-0.7.1: - add extra_requires for plugins deps and defusedxml
-0.7.1: - Remove code duplication in sudo_run and sudo_run_background from process.py
-0.7.1: - Fix empty nmap outputs due to subprocess race condition (Merge PR79 from @Shouren)
-0.7.1: - Added banner_dict support + unittest (Merge edited PR from @cfoulds)
-0.7.2: - add CSV backend support
+0.7.1: clean-up blacked code and pylint it 
+0.7.1: add unittest for defusedxml to fix billionlaugh and external entities security issues
+0.7.1: Change License from CC-BY to Apache 2.0
+0.7.1: Enabled defusedxml support as preferred option for parsing ()
+0.7.1: add extra_requires for plugins deps and defusedxml
+0.7.1: Remove code duplication in sudo_run and sudo_run_background from process.py
+0.7.1: Fix empty nmap outputs due to subprocess race condition (Merge PR79 from @Shouren)
+0.7.1: Added banner_dict support + unittest (Merge edited PR from @cfoulds)
+
+0.7.2: add CSV backend support
 0.7.2: improve API for NSE scripts
 0.7.2: add support for post,pre and host scripts
 0.7.2: add a Contribution guideline page
 0.7.2: add development environment config and setup
 0.7.2: add pre-commit hooks to enforce black and isort
 0.7.2: automate in github actions the git workflow + doc update + pypi update
-0.7.3: create complete python testing environment based on docker-compose and some examples
-- complete unit tests with coverall support
-- Add new plugins to support import/export from mysql, couchdb, csv
-- add unittest for udp scans, ping sweeping
-- add support for 'resume' capability (see nmap --resume)
+
+0.7.3: Add support and tests for traceroute in nmap
+
+0.7.4: create complete python testing environment based on docker-compose and some examples
