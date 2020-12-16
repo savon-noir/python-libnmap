@@ -42,7 +42,7 @@ All the documentation is available on [read the docs](https://libnmap.readthedoc
 
 ## Dependencies
 
-libnmap has by default no dependencies.
+libnmap has by default no dependencies, except defusedxml if you need to import untrusted XML scans data.
 
 The only additional python modules you'll have to install depends if you wish to use libnmap to store reports on an exotic data store via libnmap's independents plugins.
 
@@ -52,15 +52,27 @@ Below the list of optional dependencies:
 - [pymongo](https://github.com/mongodb/mongo-python-driver/)
 - [boto](https://github.com/boto/boto)
 
+## Security
+
+If you are importing/parsing untrusted XML scan outputs with python-libnmap, install defusedxml library:
+
+```bash
+ronald@brouette:~/dev$ pip install defusedxml
+```
+
+This will prevent you from being vulnerable to [XML External Entities attacks](https://owasp.org/www-community/vulnerabilities/XML_External_Entity_(XXE)_Processing).
+
+For more information, read the [official libnmap documentation](https://libnmap.readthedocs.io/en/latest/parser.html#security-note-for-libnmap-parser)
+
+This note relates to a cascaded CVE vulnerability from the python core library XML ElementTree. Nevertheless, python-libnmap has been assigned an [official CVE](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-1010017) to track this issue.
+
+This CVE is addressed from v0.7.1.
+
 ## Python Support
 
 The libnmap code is tested against the following python interpreters:
 
-- Python 2.6
 - Python 2.7
-- Python 3.3
-- Python 3.4
-- Python 3.5
 - Python 3.6
 - Python 3.7
 - Python 3.8
