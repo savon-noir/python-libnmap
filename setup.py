@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from distutils.core import setup
 
-with open("README.md") as rfile:
+with open("README.rst") as rfile:
     long_description = rfile.read()
 
 setup(
