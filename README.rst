@@ -94,7 +94,7 @@ an `official
 CVE <https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-1010017>`__
 to track this issue.
 
-This CVE is addressed from v0.7.1.
+This CVE is addressed from v0.7.2.
 
 Python Support
 --------------
@@ -143,8 +143,6 @@ in Kibana like the screenshot below:
 
 .. figure:: https://github.com/savon-noir/python-libnmap/blob/es/examples/kibanalibnmap.png
    :alt: Kibanane
-
-   Kibanane
 
 Contributors
 ------------

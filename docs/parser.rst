@@ -12,7 +12,7 @@ Security note for libnmap.parser
 
 By default, python-libnmap's parser module does not enforces an extra XML parser module than the one provided in the python core distribution.
 
-In versions previous to 0.7.1, by default, the `ElementTree XML API was used <https://docs.python.org/3/library/xml.etree.elementtree.html>`_.
+In versions previous to 0.7.2, by default, the `ElementTree XML API was used <https://docs.python.org/3/library/xml.etree.elementtree.html>`_.
 This XML library is vulnerable to several `XML External Entities attacks <https://owasp.org/www-community/vulnerabilities/XML_External_Entity_(XXE)_Processing>`_ which may lead to:
 
 - Denial of Service attacks
