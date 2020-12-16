@@ -44,3 +44,4 @@ nosetests.xml
 __pycache__
 .vscode/settings.json
 .noseids
+_build

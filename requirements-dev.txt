@@ -1,0 +1,7 @@
+black==20.8b1    
+defusedxml==0.6.0     
+isort==5.6.4     
+pre-commit
+pytest
+pytest-cov
+flake8

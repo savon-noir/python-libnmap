@@ -7,6 +7,11 @@
 0.7.1: Fix empty nmap outputs due to subprocess race condition (Merge PR79 from @Shouren)
 0.7.1: Added banner_dict support + unittest (Merge edited PR from @cfoulds)
 
+release:
+- changelog date not respecting KACL specs
+- check https://github.com/anton-yurchenko/git-release
+- https://github.com/sean0x42/markdown-extract 
+
 0.7.2: add CSV backend support
 0.7.2: improve API for NSE scripts
 0.7.2: add support for post,pre and host scripts

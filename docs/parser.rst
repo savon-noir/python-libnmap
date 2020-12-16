@@ -1,6 +1,42 @@
 libnmap.parser
 ==============
 
+Security note for libnmap.parser
+--------------------------------
+
+**TLDR:** if you are importing/parsing untrusted XML scan outputs with python-libnmap, install defusedxml library: 
+
+.. code-block:: bash
+
+    ronald@brouette:~/dev$ pip install defusedxml
+
+By default, python-libnmap's parser module does not enforces an extra XML parser module than the one provided in the python core distribution.
+
+In versions previous to 0.7.1, by default, the `ElementTree XML API was used <https://docs.python.org/3/library/xml.etree.elementtree.html>`_.
+This XML library is vulnerable to several `XML External Entities attacks <https://owasp.org/www-community/vulnerabilities/XML_External_Entity_(XXE)_Processing>`_ which may lead to:
+
+- Denial of Service attacks
+- Remote and local files inclusions
+- Remote code execution
+
+This implies, de facto, that parsing any untrusted XML file could result in any of the above. 
+
+Fortunately, one of the python core developer is maintaining an alternative Python XML parsing library: `defusedxml <https://pypi.org/project/defusedxml/>`_ which addresses all the above vulnerabilities.
+
+Since the above vulnerabilities will only affect you if you are parsing untrusted XML scan outputs, by default, the defusedxml library is not enforced. 
+But if the defusedxml library is installed, it will be the preferred XML parser picked by python-libnmap.
+
+Consider the following lines from libnmap.parser module:
+
+.. literalinclude:: ../libnmap/parser.py
+   :linenos:
+   :lines: 3-10
+
+
+- Line 4 first tries to import defusedxml 
+- if it fails, it then tries to load cElementTree (known to be more performant)
+- if it fails, it then defaults to XML ElementTree.
+
 Purpose of libnmap.parser
 -------------------------
 
@@ -40,14 +76,18 @@ All of the above methods can receive as input:
 - a list of scanned services in XML (<ports>...</ports> tag) and will return a python array of NmapService objects
 - a scanned service in XML (<port>...</port> tag) and will return a NmapService object
 
-Small example::
+Small example:
+
+.. code-block:: python
 
     from libnmap.parser import NmapParser
     
     nmap_report = NmapParser.parse_fromfile('libnmap/test/files/1_os_banner_scripts.xml')
     print "Nmap scan summary: {0}".format(nmap_report.summary)
 
-Basic usage from a processed scan::
+Basic usage from a processed scan:
+
+.. code-block:: python
 
     from libnmap.process import NmapProcess
     from libnmap.parser import NmapParser
