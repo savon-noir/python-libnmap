@@ -14,6 +14,10 @@ class TestNmapParser(unittest.TestCase):
             {"file": "%s/%s" % (fdir, "files/2_hosts.xml"), "hosts": 2},
             {"file": "%s/%s" % (fdir, "files/1_hosts.xml"), "hosts": 1},
             {
+                "file": "%s/%s" % (fdir, "files/1_hosts_incomplete.xml"),
+                "hosts": 1,
+            },
+            {
                 "file": "%s/%s"
                 % (fdir, "files/1_hosts_banner_ports_notsyn.xml"),
                 "hosts": 1,
@@ -128,7 +132,7 @@ class TestNmapParser(unittest.TestCase):
             fd = open(testfile["file"], "r")
             s = fd.read()
             fd.close()
-            NmapParser.parse(s)
+            NmapParser.parse(s, incomplete=True)
 
     def test_class_ports_parser(self):
         pdict = NmapParser.parse(self.ports_string)
