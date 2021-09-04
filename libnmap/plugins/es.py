@@ -48,7 +48,7 @@ class NmapElasticsearchPlugin(NmapBackendPlugin):
 
     def get(self, id):
         """
-        retreive a NmapReport from the backend
+        retrieve a NmapReport from the backend
         :param id: str
         :return: NmapReport
         """

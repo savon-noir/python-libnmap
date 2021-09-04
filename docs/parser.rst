@@ -63,7 +63,7 @@ Using libnmap.parser module
 
 NmapParser parse the whole data and returns nmap objects usable via their documented API.
 
-The NmapParser should never be instanciated and only the following methods should be called:
+The NmapParser should never be instantiated and only the following methods should be called:
 
 - NmapParser.parse(string)
 - NmapParser.parse_fromfile(file_path)

@@ -17,7 +17,7 @@ Those methods return a python set() of keys which have been changed/added/remove
 object to another.
 The keys of each objects could be found in the implementation of the get_dict() methods of the compared objects.
 
-The example below is a heavy version of going through all nested objects to see waht has changed after a diff::
+The example below is a heavy version of going through all nested objects to see what has changed after a diff::
 
     #!/usr/bin/env python
     

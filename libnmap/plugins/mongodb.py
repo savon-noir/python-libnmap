@@ -15,7 +15,7 @@ class NmapMongodbPlugin(NmapBackendPlugin):
     Implementation is made using pymongo
     Object of this class must be create via the
     BackendPluginFactory.create(**url) where url is a named dict like
-    {'plugin_name': "mongodb"} this dict may reeive all the param
+    {'plugin_name': "mongodb"} this dict may receive all the param
     MongoClient() support
     """
 

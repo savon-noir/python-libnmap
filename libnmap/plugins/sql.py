@@ -77,7 +77,7 @@ class NmapSqlPlugin(NmapBackendPlugin):
         - create all the necessary obj to discuss with the DB
         - create all the mapping(ORM)
 
-        todo : suport the : sqlalchemy.engine_from_config
+        todo : support the : sqlalchemy.engine_from_config
 
         :param **kwargs:
         :raises: ValueError if no url is given,
@@ -121,7 +121,7 @@ class NmapSqlPlugin(NmapBackendPlugin):
 
     def get(self, report_id=None):
         """
-        retreive a NmapReport from the backend
+        retrieve a NmapReport from the backend
 
         :param id: str
 
