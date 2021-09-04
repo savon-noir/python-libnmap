@@ -254,7 +254,7 @@ class NmapReport(object):
     @property
     def hosts_up(self):
         """
-        Accessor returning the numer of host detected
+        Accessor returning the number of host detected
         as 'up' during the scan.
 
         :return: integer (0 >= or -1)
@@ -270,7 +270,7 @@ class NmapReport(object):
     @property
     def hosts_down(self):
         """
-        Accessor returning the numer of host detected
+        Accessor returning the number of host detected
         as 'down' during the scan.
 
         :return: integer (0 >= or -1)

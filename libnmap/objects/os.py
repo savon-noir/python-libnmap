@@ -269,7 +269,7 @@ class NmapOSClass(object):
 class NmapOSFingerprint(object):
     """
     NmapOSFingerprint is a easier API for using os fingerprinting.
-    Data for OS fingerprint (<os> tag) is instanciated from
+    Data for OS fingerprint (<os> tag) is instantiated from
     a NmapOSFingerprint which is accessible in NmapHost via NmapHost.os
     """
 

@@ -22,7 +22,7 @@ class NmapTask(object):
 
     """
     NmapTask is a internal class used by process. Each time nmap
-    starts a new task during the scan, a new class will be instanciated.
+    starts a new task during the scan, a new class will be instantiated.
     Classes examples are: "Ping Scan", "NSE script", "DNS Resolve",..
     To each class an estimated time to complete is assigned and updated
     at least every second within the NmapProcess.
@@ -215,7 +215,7 @@ class NmapProcess(Thread):
     def sudo_run(self, run_as="root"):
         """
         Public method enabling the library's user to run the scan with
-        priviledges via sudo. The sudo configuration should be set manually
+        privileges via sudo. The sudo configuration should be set manually
         on the local system otherwise sudo will prompt for a password.
         This method alters the command line by prefixing the sudo command to
         nmap and will then call self.run()
@@ -245,7 +245,7 @@ class NmapProcess(Thread):
     def sudo_run_background(self, run_as="root"):
         """
         Public method enabling the library's user to run in background a
-        nmap scan with priviledges via sudo.
+        nmap scan with privileges via sudo.
         The sudo configuration should be set manually on the local system
         otherwise sudo will prompt for a password.
         This method alters the command line by prefixing the sudo command to
