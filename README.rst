@@ -36,10 +36,10 @@ The lib currently offers the following modules:
    de/serialize scan results in a json format
 -  **diff**: enables you to see what changed between two scans
 -  **common**: contains basic nmap objects like NmapHost and
-   NmapService. It is to note that each object can be “diff()ed” with
+   NmapService. It is to note that each object can be "diff()ed" with
    another similar object.
 -  **plugins**: enables you to support datastores for your scan results
-   directly in the “NmapReport” object. from report module:
+   directly in the "NmapReport" object. from report module:
 
    -  mongodb: insert/get/getAll/delete
    -  sqlalchemy: insert/get/getAll/delete
