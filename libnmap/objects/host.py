@@ -491,6 +491,16 @@ class NmapHost(object):
 
         return r.get("reasons", None)
 
+    @property
+    def user_target_hostname(self):
+        """
+        Returns user specified target hostname
+
+        :return: string
+        """
+
+        return self._extras.get("user_target_hostname")
+
     def get_dict(self):
         """
         Return a dict representation of the object.

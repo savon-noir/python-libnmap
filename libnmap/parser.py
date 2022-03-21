@@ -309,8 +309,10 @@ class NmapParser(object):
         ]
         for xh in xelement:
             if xh.tag == "hostnames":
-                for hostname in cls.__parse_hostnames(xh):
+                for hostname, type_ in cls.__parse_hostnames(xh):
                     _hostnames.append(hostname)
+                    if type_ == "user":
+                        _host_extras.update({"user_target_hostname": hostname})
             elif xh.tag == "ports":
                 ports_dict = cls._parse_xml_ports(xh)
                 for port in ports_dict["ports"]:
@@ -352,14 +354,14 @@ class NmapParser(object):
         :param scanhostnames_data: <hostnames> XML tag from a nmap scan
         :type scanhostnames_data: xml.ElementTree.Element or a string
 
-        :return: list of hostnames
+        :return: list of tuples (hostname, type)
         """
 
         xelement = cls.__format_element(scanhostnames_data)
         hostnames = []
         for hname in xelement:
             if hname.tag == "hostname":
-                hostnames.append(hname.get("name"))
+                hostnames.append((hname.get("name"), hname.get("type")))
         return hostnames
 
     @classmethod
