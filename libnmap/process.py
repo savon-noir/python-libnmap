@@ -4,6 +4,7 @@
 import os
 import platform
 import shlex
+import string
 import subprocess
 import warnings
 from threading import Thread
@@ -128,6 +129,9 @@ class NmapProcess(Thread):
             raise Exception(
                 "Supplied target list should be either a string or a list"
             )
+
+        for target in self.__nmap_targets:
+            self.__validate_target(target)
 
         self._nmap_options = set(options.split())
         if safe_mode and not self._nmap_options.isdisjoint(unsafe_opts):
@@ -479,6 +483,27 @@ class NmapProcess(Thread):
         if self.__nmap_targets:
             cmdline += self.__nmap_targets  # already a list
         return cmdline
+
+    @staticmethod
+    def __validate_target(target):
+        # See https://nmap.org/book/man-target-specification.html for all the
+        # ways targets can be specified
+        allowed_characters = frozenset(
+            string.ascii_letters + string.digits + "-.:/% "
+        )
+        if not set(target).issubset(allowed_characters):
+            raise Exception(
+                "Target '{}' contains invalid characters".format(target)
+            )
+        # FQDN can contain dashes anywhere except at the beginning or end
+        # This check also fixes/prevents CVE-2022-30284, which depends on being
+        # able to pass options such as --script as a target
+        elif target.startswith("-") or target.endswith("-"):
+            raise Exception(
+                "Target '{}' cannot begin or end with a dash ('-')".format(
+                    target
+                )
+            )
 
     @property
     def command(self):
