@@ -19,22 +19,47 @@ class TestNmapProcess(unittest.TestCase):
             self._assertRaisesRegex = self.assertRaisesRegexp
         self.fdir = os.path.dirname(os.path.realpath(__file__))
 
-    def test_check_targets(self):
-        invalid_target_tests = [{"a": "bba"}, 5]
+    def test_check_valid_targets(self):
         valid_target_tests = [
             {"value": "127.0.0.1, 1.1.1.1,     2.20.202", "size": 3},
             {"value": ["127.0.0.1", "1.1.1.1", "2.20.202.2"], "size": 3},
             {"value": ["     127.0.0.1", "  1.1.1.1"], "size": 2},
             {"value": "     127.0.0.1,      1.1.1.1  , a", "size": 3},
+            {"value": ["192.168.10.0/24", "192.168.0-255.1-254"], "size": 2},
+            {"value": ["fe80::a8bb:ccff:fedd:eeff%eth0"], "size": 1},
+            {"value": ["my-domain.com", "my-num3r1c-domain.com"], "size": 2},
         ]
         for vtarget in valid_target_tests:
             nmapobj = NmapProcess(targets=vtarget["value"], options="-sP")
             self.assertEqual(vtarget["size"], len(nmapobj.targets))
 
-        for vtarget in invalid_target_tests:
+    def test_check_invalid_targets(self):
+        invalid_target_type_tests = [{"a": "bba"}, 5]
+        invalid_target_character_tests = ["1.1.1.1$", "invalid_domain.com"]
+        invalid_target_dash_tests = ["-invalid-target", "--option"]
+
+        for vtarget in invalid_target_type_tests:
             self._assertRaisesRegex(
                 Exception,
                 "Supplied target list should be either a string or a list",
+                NmapProcess,
+                targets=vtarget,
+                options="-sP",
+            )
+
+        for vtarget in invalid_target_character_tests:
+            self._assertRaisesRegex(
+                Exception,
+                "contains invalid characters",
+                NmapProcess,
+                targets=vtarget,
+                options="-sP",
+            )
+
+        for vtarget in invalid_target_dash_tests:
+            self._assertRaisesRegex(
+                Exception,
+                "cannot begin or end with a dash",
                 NmapProcess,
                 targets=vtarget,
                 options="-sP",
