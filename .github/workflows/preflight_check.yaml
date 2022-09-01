@@ -61,7 +61,7 @@ jobs:
         COVERALLS_FLAG_NAME: ${{ matrix.python-version }}
         COVERALLS_PARALLEL: true
       run: |
-        coveralls --service=gihtub
+        coveralls --service=github
   coveralls:
     name: Finish Coveralls
     needs: test
@@ -71,6 +71,6 @@ jobs:
     - name: Finished
       run: |
         pip3 install --upgrade coveralls
-        coveralls --finish
+        coveralls --finish --service=github
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
