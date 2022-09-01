@@ -6,7 +6,7 @@ with open("README.rst", encoding="utf-8") as rfile:
 
 setup(
     name="python-libnmap",
-    version="0.7.2",
+    version="0.7.3",
     author="Ronald Bister",
     author_email="mini.pelle@gmail.com",
     packages=["libnmap", "libnmap.plugins", "libnmap.objects"],
