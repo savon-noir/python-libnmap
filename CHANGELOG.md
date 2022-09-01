@@ -142,7 +142,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added NmapReport.endtimestr
 - Added and tested cElementTree support (performance)
 
-### Fixed 
+### Fixed
 
 - Fixed bug when NmapReport.summary is empty
 
@@ -199,10 +199,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added stop() to terminate nmap scan running in background
 
-### Fixed 
+### Fixed
 
 - Bug corrected in missing data from nmap scan output
-                      
+
 ## [v0.3.1] - 17/06/2013
 
 ### Changed

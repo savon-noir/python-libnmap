@@ -1,4 +1,4 @@
-0.7.2: clean-up blacked code and pylint it 
+0.7.2: clean-up blacked code and pylint it
 0.7.2: add unittest for defusedxml to fix billionlaugh and external entities security issues
 0.7.2: Change License from CC-BY to Apache 2.0
 0.7.2: Enabled defusedxml support as preferred option for parsing ()
@@ -10,7 +10,7 @@
 release:
 - changelog date not respecting KACL specs
 - check https://github.com/anton-yurchenko/git-release
-- https://github.com/sean0x42/markdown-extract 
+- https://github.com/sean0x42/markdown-extract
 
 Contribution file:
 - specify where version needs to be set before adding tag to commit
