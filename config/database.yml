@@ -4,7 +4,6 @@ sqlite:
   timeout: 500
 mysql:
   adapter: mysql2
-  database: poulet 
+  database: poulet
   username:
   encoding: utf8
-
