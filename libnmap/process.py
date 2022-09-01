@@ -486,8 +486,24 @@ class NmapProcess(Thread):
 
     @staticmethod
     def __validate_target(target):
-        # See https://nmap.org/book/man-target-specification.html for all the
-        # ways targets can be specified
+        """
+        Check if a provided target is valid. This function was created
+        in order to address CVE-2022-30284
+
+        See https://nmap.org/book/man-target-specification.html for all the
+        ways targets can be specified
+
+        This function verifies the following:
+
+        - matches the user specified target against a list of allowed chars
+        - check if dashes are used at the start or at the end of target
+
+        FQDN can contain dashes anywhere except at the beginning or end
+        This check also fixes/prevents CVE-2022-30284, which depends on being
+        able to pass options such as --script as a target
+
+        :return: False if target contains forbidden characters
+        """
         allowed_characters = frozenset(
             string.ascii_letters + string.digits + "-.:/% "
         )
@@ -495,15 +511,13 @@ class NmapProcess(Thread):
             raise Exception(
                 "Target '{}' contains invalid characters".format(target)
             )
-        # FQDN can contain dashes anywhere except at the beginning or end
-        # This check also fixes/prevents CVE-2022-30284, which depends on being
-        # able to pass options such as --script as a target
         elif target.startswith("-") or target.endswith("-"):
             raise Exception(
                 "Target '{}' cannot begin or end with a dash ('-')".format(
                     target
                 )
             )
+        return True
 
     @property
     def command(self):

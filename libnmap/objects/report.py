@@ -411,6 +411,11 @@ class NmapReport(object):
         return rval
 
     def __repr__(self):
+        """
+        Returns a string-based representation of the report
+
+        :return: string
+        """
         return "{0}: started at {1} hosts up {2}/{3}".format(
             self.__class__.__name__,
             self.started,
