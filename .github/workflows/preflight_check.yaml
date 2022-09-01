@@ -28,7 +28,7 @@ jobs:
       uses: psf/black@stable
       with:
         options: "--check -l 79"
-        version: "28.8.0"
+        version: "22.8.0"
     - name: Format checker with isort
       run: isort --check-only -m 3 -l 79 --profile=black .
     - name: Lint with flake8
