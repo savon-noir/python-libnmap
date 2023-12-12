@@ -34,7 +34,9 @@ class NmapParser(object):
 
         :param incomplete: enable you to parse interrupted nmap scans \
         and/or incomplete nmap xml blocks by adding a </nmaprun> at \
-        the end of the scan.
+        the end of the scan. Be aware that this flag does not work for \
+        already valid XML files, because adding an XML tag will \
+        invalidate the XML.
         :type incomplete: boolean
 
         As of today, only XML parsing is supported.
