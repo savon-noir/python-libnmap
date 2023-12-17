@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from distutils.core import setup
+from setuptools import setup
 
 with open("README.rst", encoding="utf-8") as rfile:
     long_description = rfile.read()
