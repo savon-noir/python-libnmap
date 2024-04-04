@@ -327,6 +327,9 @@ class NmapParser(object):
             elif xh.tag == "hostscript":
                 _host_scripts = cls.__parse_host_scripts(xh)
                 _host_extras.update({"hostscript": _host_scripts})
+            elif xh.tag == "trace":
+                _trace = cls.__parse_trace(xh)
+                _host_extras.update({"trace": _trace})
             elif xh.tag in extra_tags:
                 _host_extras[xh.tag] = cls.__format_attributes(xh)
             # else:
@@ -677,6 +680,30 @@ class NmapParser(object):
                 rdict[xmltag.tag] = cls.__format_attributes(xmltag)
             else:
                 exmsg = "Unexcepted node in <runstats>: {0}".format(xmltag.tag)
+                raise NmapParserException(exmsg)
+
+        return rdict
+
+    @classmethod
+    def __parse_trace(cls, scantrace_data):
+        """
+        Private method parsing a portion of a nmap scan result.
+        Receives a <trace> XML tag.
+
+        :param scantrace_data: <trace> XML tag from a nmap scan
+        :type scantrace_data: xml.ElementTree.Element or a string
+
+        :return: python dict representing the XML trace tag
+        """
+
+        xelement = cls.__format_element(scantrace_data)
+
+        rdict = {}
+        for xmltag in xelement:
+            if xmltag.tag in ["port", "proto", "hop"]:
+                rdict[xmltag.tag] = cls.__format_attributes(xmltag)
+            else:
+                exmsg = "Unexcepted node in <trace>: {0}".format(xmltag.tag)
                 raise NmapParserException(exmsg)
 
         return rdict
