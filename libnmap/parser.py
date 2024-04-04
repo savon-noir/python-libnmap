@@ -675,7 +675,6 @@ class NmapParser(object):
         xelement = cls.__format_element(scanrunstats_data)
 
         rdict = {}
-        rdict["port"]
         for xmltag in xelement:
             if xmltag.tag in ["finished", "hosts"]:
                 rdict[xmltag.tag] = cls.__format_attributes(xmltag)
