@@ -675,6 +675,7 @@ class NmapParser(object):
         xelement = cls.__format_element(scanrunstats_data)
 
         rdict = {}
+        rdict["port"]
         for xmltag in xelement:
             if xmltag.tag in ["finished", "hosts"]:
                 rdict[xmltag.tag] = cls.__format_attributes(xmltag)
@@ -697,11 +698,15 @@ class NmapParser(object):
         """
 
         xelement = cls.__format_element(scantrace_data)
+        _trace_attrs = cls.__format_attributes(xelement)
 
         rdict = {}
+        rdict["port"] = _trace_attrs["port"]
+        rdict["proto"] = _trace_attrs["proto"]
+        rdict["hops"] = []
         for xmltag in xelement:
-            if xmltag.tag in ["port", "proto", "hop"]:
-                rdict[xmltag.tag] = cls.__format_attributes(xmltag)
+            if xmltag.tag in ["hop"]:
+                rdict["hops"].append(cls.__format_attributes(xmltag))
             else:
                 exmsg = "Unexcepted node in <trace>: {0}".format(xmltag.tag)
                 raise NmapParserException(exmsg)
