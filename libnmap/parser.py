@@ -305,6 +305,7 @@ class NmapParser(object):
             "tcpsequence",
             "ipidsequence",
             "tcptssequence",
+            "trace"
             "times",
         ]
         for xh in xelement:
