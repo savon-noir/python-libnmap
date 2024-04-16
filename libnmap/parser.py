@@ -700,11 +700,12 @@ class NmapParser(object):
         _trace_attrs = cls.__format_attributes(xelement)
 
         rdict = {}
-        if "proto" not in _trace_attrs:
-            rdict["port"] = _trace_attrs["port"]
 
-        if "port" not in _trace_attrs:
-            rdict["port"] = _trace_attrs["proto"]
+        if "proto" in _trace_attrs:
+            rdict["proto"] = _trace_attrs["proto"]
+
+        if "port" in _trace_attrs:
+            rdict["port"] = _trace_attrs["port"]
 
         rdict["hops"] = []
         for xmltag in xelement:
