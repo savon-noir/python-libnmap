@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from distutils.core import setup
 import sys
+from distutils.core import setup
 
 if sys.version_info >= (3, 0):
     with open("README.rst", encoding="utf-8") as rfile:
