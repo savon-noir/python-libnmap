@@ -2,10 +2,10 @@
 from distutils.core import setup
 import sys
 
-if sys.version_info >= (3,0):
+if sys.version_info >= (3, 0):
     with open("README.rst", encoding="utf-8") as rfile:
         long_description = rfile.read()
-else: # encoding not compatible with python2
+else:  # encoding not compatible with python2
     with open("README.rst") as rfile:
         long_description = rfile.read()
 

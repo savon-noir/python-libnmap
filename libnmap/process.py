@@ -20,7 +20,6 @@ __all__ = ["NmapProcess"]
 
 
 class NmapTask(object):
-
     """
     NmapTask is a internal class used by process. Each time nmap
     starts a new task during the scan, a new class will be instantiated.
@@ -46,7 +45,6 @@ class NmapTask(object):
 
 
 class NmapProcess(Thread):
-
     """
     NmapProcess is a class which wraps around the nmap executable.
 

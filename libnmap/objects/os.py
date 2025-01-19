@@ -89,7 +89,6 @@ class NmapOSMatch(object):
             pass
 
     def add_osclass(self, osclass_obj):
-
         """
         Add a NmapOSClass object to the OSMatch object. This method is
         useful to implement compatibility with older versions of NMAP
