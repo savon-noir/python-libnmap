@@ -10,14 +10,14 @@ from libnmap.parser import NmapParser, NmapParserException
 class TestExtraPorts(unittest.TestCase):
     def setUp(self):
         fdir = os.path.dirname(os.path.realpath(__file__))
-        _extrareason = [
+        _extrareasons = [
             {"reason": "filtered", "count": "3"},
             {"reason": "resets", "count": "7"},
         ]
         self.flist = [
             {
                 "path": "%s/%s" % (fdir, "files/extra_ports.xml"),
-                "extrareason": _extrareason,
+                "extrareasons": _extrareasons,
             }
         ]
 
@@ -26,12 +26,14 @@ class TestExtraPorts(unittest.TestCase):
             rep1 = NmapParser.parse_fromfile(fentry["path"])
             ep_list = rep1.hosts[0].extraports
             self.assertEqual(len(ep_list), 2)
-            self.assertEqual(ep_list[0].extra_count, 65509)
-            self.assertEqual(ep_list[0].extra_state, "closed")
-            self.assertEqual(len(ep_list[0].extra_reasons), 1)
-            self.assertEqual(ep_list[1].extra_count, 10)
-            self.assertEqual(len(ep_list[1].extra_reasons), 2)
-            self.assertEqual(ep_list[1].extra_reasons, fentry["extrareason"])
+            self.assertEqual(ep_list[0]["count"], "65509")
+            self.assertEqual(ep_list[0]["state"], "closed")
+            self.assertEqual(len(ep_list[0]["extrareasons"]), 1)
+            self.assertEqual(ep_list[1]["count"], "10")
+            self.assertEqual(len(ep_list[1]["extrareasons"]), 2)
+            self.assertEqual(
+                ep_list[1]["extrareasons"], fentry["extrareasons"]
+            )
 
 
 if __name__ == "__main__":

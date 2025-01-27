@@ -11,7 +11,7 @@ except ImportError:
 
 from xml.etree.ElementTree import iselement as et_iselement
 
-from libnmap.objects import NmapExtraPort, NmapHost, NmapReport, NmapService
+from libnmap.objects import NmapHost, NmapReport, NmapService
 
 
 class NmapParser(object):
@@ -469,9 +469,9 @@ class NmapParser(object):
         :param extraports_data: XML data for extraports
         :type extraports_data: xml.ElementTree.Element or a string
 
-        :return: python dict with following keys: state, count, reason
+        :return: python dict with following keys: state, count, reasons
         """
-        rdict = {"state": "", "count": "", "reasons": []}
+        rdict = {"state": "", "count": "", "extrareasons": []}
         xelement = cls.__format_element(extraports_data)
         extraports_dict = cls.__format_attributes(xelement)
 
@@ -480,9 +480,8 @@ class NmapParser(object):
         for xelt in xelement:
             if xelt.tag == "extrareasons":
                 extrareasons_dict = cls.__format_attributes(xelt)
-                rdict["reasons"].append(extrareasons_dict)
-        robj = NmapExtraPort(rdict)
-        return robj
+                rdict["extrareasons"].append(extrareasons_dict)
+        return rdict
 
     @classmethod
     def __parse_script_table(cls, script_table):
