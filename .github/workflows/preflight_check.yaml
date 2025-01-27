@@ -28,7 +28,7 @@ jobs:
       uses: psf/black@stable
       with:
         options: "--check -l 79 --exclude docs/"
-        version: "22.8.0"
+        version: "24.3.0"
     - name: Format checker with isort
       run: isort --check-only -m 3 -l 79 --profile=black .
     - name: Lint with flake8
@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10"]
+        python-version: ["3.8", "3.9", "3.10"]
     steps:
     - uses: actions/checkout@v4
     - name: Setup Python ${{ matrix.python-version }}
