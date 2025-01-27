@@ -391,10 +391,6 @@ class NmapParser(object):
             elif xservice.tag == "extraports":
                 extraports = cls.__parse_extraports(xservice)
                 rdict['extraports'].append(extraports)
-            # DEBUG REMOVE ME    
-            else:
-               print "struct port unknown attr: %s value: %s" %
-                      (h.tag, h.get(h.tag))
         return rdict
 
     @classmethod
@@ -477,10 +473,8 @@ class NmapParser(object):
         xelement = cls.__format_element(extraports_data)
         extraports_dict = cls.__format_attributes(xelement)
 
-        if "state" in extraports_dict:
-            rdict["state"] = extraports_dict
-        if "count" in extraports_dict:
-            rdict["count"] = extraports_dict
+        rdict["state"] = extraports_dict.get("state", None)
+        rdict["count"] = extraports_dict.get("count", None)
         for xelt in xelement:
             if xelt.tag == "extrareasons":
                 extrareasons_dict = cls.__format_attributes(xelt)

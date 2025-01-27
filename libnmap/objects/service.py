@@ -388,7 +388,7 @@ class NmapExtraPort(object):
         self._reasons = xdict.get('reasons', [])
 
     @property
-    def count(self):
+    def extra_count(self):
         """
            Accessor for the number of extraports
 
@@ -397,7 +397,7 @@ class NmapExtraPort(object):
         return int(self._count)
 
     @property
-    def state(self):
+    def extra_state(self):
         """
            Accessor for the state of extraports listed
 
@@ -406,11 +406,11 @@ class NmapExtraPort(object):
         return self._state
 
     @property
-    def reason(self):
+    def extra_reasons(self):
         """
            Return the first reason available for the extraport listed.
 
            :return: dict, empty if no extraports reason available
         """
 
-        return self.reasons[0] if len(self.reasons) else {}
+        return self._reasons
