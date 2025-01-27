@@ -1,24 +1,34 @@
 exclude: ^(test/|.tox/|docs)
 repos:
--   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.3.0
-    hooks:
-    - id: check-yaml
-    - id: end-of-file-fixer
-    - id: trailing-whitespace
--   repo: https://github.com/psf/black
-    rev: 24.3.0
-    hooks:
-    - id: black
-      args: [--line-length=79]
-      files: ^libnmap
--   repo: https://github.com/pre-commit/mirrors-isort
-    rev: v5.6.4
-    hooks:
-    - id: isort
-      args: [--multi-line=3, --line-length=79, --profile=black]
--   repo: https://gitlab.com/pycqa/flake8
-    rev: 3.8.4
-    hooks:
-    - id: flake8
-      exclude: ^libnmap/(test/|docs/|examples/)
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v2.3.0
+  hooks:
+  - id: check-yaml
+  - id: end-of-file-fixer
+  - id: trailing-whitespace
+- repo: https://github.com/psf/black
+  rev: 24.3.0
+  hooks:
+  - id: black
+    args: [--line-length=79]
+    files: ^libnmap
+- repo: https://github.com/pre-commit/mirrors-isort
+  rev: v5.6.4
+  hooks:
+  - id: isort
+    args: [--multi-line=3, --line-length=79, --profile=black]
+- repo: https://gitlab.com/pycqa/flake8
+  rev: 3.8.4
+  hooks:
+  - id: flake8
+    exclude: ^libnmap/(test/|docs/|examples/)
+- repo: local
+  hooks:
+  - id: pytest-check
+    name: pytest-check
+    stages: [pre-commit]
+    types: [python]
+    entry: pytest --cov=libnmap/ --ignore=libnmap/test/test_backend_plugin_factory.py
+    language: system
+    pass_filenames: false
+    always_run: true

@@ -465,9 +465,10 @@ class NmapHost(object):
     @property
     def extraports(self):
         """
-        Returns a list of NmapExtraPort objects
+        Returns a list of extraport dict with
+        with struct { count: "123", state: "filtered, extrareasons: [{}] }
 
-        :return: list of NmapExtraPort objects
+        :return: list of extraport dict
         """
         return self._extraports
 
