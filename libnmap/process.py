@@ -325,6 +325,11 @@ class NmapProcess(Thread):
         # Call the callback one last time to signal the new state
         if self.__nmap_event_callback:
             self.__nmap_event_callback(self)
+
+        # Close I/O handlers before exiting
+        self.__nmap_proc.stdout.close()
+        self.__nmap_proc.stderr.close()
+
         return self.rc
 
     def run_background(self):
