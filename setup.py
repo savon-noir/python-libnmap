@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
+
 try:
     from setuptools import setup
 except ImportError:
