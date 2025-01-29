@@ -96,7 +96,8 @@ class NmapParser(object):
                 "wrong nmap_data type given as argument: cannot parse data"
             )
 
-        if incomplete is True:
+        last_line = [i for i in nmap_data.split("\n") if i][-1]
+        if incomplete is True and not last_line.endswith("</nmaprun>"):
             nmap_data += "</nmaprun>"
 
         try:
