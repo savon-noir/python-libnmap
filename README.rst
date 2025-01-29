@@ -115,14 +115,6 @@ You can install libnmap via pip:
 
    ronald@brouette:~$ pip install python-libnmap
 
-or via git and dist utils (à l’ancienne):
-
-.. code:: bash
-
-   ronald@brouette:~$ git clone https://github.com/savon-noir/python-libnmap.git
-   ronald@brouette:~$ cd python-libnmap
-   ronald@brouette:~$ python setup.py install
-
 or via git and pip:
 
 .. code:: bash
@@ -130,6 +122,15 @@ or via git and pip:
    ronald@brouette:~$ git clone https://github.com/savon-noir/python-libnmap.git
    ronald@brouette:~$ cd python-libnmap
    ronald@brouette:~$ pip install .
+
+or via git and dist utils (à l’ancienne/deprecated):
+
+.. code:: bash
+
+   ronald@brouette:~$ git clone https://github.com/savon-noir/python-libnmap.git
+   ronald@brouette:~$ cd python-libnmap
+   ronald@brouette:~$ python setup.py install
+
 
 Examples
 --------
