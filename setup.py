@@ -5,11 +5,10 @@ try:
 except ImportError:
     from distutils.core import setup
 
-
 if sys.version_info >= (3, 0):
     with open("README.rst", encoding="utf-8") as rfile:
         long_description = rfile.read()
-else:  # encoding not compatible with python2
+else:  # if encoding not compatible with python2
     with open("README.rst") as rfile:
         long_description = rfile.read()
 
@@ -42,6 +41,8 @@ setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Topic :: System :: Networking",
     ],
 )
